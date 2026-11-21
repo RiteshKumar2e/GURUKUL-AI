@@ -17,37 +17,49 @@ A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), built f
 ## Project structure
 
 ```
-frontend/   React 18 + Vite + TypeScript + Tailwind (PWA)
-backend/    Node.js + Express + TypeScript + Prisma
-  src/        config/, routes/, controllers/, services/{ai,tutor,vision,voice,adaptive-learning,sync}, repositories/, middleware/, validators/, utils/
-  prisma/     schema.prisma, migrations/, seed.ts
+frontend/   React 18 + Vite + TypeScript + Tailwind (PWA), deployed on Vercel (vercel.json)
+backend/    Node.js + Express + TypeScript + Drizzle ORM + Turso (libSQL)
+  src/        config/, db/ (schema.ts, client.ts), routes/, controllers/, services/, repositories/, middleware/, validators/, utils/
+  drizzle/    SQL migrations generated from src/db/schema.ts
+  scripts/    migrate.ts, seed.ts, db-check.ts
   content/    class9-maths.json  (editable lessons and questions, with source notes)
-  tests/      Vitest + Supertest tests
-docker-compose.yml   local PostgreSQL 16 (host port 5433)
+  tests/      Vitest + Supertest tests (run on a throwaway database)
 ```
 
 There is no root `package.json`. Install and run each app from its own folder.
 
 ## Requirements
 
-- Node.js 20 or newer (the author reports testing on 22.12).
-- PostgreSQL 14 or newer. Docker Compose is the easiest route (see below).
+- Node.js 20 or newer (tested on 22.12).
+- A [Turso](https://turso.tech) database. There is no local database: the backend always talks to Turso.
+
+## Database: Turso setup
+
+1. Install the CLI and sign in: `npm i -g @tursodatabase/cli` (or see turso.tech/docs), then `turso auth login`.
+2. Create a database close to your users: `turso db create gurukul-ai --location aws-ap-south-1`.
+3. Get the URL: `turso db show gurukul-ai --url` (looks like `libsql://gurukul-ai-<org>.turso.io`).
+4. Create a token: `turso db tokens create gurukul-ai`.
+5. Put both in `backend/.env` as `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. They stay on the server: the browser never sees them.
+6. Check the connection (read-only): `npm run db:check`.
+7. Create the tables: `npm run db:migrate`.
+8. Load curriculum and the synthetic demo accounts: `npm run db:seed` (`SEED_DEMO=false` skips the demo accounts).
+
+**Migrations are safe by design.** `db:migrate` applies only migrations that are not yet recorded in `__drizzle_migrations`. It refuses to run any migration that contains `DROP TABLE`, `DROP COLUMN`, `DELETE FROM` or a table rebuild unless you set `ALLOW_DESTRUCTIVE_MIGRATION=true` after taking a backup (`turso db shell gurukul-ai .dump > backup.sql`). Nothing in the project resets the database.
+
+**Changing the schema:** edit `src/db/schema.ts`, run `npm run db:generate` to create a new SQL file in `drizzle/`, review it, then `npm run db:migrate`.
 
 ## Local setup
 
 Use two terminals.
 
 ```bash
-# From the project root: start PostgreSQL on localhost:5433
-docker compose up -d db
-
 # Terminal 1: backend (API on http://localhost:5000)
 cd backend
 cp .env.example .env          # Windows: copy .env.example .env
-# edit backend/.env (see Environment below)
+# fill in TURSO_DATABASE_URL, TURSO_AUTH_TOKEN, JWT secrets (see Environment below)
 npm install
-npm run db:migrate            # first time only: create tables
-npm run db:seed               # first time only: lessons, questions, synthetic demo accounts
+npm run db:migrate            # first time only
+npm run db:seed               # first time only
 npm run dev
 
 # Terminal 2: frontend (web app on http://localhost:5173)
@@ -67,8 +79,6 @@ Demo accounts hold **synthetic** data only. The password is `Demo@1234` for all 
 | `demo.parent` | Parent linked to the demo student |
 | `demo.teacher` | Teacher linked to the demo student |
 
-To seed without demo accounts, set `SEED_DEMO=false` before `npm run db:seed`.
-
 ## Scripts
 
 Run these inside `backend/` or `frontend/`.
@@ -76,14 +86,18 @@ Run these inside `backend/` or `frontend/`.
 | Command | Backend | Frontend |
 |---|---|---|
 | `npm run dev` | `tsx watch src/server.ts` | `vite` |
-| `npm run build` | `prisma generate` + `tsc` | `tsc -b` + `vite build` |
-| `npm run lint` | `tsc --noEmit` | `tsc -b --noEmit` |
-| `npm run test` | `vitest run` (API tests need the database) | `vitest run` |
+| `npm run build` | `tsc` | `tsc -b` + `vite build` |
+| `npm run lint` | `tsc --noEmit` (src, scripts and tests) | `tsc -b --noEmit` |
+| `npm run test` | `vitest run` on a throwaway temp database | `vitest run` |
 | `npm start` | `node dist/server.js` | — |
 | `npm run preview` | — | `vite preview` (service worker active, port 4173) |
-| `npm run db:migrate` / `db:deploy` / `db:seed` / `db:reset` | Prisma dev migrate / deploy / seed / reset | — |
+| `npm run db:check` | Read-only connection and table check | — |
+| `npm run db:migrate` | Apply pending migrations (non-destructive) | — |
+| `npm run db:seed` | Upsert curriculum + replace the 3 demo accounts | — |
+| `npm run db:generate` | Create a migration from `src/db/schema.ts` | — |
+| `npm run db:studio` | Drizzle Studio (browse data) | — |
 
-On Windows, stop the backend dev server before `npm run build`, because the Prisma client file may be locked.
+Backend tests never use the Turso database in `.env`: `tests/globalSetup.ts` creates a temporary libSQL file in the OS temp folder, migrates and seeds it, and deletes it afterwards.
 
 ## Environment
 
@@ -93,13 +107,14 @@ Each app has its own `.env`, created from its `.env.example`. Real `.env` files 
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
-| `DATABASE_URL` | yes | — | PostgreSQL connection string |
+| `TURSO_DATABASE_URL` | yes | — | `libsql://<db>-<org>.turso.io` |
+| `TURSO_AUTH_TOKEN` | yes | — | From `turso db tokens create <db>`. Server-side only |
 | `JWT_SECRET` | yes | — | At least 32 characters |
 | `JWT_REFRESH_SECRET` | yes | — | At least 32 characters; must differ from `JWT_SECRET` |
 | `ACCESS_TOKEN_TTL` | no | `15m` | Access token lifetime |
 | `REFRESH_TOKEN_TTL_DAYS` | no | `7` | Refresh token lifetime |
 | `PORT` | no | `5000` | |
-| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed CORS origin(s), comma-separated |
+| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed CORS origin(s), comma-separated, e.g. `http://localhost:5173,https://gurukul-ai.vercel.app` |
 | `UPLOAD_DIR` | no | `uploads` | Temporary upload folder; files are deleted after processing |
 | `MAX_UPLOAD_MB` | no | `6` | Upload size limit |
 | `COOKIE_SECURE` | no | off | `true` in production over HTTPS |
@@ -191,12 +206,27 @@ To verify on your own machine, run `npm run lint`, `npm run test` and `npm run b
 
 Groq retires models over time. The defaults above were chosen because the older ones were no longer available on the development key. To see what your key can use, call `GET https://api.groq.com/openai/v1/models` with your key. Check the IDs at https://console.groq.com/docs/models.
 
-## Production notes
+## Deployment
 
-- **Database:** `npm --prefix backend run db:deploy`, then `npm --prefix backend run db:seed`. Set `SEED_DEMO=false` to skip demo accounts.
-- **Backend:** `npm --prefix backend run build && npm --prefix backend start`. Behind a proxy set `NODE_ENV=production`, `TRUST_PROXY=true`, `ENFORCE_HTTPS=true` and `COOKIE_SECURE=true`.
-- **Frontend:** `npm --prefix frontend run build` writes `frontend/dist`. Deploy it as a static site with SPA fallback to `index.html`. Set `VITE_SITE_URL` and `VITE_API_URL` before building. The build also writes `sitemap.xml`, `robots.txt` and the service worker precache list.
-- Serve over HTTPS. Browsers allow service workers, microphone access and camera capture only on secure origins.
+**Frontend (Vercel).** Import the repository, set **Root Directory** to `frontend`. `frontend/vercel.json` sets the build (`npm run build`, output `dist`), the SPA fallback to `index.html`, long caching for hashed assets, no caching for `sw.js` and `index.html`, and security headers. In Vercel → Settings → Environment Variables set:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_URL` | Your **deployed** backend, e.g. `https://<backend-host>/api` (not `localhost`) |
+| `VITE_SITE_URL` | `https://gurukul-ai.vercel.app` |
+| `VITE_APP_NAME` | `GURUKUL AI` |
+
+Redeploy after changing them: Vite bakes these values in at build time.
+
+**Backend (any Node host, e.g. Render, Railway, Fly.io).** Root directory `backend`, build `npm ci && npm run build`, start `npm run db:migrate && npm start`. Set the variables from `backend/.env.example`, plus:
+
+- `NODE_ENV=production`, `TRUST_PROXY=true`, `ENFORCE_HTTPS=true`, `COOKIE_SECURE=true`
+- `COOKIE_SAMESITE=none`, because the frontend (vercel.app) and the API are on different sites; without it the login refresh cookie is not sent
+- `FRONTEND_URL=https://gurukul-ai.vercel.app`
+
+`GET /api/health` reports `db` (`up`/`down`), whether migrations are applied and the AI mode. It never includes credentials.
+
+Serve everything over HTTPS. Browsers allow service workers, microphone access and camera capture only on secure origins.
 
 ## API
 
