@@ -1,4 +1,4 @@
-import type { AnswerOrigin, Question, RecommendationKind } from '@prisma/client';
+import type { AnswerOrigin, Question, RecommendationKind } from '../../db/schema';
 import { learningRepository } from '../../repositories/learningRepository';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
 import { gradeAnswer } from '../../utils/grading';

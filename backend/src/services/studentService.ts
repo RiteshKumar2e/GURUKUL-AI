@@ -1,5 +1,6 @@
-import type { TeachingLevel } from '@prisma/client';
-import { prisma } from '../config/prisma';
+import { eq } from 'drizzle-orm';
+import { db, isUniqueViolation } from '../db/client';
+import { studentProfiles, type TeachingLevel } from '../db/schema';
 import { guardianRepository } from '../repositories/guardianRepository';
 import { learningRepository } from '../repositories/learningRepository';
 import { notFound } from '../utils/errors';
@@ -8,7 +9,7 @@ import { progressService } from './progressService';
 
 export const studentService = {
   async profile(studentId: string) {
-    const s = await prisma.studentProfile.findUnique({ where: { id: studentId }, include: { user: { select: { displayName: true, preferredLanguage: true, username: true } } } });
+    const s = await db.query.studentProfiles.findFirst({ where: eq(studentProfiles.id, studentId), with: { user: { columns: { displayName: true, preferredLanguage: true, username: true } } } });
     if (!s) throw notFound('Student profile not found.');
     const guardians = await guardianRepository.linkedGuardians(studentId);
     return {
@@ -30,17 +31,18 @@ export const studentService = {
   },
 
   async update(studentId: string, data: { district?: string | null; teachingLevel?: TeachingLevel; dailyGoalMinutes?: number; onboardingDone?: boolean }) {
-    await prisma.studentProfile.update({ where: { id: studentId }, data });
+    if (Object.keys(data).length) await db.update(studentProfiles).set(data).where(eq(studentProfiles.id, studentId));
     return this.profile(studentId);
   },
 
   async rotateLinkCode(studentId: string) {
     for (let i = 0; i < 5; i++) {
       try {
-        const s = await prisma.studentProfile.update({ where: { id: studentId }, data: { linkCode: generateLinkCode() } });
+        const [s] = await db.update(studentProfiles).set({ linkCode: generateLinkCode() }).where(eq(studentProfiles.id, studentId)).returning({ linkCode: studentProfiles.linkCode });
+        if (!s) throw notFound('Student profile not found.');
         return { linkCode: s.linkCode };
-      } catch {
-        /* collision: retry */
+      } catch (err) {
+        if (!isUniqueViolation(err, 'link_code')) throw err; // only a code collision is retried
       }
     }
     throw new Error('Could not generate a new code');

@@ -1,4 +1,4 @@
-import type { Question } from '@prisma/client';
+import type { Question } from '../db/schema';
 import { curriculumRepository } from '../repositories/curriculumRepository';
 import { learningRepository } from '../repositories/learningRepository';
 import { adaptiveService } from './adaptive-learning/adaptiveService';

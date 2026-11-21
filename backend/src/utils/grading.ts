@@ -1,4 +1,4 @@
-import type { QuestionType } from '@prisma/client';
+import type { QuestionType } from '../db/schema';
 import { numbersMatch, parseNumericAnswer } from './math';
 
 export function gradeAnswer(type: QuestionType, correctAnswer: string, given: string): boolean {

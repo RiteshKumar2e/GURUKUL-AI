@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
+import { dbErrorInfo, isForeignKeyViolation, isUniqueViolation } from '../db/client';
 import multer from 'multer';
 import { AppError } from '../utils/errors';
 import { env } from '../config/env';
@@ -17,9 +17,11 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     const message = err.code === 'LIMIT_FILE_SIZE' ? `File is too large (max ${env.MAX_UPLOAD_MB} MB).` : 'Upload failed.';
     return res.status(400).json({ error: { code: 'UPLOAD_ERROR', message } });
   }
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    if (err.code === 'P2002') return res.status(409).json({ error: { code: 'CONFLICT', message: 'This already exists.' } });
-    if (err.code === 'P2025') return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Not found.' } });
+  if (isUniqueViolation(err)) return res.status(409).json({ error: { code: 'CONFLICT', message: 'This already exists.' } });
+  if (isForeignKeyViolation(err)) return res.status(400).json({ error: { code: 'INVALID_REFERENCE', message: 'A referenced item does not exist.' } });
+  if (dbErrorInfo(err) || /fetch failed|ECONNREFUSED|ETIMEDOUT/i.test(String((err as Error)?.message))) {
+    console.error(`[db] ${req.method} ${req.originalUrl}`, dbErrorInfo(err)?.code ?? (err as Error).message);
+    return res.status(503).json({ error: { code: 'DB_UNAVAILABLE', message: 'The database is not reachable right now. Please try again shortly.' } });
   }
   if (err instanceof SyntaxError && 'body' in (err as object)) {
     return res.status(400).json({ error: { code: 'BAD_JSON', message: 'Request body is not valid JSON.' } });

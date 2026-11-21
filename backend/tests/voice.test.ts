@@ -11,7 +11,7 @@ import { buildWav, concatWav, parseWav } from '../src/services/speech/wav';
 import { GeminiProvider } from '../src/services/llm/geminiProvider';
 import { getSttProvider, getTtsProvider, getLlmProvider, resetVoiceProvidersForTests } from '../src/services/voice/registry';
 import { createApp } from '../src/app';
-import { prisma } from '../src/config/prisma';
+import { deleteUsersWithPrefix } from './helpers';
 
 function wav(samples: number[]) {
   const fmt = Buffer.alloc(16);
@@ -167,8 +167,7 @@ describe('voice API (no keys configured)', () => {
     token = res.body.accessToken;
   });
   afterAll(async () => {
-    await prisma.user.deleteMany({ where: { username: { startsWith: `${prefix}_` } } });
-    await prisma.$disconnect();
+    await deleteUsersWithPrefix(prefix);
   });
 
   it('reports capabilities including Telugu', async () => {

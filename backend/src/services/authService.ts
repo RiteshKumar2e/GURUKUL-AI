@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
-import type { Language, Role } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { Language, Role } from '../db/schema';
+import { isUniqueViolation } from '../db/client';
 import { userRepository } from '../repositories/userRepository';
 import { conflict, unauthorized, badRequest } from '../utils/errors';
 import { createRefreshToken, generateLinkCode, hashRefreshToken, refreshExpiry, signAccessToken } from '../utils/tokens';
@@ -51,11 +51,10 @@ export const authService = {
         return { user, ...tokens };
       } catch (err) {
         // retry only on a link-code collision; surface everything else
-        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-          const target = String((err.meta as { target?: unknown })?.target ?? '');
-          if (target.includes('email')) throw conflict('This email is already registered.');
-          if (target.includes('username')) throw conflict('This username is already taken. Try another one.');
-          lastErr = err;
+        if (isUniqueViolation(err)) {
+          if (isUniqueViolation(err, 'users.email')) throw conflict('This email is already registered.');
+          if (isUniqueViolation(err, 'users.username')) throw conflict('This username is already taken. Try another one.');
+          lastErr = err; // link-code collision: try a new code
           continue;
         }
         throw err;

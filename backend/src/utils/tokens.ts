@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import type { Role } from '@prisma/client';
+import type { Role } from '../db/schema';
 import { env } from '../config/env';
 
 export interface AccessPayload {

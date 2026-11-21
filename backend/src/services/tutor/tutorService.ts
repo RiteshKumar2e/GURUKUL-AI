@@ -1,6 +1,8 @@
 import { z } from 'zod';
-import type { ConversationMode, Prisma } from '@prisma/client';
-import { prisma } from '../../config/prisma';
+import { eq } from 'drizzle-orm';
+import type { ConversationMode } from '../../db/schema';
+import { studentProfiles } from '../../db/schema';
+import { db } from '../../db/client';
 import { tutorRepository } from '../../repositories/tutorRepository';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
 import { badRequest, notFound, unavailable } from '../../utils/errors';
@@ -89,7 +91,7 @@ function extractJson(text: string): unknown {
   }
 }
 
-function lessonContext(lesson: { content: Prisma.JsonValue } | undefined, title: string) {
+function lessonContext(lesson: { content: unknown } | undefined, title: string) {
   if (!lesson || !Array.isArray(lesson.content)) return undefined;
   const lines = (lesson.content as Array<{ kind: string; hi?: string; en?: string }>).map((b) => `- ${b.en ?? ''}`).join('\n');
   return `Topic: ${title}\n${lines}`.slice(0, 2500);
@@ -165,13 +167,13 @@ export const tutorService = {
     const content = input.content.trim();
     if (!content) throw badRequest('Please type a question.');
 
-    const student = await prisma.studentProfile.findUnique({ where: { id: studentId }, include: { user: { select: { preferredLanguage: true } } } });
+    const student = await db.query.studentProfiles.findFirst({ where: eq(studentProfiles.id, studentId), with: { user: { columns: { preferredLanguage: true } } } });
     const language: TutorLanguage = input.language ?? student?.user.preferredLanguage ?? 'HI';
     const topic = conversation.topicId ? await curriculumRepository.topicById(conversation.topicId) : null;
 
     const userMsg = await tutorRepository.addMessage({ conversationId, role: 'USER', content });
     if (conversation.messages.length === 0 && conversation.title === 'नया सवाल') {
-      await prisma.tutorConversation.update({ where: { id: conversationId }, data: { title: content.slice(0, 70) } });
+      await tutorRepository.setTitle(conversationId, content.slice(0, 70));
     }
 
     const provider = getLlmProvider();
@@ -212,7 +214,7 @@ export const tutorService = {
         }
       } catch (err) {
         if (err instanceof AIProviderError) {
-          await prisma.tutorMessage.delete({ where: { id: userMsg.id } }).catch(() => undefined);
+          await tutorRepository.deleteMessage(userMsg.id).catch(() => undefined);
           console.warn(`[tutor] provider error: ${err.message}`);
           throw unavailable(MSG.unavailable[language]);
         }
@@ -224,7 +226,7 @@ export const tutorService = {
       conversationId,
       role: 'ASSISTANT',
       content: renderPlain(structured),
-      structured: structured as unknown as Prisma.InputJsonValue,
+      structured,
       provider: provider.name,
       model,
       verification: structured.verification,

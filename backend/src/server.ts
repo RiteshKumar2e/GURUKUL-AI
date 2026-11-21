@@ -1,9 +1,11 @@
 import { env } from './config/env';
-import { prisma } from './config/prisma';
+import { closeDatabase, initDatabase } from './db/client';
 import { createApp } from './app';
 import { aiStatus } from './services/ai';
 
 const app = createApp();
+
+void initDatabase();
 
 const server = app.listen(env.PORT, () => {
   const ai = aiStatus();
@@ -14,7 +16,7 @@ const server = app.listen(env.PORT, () => {
 async function shutdown(signal: string) {
   console.log(`${signal} received, shutting down`);
   server.close(async () => {
-    await prisma.$disconnect();
+    closeDatabase();
     process.exit(0);
   });
   setTimeout(() => process.exit(1), 10_000).unref();

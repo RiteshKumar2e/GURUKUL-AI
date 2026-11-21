@@ -1,8 +1,11 @@
-import type { Role } from '@prisma/client';
+import { eq } from 'drizzle-orm';
+import type { Role } from '../db/schema';
+import { studentProfiles } from '../db/schema';
+import { db } from '../db/client';
+import { tutorRepository } from '../repositories/tutorRepository';
 import { guardianRepository } from '../repositories/guardianRepository';
 import { badRequest, forbidden, notFound } from '../utils/errors';
 import { progressService } from './progressService';
-import { prisma } from '../config/prisma';
 
 async function profileId(userId: string, role: Role) {
   const id = await guardianRepository.profileIdFor(userId, role);
@@ -50,10 +53,10 @@ export const guardianService = {
     const pid = await profileId(userId, role);
     if (!(await guardianRepository.isLinked(role, pid, studentId))) throw notFound('Student not found.');
     const [student, overview, activity, tutorCount] = await Promise.all([
-      prisma.studentProfile.findUnique({ where: { id: studentId }, select: { classLevel: true, board: true, district: true, user: { select: { displayName: true } } } }),
+      db.query.studentProfiles.findFirst({ where: eq(studentProfiles.id, studentId), columns: { classLevel: true, board: true, district: true }, with: { user: { columns: { displayName: true } } } }),
       progressService.overview(studentId),
       progressService.activity(studentId),
-      prisma.tutorConversation.count({ where: { studentId } }),
+      tutorRepository.countForStudent(studentId),
     ]);
     return {
       student: { id: studentId, displayName: student!.user.displayName, classLevel: student!.classLevel, board: student!.board, district: student!.district },

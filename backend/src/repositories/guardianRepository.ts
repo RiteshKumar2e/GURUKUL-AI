@@ -1,61 +1,61 @@
-import type { Role } from '@prisma/client';
-import { prisma } from '../config/prisma';
+import { and, eq, inArray } from 'drizzle-orm';
+import { db } from '../db/client';
+import { parentProfiles, studentParents, studentProfiles, studentTeachers, teacherProfiles, type Role } from '../db/schema';
 
 /** Parents and teachers are both "guardians" for access-control purposes. */
 export const guardianRepository = {
   profileIdFor: async (userId: string, role: Role): Promise<string | null> => {
-    if (role === 'PARENT') return (await prisma.parentProfile.findUnique({ where: { userId } }))?.id ?? null;
-    if (role === 'TEACHER') return (await prisma.teacherProfile.findUnique({ where: { userId } }))?.id ?? null;
+    if (role === 'PARENT') return (await db.query.parentProfiles.findFirst({ where: eq(parentProfiles.userId, userId), columns: { id: true } }))?.id ?? null;
+    if (role === 'TEACHER') return (await db.query.teacherProfiles.findFirst({ where: eq(teacherProfiles.userId, userId), columns: { id: true } }))?.id ?? null;
     return null;
   },
 
-  studentByLinkCode: (linkCode: string) =>
-    prisma.studentProfile.findUnique({ where: { linkCode }, include: { user: { select: { displayName: true } } } }),
+  studentByLinkCode: async (linkCode: string) =>
+    (await db.query.studentProfiles.findFirst({ where: eq(studentProfiles.linkCode, linkCode), with: { user: { columns: { displayName: true } } } })) ?? null,
 
+  /** Idempotent: linking twice is not an error (unique index + DO NOTHING). */
   link: (role: Role, profileId: string, studentId: string) =>
     role === 'PARENT'
-      ? prisma.studentParent.upsert({
-          where: { studentId_parentId: { studentId, parentId: profileId } },
-          create: { studentId, parentId: profileId },
-          update: {},
-        })
-      : prisma.studentTeacher.upsert({
-          where: { studentId_teacherId: { studentId, teacherId: profileId } },
-          create: { studentId, teacherId: profileId },
-          update: {},
-        }),
+      ? db.insert(studentParents).values({ studentId, parentId: profileId }).onConflictDoNothing()
+      : db.insert(studentTeachers).values({ studentId, teacherId: profileId }).onConflictDoNothing(),
 
   unlink: (role: Role, profileId: string, studentId: string) =>
     role === 'PARENT'
-      ? prisma.studentParent.deleteMany({ where: { studentId, parentId: profileId } })
-      : prisma.studentTeacher.deleteMany({ where: { studentId, teacherId: profileId } }),
+      ? db.delete(studentParents).where(and(eq(studentParents.studentId, studentId), eq(studentParents.parentId, profileId)))
+      : db.delete(studentTeachers).where(and(eq(studentTeachers.studentId, studentId), eq(studentTeachers.teacherId, profileId))),
 
   isLinked: async (role: Role, profileId: string, studentId: string) => {
-    if (role === 'PARENT') return !!(await prisma.studentParent.findUnique({ where: { studentId_parentId: { studentId, parentId: profileId } } }));
-    return !!(await prisma.studentTeacher.findUnique({ where: { studentId_teacherId: { studentId, teacherId: profileId } } }));
+    if (role === 'PARENT')
+      return !!(await db.query.studentParents.findFirst({ where: and(eq(studentParents.studentId, studentId), eq(studentParents.parentId, profileId)), columns: { id: true } }));
+    return !!(await db.query.studentTeachers.findFirst({ where: and(eq(studentTeachers.studentId, studentId), eq(studentTeachers.teacherId, profileId)), columns: { id: true } }));
   },
 
-  linkedStudents: (role: Role, profileId: string) => {
-    const where = role === 'PARENT' ? { parents: { some: { parentId: profileId } } } : { teachers: { some: { teacherId: profileId } } };
-    return prisma.studentProfile.findMany({
-      where,
-      select: {
-        id: true,
-        classLevel: true,
-        board: true,
-        district: true,
-        user: { select: { displayName: true } },
-        progress: { select: { mastery: true, attempts: true, correct: true, lastActivityAt: true } },
+  linkedStudents: async (role: Role, profileId: string) => {
+    const links =
+      role === 'PARENT'
+        ? await db.select({ studentId: studentParents.studentId }).from(studentParents).where(eq(studentParents.parentId, profileId))
+        : await db.select({ studentId: studentTeachers.studentId }).from(studentTeachers).where(eq(studentTeachers.teacherId, profileId));
+    if (!links.length) return [];
+    return db.query.studentProfiles.findMany({
+      where: inArray(
+        studentProfiles.id,
+        links.map((l) => l.studentId),
+      ),
+      columns: { id: true, classLevel: true, board: true, district: true },
+      with: {
+        user: { columns: { displayName: true } },
+        progress: { columns: { mastery: true, attempts: true, correct: true, lastActivityAt: true } },
       },
     });
   },
 
-  linkedGuardians: (studentId: string) =>
-    prisma.studentProfile.findUnique({
-      where: { id: studentId },
-      select: {
-        parents: { select: { parent: { select: { user: { select: { displayName: true } } } }, createdAt: true } },
-        teachers: { select: { teacher: { select: { schoolName: true, user: { select: { displayName: true } } } }, createdAt: true } },
+  linkedGuardians: async (studentId: string) =>
+    (await db.query.studentProfiles.findFirst({
+      where: eq(studentProfiles.id, studentId),
+      columns: { id: true },
+      with: {
+        parents: { columns: { createdAt: true }, with: { parent: { columns: { id: true }, with: { user: { columns: { displayName: true } } } } } },
+        teachers: { columns: { createdAt: true }, with: { teacher: { columns: { schoolName: true }, with: { user: { columns: { displayName: true } } } } } },
       },
-    }),
+    })) ?? null,
 };

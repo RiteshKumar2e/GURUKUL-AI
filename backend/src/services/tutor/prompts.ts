@@ -1,4 +1,4 @@
-import type { TeachingLevel } from '@prisma/client';
+import type { TeachingLevel } from '../../db/schema';
 
 export type TutorIntent = 'hint' | 'solution' | 'explain' | 'check';
 

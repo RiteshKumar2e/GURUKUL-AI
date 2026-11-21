@@ -56,8 +56,9 @@ export const syncManager = {
         const res = await api<{ results: Array<{ clientId: string; status: string }>; applied: number; rejected: number }>('/sync', {
           body: { records: batch.map(({ clientId, kind, createdAt, payload }) => ({ clientId, kind, createdAt, payload })) },
         });
-        // Applied, duplicate and rejected records are all settled; only network failures stay queued.
-        await offlineDb.removeFromQueue(res.results.map((r) => r.clientId));
+        // Applied, duplicate and rejected records are settled. RETRY (server database briefly
+        // unavailable) and network failures stay queued for the next attempt.
+        await offlineDb.removeFromQueue(res.results.filter((r) => r.status !== 'RETRY').map((r) => r.clientId));
         applied += res.applied;
         rejected += res.rejected;
       }

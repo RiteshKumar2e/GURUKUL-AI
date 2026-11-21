@@ -9,7 +9,14 @@ const bool = z
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  // Turso cloud database: libsql://<db>-<org>.turso.io (get it with `turso db show <db> --url`).
+  // A file: URL is accepted only for the automated test run, which uses a throwaway temp file.
+  TURSO_DATABASE_URL: z
+    .string()
+    .trim()
+    .min(1, 'TURSO_DATABASE_URL is required: your Turso database URL, e.g. libsql://gurukul-ai-<org>.turso.io')
+    .refine((v) => /^(libsql|https?|wss?|file):/.test(v), 'TURSO_DATABASE_URL must start with libsql:// (or https:// / wss://)'),
+  TURSO_AUTH_TOKEN: z.string().default(''),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
   ACCESS_TOKEN_TTL: z.string().default('15m'),
@@ -57,6 +64,16 @@ if (!parsed.success) {
 
 const data = parsed.data;
 
+const dbIsLocalFile = data.TURSO_DATABASE_URL.startsWith('file:');
+if (dbIsLocalFile && data.NODE_ENV !== 'test') {
+  console.error('[env] TURSO_DATABASE_URL must be a Turso URL (libsql://...). Local database files are only used by the test run.');
+  process.exit(1);
+}
+if (!dbIsLocalFile && !data.TURSO_AUTH_TOKEN.trim()) {
+  console.error('[env] TURSO_AUTH_TOKEN is required (create one with `turso db tokens create <db>`)');
+  process.exit(1);
+}
+
 if (data.NODE_ENV === 'production') {
   if (!data.COOKIE_SECURE) console.warn('[env] COOKIE_SECURE should be true in production');
   if (data.JWT_SECRET === data.JWT_REFRESH_SECRET) {
@@ -69,6 +86,7 @@ export const env = {
   ...data,
   isProd: data.NODE_ENV === 'production',
   isTest: data.NODE_ENV === 'test',
+  dbIsLocalFile,
   aiEnabled: data.AI_API_KEY.trim().length > 0,
   geminiEnabled: data.GEMINI_API_KEY.trim().length > 0,
   sarvamEnabled: data.SARVAM_API_KEY.trim().length > 0,

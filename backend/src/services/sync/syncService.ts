@@ -1,5 +1,6 @@
-import type { Prisma } from '@prisma/client';
-import { prisma } from '../../config/prisma';
+import { and, eq } from 'drizzle-orm';
+import { db, isTransient, withRetry } from '../../db/client';
+import { syncRecords } from '../../db/schema';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
 import { adaptiveService } from '../adaptive-learning/adaptiveService';
 
@@ -7,51 +8,81 @@ export type SyncInput =
   | { clientId: string; kind: 'answer'; createdAt: string; payload: { questionId: string; answer: string; timeTakenSec?: number } }
   | { clientId: string; kind: 'lesson-complete'; createdAt: string; payload: { topicSlug: string } };
 
+type SyncResult = { clientId: string; status: 'APPLIED' | 'DUPLICATE' | 'REJECTED' | 'RETRY'; error?: string; isCorrect?: boolean };
+
 /**
- * Applies records queued on the device while offline. Idempotent per (student, clientId).
- * Answers are re-graded on the server; the device's local grading is never trusted.
+ * Applies records queued on the device while offline.
+ *
+ * Exactly-once per (student, clientId):
+ *  1. "Claim" the record by inserting a PENDING sync row. The unique index on
+ *     (student_id, client_id) makes a second, concurrent submission of the same record a no-op,
+ *     so it is reported as DUPLICATE and never applied twice.
+ *  2. Apply it (answers are re-graded on the server; the device's grading is never trusted).
+ *  3. Mark the row APPLIED or REJECTED.
+ * If step 2 fails because the database was briefly unreachable, the claim is released and the
+ * record is returned as RETRY, so the device keeps it queued instead of losing it.
  */
 export const syncService = {
   async apply(studentId: string, records: SyncInput[]) {
-    const results: Array<{ clientId: string; status: 'APPLIED' | 'DUPLICATE' | 'REJECTED'; error?: string; isCorrect?: boolean }> = [];
+    const results: SyncResult[] = [];
     let changed = false;
 
     const sorted = [...records].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
     for (const rec of sorted) {
-      const existing = await prisma.syncRecord.findUnique({ where: { studentId_clientId: { studentId, clientId: rec.clientId } } });
-      if (existing) {
+      const createdAt = new Date(rec.createdAt);
+      const when = Number.isNaN(createdAt.getTime()) || createdAt > new Date() ? new Date() : createdAt;
+
+      let claimed: { id: string } | undefined;
+      try {
+        // Safe to retry: the unique key makes the insert idempotent
+        [claimed] = await withRetry(() =>
+          db
+            .insert(syncRecords)
+            .values({ studentId, clientId: rec.clientId, kind: rec.kind, payload: rec.payload, status: 'PENDING', clientCreatedAt: when })
+            .onConflictDoNothing({ target: [syncRecords.studentId, syncRecords.clientId] })
+            .returning({ id: syncRecords.id }),
+        );
+      } catch (e) {
+        results.push({ clientId: rec.clientId, status: 'RETRY', error: 'Database unavailable' });
+        if (isTransient(e)) continue;
+        throw e;
+      }
+      if (!claimed) {
         results.push({ clientId: rec.clientId, status: 'DUPLICATE' });
         continue;
       }
-      const createdAt = new Date(rec.createdAt);
-      const when = Number.isNaN(createdAt.getTime()) || createdAt > new Date() ? new Date() : createdAt;
-      let status: 'APPLIED' | 'REJECTED' = 'APPLIED';
-      let error: string | undefined;
-      let isCorrect: boolean | undefined;
 
       try {
+        let isCorrect: boolean | undefined;
         if (rec.kind === 'answer') {
           const q = await curriculumRepository.questionById(rec.payload.questionId);
-          if (!q) throw new Error('Unknown question');
+          if (!q) throw new RejectError('Unknown question');
           const r = await adaptiveService.recordAnswer({ studentId, question: q, answer: rec.payload.answer, timeTakenSec: rec.payload.timeTakenSec, origin: 'OFFLINE_SYNC', answeredAt: when });
           isCorrect = r.isCorrect;
         } else if (rec.kind === 'lesson-complete') {
           const t = await curriculumRepository.topicBySlug(rec.payload.topicSlug);
-          if (!t) throw new Error('Unknown topic');
+          if (!t) throw new RejectError('Unknown topic');
           await adaptiveService.markLessonComplete(studentId, t.id, when);
         } else {
-          throw new Error('Unknown record kind');
+          throw new RejectError('Unknown record kind');
         }
+        await db.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimed.id));
         changed = true;
+        results.push({ clientId: rec.clientId, status: 'APPLIED', isCorrect });
       } catch (e) {
-        status = 'REJECTED';
-        error = (e as Error).message;
+        if (!(e instanceof RejectError) && isTransient(e)) {
+          // Release the claim so the device can send it again later
+          await db
+            .delete(syncRecords)
+            .where(and(eq(syncRecords.id, claimed.id), eq(syncRecords.status, 'PENDING')))
+            .catch(() => undefined);
+          results.push({ clientId: rec.clientId, status: 'RETRY', error: 'Database unavailable' });
+          continue;
+        }
+        const error = (e as Error).message.slice(0, 200);
+        await db.update(syncRecords).set({ status: 'REJECTED', error, processedAt: new Date() }).where(eq(syncRecords.id, claimed.id));
+        results.push({ clientId: rec.clientId, status: 'REJECTED', error });
       }
-
-      await prisma.syncRecord.create({
-        data: { studentId, clientId: rec.clientId, kind: rec.kind, payload: rec.payload as Prisma.InputJsonValue, status, error, clientCreatedAt: when },
-      });
-      results.push({ clientId: rec.clientId, status, error, isCorrect });
     }
 
     if (changed) await adaptiveService.recompute(studentId);
@@ -60,6 +91,10 @@ export const syncService = {
       applied: results.filter((r) => r.status === 'APPLIED').length,
       duplicates: results.filter((r) => r.status === 'DUPLICATE').length,
       rejected: results.filter((r) => r.status === 'REJECTED').length,
+      retry: results.filter((r) => r.status === 'RETRY').length,
     };
   },
 };
+
+/** A record that can never succeed (bad reference or kind); it is settled as REJECTED. */
+class RejectError extends Error {}

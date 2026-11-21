@@ -1,39 +1,48 @@
-import type { Language, Prisma, Role } from '@prisma/client';
-import { prisma } from '../config/prisma';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { db } from '../db/client';
+import {
+  adaptiveRecommendations,
+  learningProgress,
+  learningSessions,
+  parentProfiles,
+  refreshTokens,
+  studentAnswers,
+  studentParents,
+  studentProfiles,
+  studentTeachers,
+  syncRecords,
+  teacherProfiles,
+  tutorConversations,
+  tutorMessages,
+  users,
+  type Language,
+  type Role,
+} from '../db/schema';
 
-const publicUser = {
-  id: true,
-  username: true,
-  email: true,
-  role: true,
-  displayName: true,
-  preferredLanguage: true,
-  createdAt: true,
-  student: {
-    select: {
-      id: true,
-      classLevel: true,
-      board: true,
-      state: true,
-      district: true,
-      teachingLevel: true,
-      dailyGoalMinutes: true,
-      onboardingDone: true,
-      linkCode: true,
+const publicColumns = {
+  columns: { id: true, username: true, email: true, role: true, displayName: true, preferredLanguage: true, createdAt: true },
+  with: {
+    student: {
+      columns: { id: true, classLevel: true, board: true, state: true, district: true, teachingLevel: true, dailyGoalMinutes: true, onboardingDone: true, linkCode: true },
     },
+    parent: { columns: { id: true } },
+    teacher: { columns: { id: true, schoolName: true } },
   },
-  parent: { select: { id: true } },
-  teacher: { select: { id: true, schoolName: true } },
-} satisfies Prisma.UserSelect;
+} as const;
 
-export type PublicUser = Prisma.UserGetPayload<{ select: typeof publicUser }>;
+async function findPublicById(id: string) {
+  return (await db.query.users.findFirst({ where: eq(users.id, id), ...publicColumns })) ?? null;
+}
+
+export type PublicUser = NonNullable<Awaited<ReturnType<typeof findPublicById>>>;
 
 export const userRepository = {
-  findByUsername: (username: string) => prisma.user.findUnique({ where: { username }, include: { student: true } }),
-  findPublicById: (id: string) => prisma.user.findUnique({ where: { id }, select: publicUser }),
-  findById: (id: string) => prisma.user.findUnique({ where: { id }, include: { student: true } }),
+  findByUsername: async (username: string) => (await db.query.users.findFirst({ where: eq(users.username, username), with: { student: true } })) ?? null,
+  findPublicById,
+  findById: async (id: string) => (await db.query.users.findFirst({ where: eq(users.id, id), with: { student: true } })) ?? null,
 
-  create(data: {
+  /** Creates the user and its role profile atomically. */
+  async create(data: {
     username: string;
     email?: string | null;
     passwordHash: string;
@@ -42,32 +51,76 @@ export const userRepository = {
     preferredLanguage: Language;
     linkCode?: string;
     schoolName?: string | null;
-  }) {
-    return prisma.user.create({
-      data: {
-        username: data.username,
-        email: data.email || null,
-        passwordHash: data.passwordHash,
-        role: data.role,
-        displayName: data.displayName,
-        preferredLanguage: data.preferredLanguage,
-        student: data.role === 'STUDENT' ? { create: { linkCode: data.linkCode! } } : undefined,
-        parent: data.role === 'PARENT' ? { create: {} } : undefined,
-        teacher: data.role === 'TEACHER' ? { create: { schoolName: data.schoolName ?? null } } : undefined,
-      },
-      select: publicUser,
+  }): Promise<PublicUser> {
+    const id = await db.transaction(async (tx) => {
+      const [u] = await tx
+        .insert(users)
+        .values({
+          username: data.username,
+          email: data.email || null,
+          passwordHash: data.passwordHash,
+          role: data.role,
+          displayName: data.displayName,
+          preferredLanguage: data.preferredLanguage,
+        })
+        .returning({ id: users.id });
+      if (data.role === 'STUDENT') await tx.insert(studentProfiles).values({ userId: u.id, linkCode: data.linkCode! });
+      if (data.role === 'PARENT') await tx.insert(parentProfiles).values({ userId: u.id });
+      if (data.role === 'TEACHER') await tx.insert(teacherProfiles).values({ userId: u.id, schoolName: data.schoolName ?? null });
+      return u.id;
+    });
+    return (await findPublicById(id))!;
+  },
+
+  async update(id: string, data: Partial<Pick<typeof users.$inferInsert, 'displayName' | 'preferredLanguage' | 'passwordHash' | 'lastLoginAt'>>) {
+    if (Object.keys(data).length) await db.update(users).set(data).where(eq(users.id, id));
+    return findPublicById(id);
+  },
+
+  /**
+   * Permanently deletes an account and everything that belongs to it, in one transaction.
+   * Done explicitly (child rows first) so it does not depend on SQLite foreign-key enforcement,
+   * which is per-connection and off by default.
+   */
+  async delete(id: string) {
+    await db.transaction(async (tx) => {
+      const sp = await tx.select({ id: studentProfiles.id }).from(studentProfiles).where(eq(studentProfiles.userId, id));
+      const pp = await tx.select({ id: parentProfiles.id }).from(parentProfiles).where(eq(parentProfiles.userId, id));
+      const tp = await tx.select({ id: teacherProfiles.id }).from(teacherProfiles).where(eq(teacherProfiles.userId, id));
+      for (const { id: sid } of sp) {
+        const convs = await tx.select({ id: tutorConversations.id }).from(tutorConversations).where(eq(tutorConversations.studentId, sid));
+        if (convs.length) await tx.delete(tutorMessages).where(inArray(tutorMessages.conversationId, convs.map((c) => c.id)));
+        await tx.delete(tutorConversations).where(eq(tutorConversations.studentId, sid));
+        await tx.delete(studentAnswers).where(eq(studentAnswers.studentId, sid));
+        await tx.delete(learningSessions).where(eq(learningSessions.studentId, sid));
+        await tx.delete(learningProgress).where(eq(learningProgress.studentId, sid));
+        await tx.delete(adaptiveRecommendations).where(eq(adaptiveRecommendations.studentId, sid));
+        await tx.delete(syncRecords).where(eq(syncRecords.studentId, sid));
+        await tx.delete(studentParents).where(eq(studentParents.studentId, sid));
+        await tx.delete(studentTeachers).where(eq(studentTeachers.studentId, sid));
+      }
+      for (const { id: pid } of pp) await tx.delete(studentParents).where(eq(studentParents.parentId, pid));
+      for (const { id: tid } of tp) await tx.delete(studentTeachers).where(eq(studentTeachers.teacherId, tid));
+      await tx.delete(studentProfiles).where(eq(studentProfiles.userId, id));
+      await tx.delete(parentProfiles).where(eq(parentProfiles.userId, id));
+      await tx.delete(teacherProfiles).where(eq(teacherProfiles.userId, id));
+      await tx.delete(refreshTokens).where(eq(refreshTokens.userId, id));
+      await tx.delete(users).where(eq(users.id, id));
     });
   },
 
-  update: (id: string, data: Prisma.UserUpdateInput) => prisma.user.update({ where: { id }, data, select: publicUser }),
-  delete: (id: string) => prisma.user.delete({ where: { id } }),
-
   // refresh tokens
-  saveRefreshToken: (userId: string, tokenHash: string, expiresAt: Date) =>
-    prisma.refreshToken.create({ data: { userId, tokenHash, expiresAt } }),
-  findRefreshToken: (tokenHash: string) => prisma.refreshToken.findUnique({ where: { tokenHash }, include: { user: { include: { student: true } } } }),
+  saveRefreshToken: (userId: string, tokenHash: string, expiresAt: Date) => db.insert(refreshTokens).values({ userId, tokenHash, expiresAt }),
+  findRefreshToken: async (tokenHash: string) =>
+    (await db.query.refreshTokens.findFirst({ where: eq(refreshTokens.tokenHash, tokenHash), with: { user: { with: { student: true } } } })) ?? null,
   revokeRefreshToken: (tokenHash: string) =>
-    prisma.refreshToken.updateMany({ where: { tokenHash, revokedAt: null }, data: { revokedAt: new Date() } }),
+    db
+      .update(refreshTokens)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(refreshTokens.tokenHash, tokenHash), isNull(refreshTokens.revokedAt))),
   revokeAllForUser: (userId: string) =>
-    prisma.refreshToken.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } }),
+    db
+      .update(refreshTokens)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(refreshTokens.userId, userId), isNull(refreshTokens.revokedAt))),
 };

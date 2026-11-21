@@ -38,3 +38,10 @@ backend/uploads/*
 .idea/
 *.swp
 graphify-out/
+
+# Database backups and any stray local database files
+backend/backups/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

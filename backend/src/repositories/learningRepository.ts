@@ -1,24 +1,41 @@
-import type { AnswerOrigin, Prisma, RecommendationKind, SessionType } from '@prisma/client';
-import { prisma } from '../config/prisma';
+import { and, count, desc, eq, gte } from 'drizzle-orm';
+import { db } from '../db/client';
+import {
+  adaptiveRecommendations,
+  learningProgress,
+  learningSessions,
+  questions,
+  studentAnswers,
+  type AnswerOrigin,
+  type RecommendationKind,
+  type SessionType,
+} from '../db/schema';
+
+type ProgressFields = Partial<Omit<typeof learningProgress.$inferInsert, 'id' | 'studentId' | 'topicId'>>;
+
+const recTopic = { columns: { slug: true, titleHi: true, titleEn: true }, with: { chapter: { columns: { slug: true, number: true, nameHi: true, nameEn: true } } } } as const;
 
 export const learningRepository = {
-  progressFor: (studentId: string, topicId: string) =>
-    prisma.learningProgress.findUnique({ where: { studentId_topicId: { studentId, topicId } } }),
+  progressFor: async (studentId: string, topicId: string) =>
+    (await db.query.learningProgress.findFirst({ where: and(eq(learningProgress.studentId, studentId), eq(learningProgress.topicId, topicId)) })) ?? null,
 
-  upsertProgress: (studentId: string, topicId: string, data: Omit<Prisma.LearningProgressUncheckedCreateInput, 'studentId' | 'topicId'>) =>
-    prisma.learningProgress.upsert({
-      where: { studentId_topicId: { studentId, topicId } },
-      create: { studentId, topicId, ...data },
-      update: data,
-    }),
+  /** Atomic insert-or-update on the (student, topic) unique index. */
+  upsertProgress: async (studentId: string, topicId: string, data: ProgressFields) =>
+    (
+      await db
+        .insert(learningProgress)
+        .values({ studentId, topicId, ...data })
+        .onConflictDoUpdate({ target: [learningProgress.studentId, learningProgress.topicId], set: data })
+        .returning()
+    )[0],
 
   allProgress: (studentId: string) =>
-    prisma.learningProgress.findMany({
-      where: { studentId },
-      include: { topic: { select: { id: true, slug: true, titleHi: true, titleEn: true, chapter: { select: { slug: true, number: true, nameHi: true, nameEn: true } } } } },
+    db.query.learningProgress.findMany({
+      where: eq(learningProgress.studentId, studentId),
+      with: { topic: { columns: { id: true, slug: true, titleHi: true, titleEn: true }, with: { chapter: { columns: { slug: true, number: true, nameHi: true, nameEn: true } } } } },
     }),
 
-  createAnswer: (data: {
+  createAnswer: async (data: {
     studentId: string;
     questionId: string;
     sessionId?: string | null;
@@ -28,61 +45,79 @@ export const learningRepository = {
     timeTakenSec?: number | null;
     origin?: AnswerOrigin;
     answeredAt?: Date;
-  }) => prisma.studentAnswer.create({ data }),
+  }) => (await db.insert(studentAnswers).values(data).returning())[0],
 
   recentAnswers: (studentId: string, take = 20) =>
-    prisma.studentAnswer.findMany({
-      where: { studentId },
-      orderBy: { answeredAt: 'desc' },
-      take,
-      include: { question: { select: { slug: true, promptHi: true, promptEn: true, topic: { select: { slug: true, titleHi: true, titleEn: true } } } } },
+    db.query.studentAnswers.findMany({
+      where: eq(studentAnswers.studentId, studentId),
+      orderBy: (a, { desc }) => [desc(a.answeredAt)],
+      limit: take,
+      with: { question: { columns: { slug: true, promptHi: true, promptEn: true }, with: { topic: { columns: { slug: true, titleHi: true, titleEn: true } } } } },
     }),
 
   recentCorrectQuestionIds: async (studentId: string, topicId: string, since: Date) => {
-    const rows = await prisma.studentAnswer.findMany({
-      where: { studentId, isCorrect: true, answeredAt: { gte: since }, question: { topicId } },
-      select: { questionId: true },
-    });
+    const rows = await db
+      .select({ questionId: studentAnswers.questionId })
+      .from(studentAnswers)
+      .innerJoin(questions, eq(questions.id, studentAnswers.questionId))
+      .where(and(eq(studentAnswers.studentId, studentId), eq(studentAnswers.isCorrect, true), gte(studentAnswers.answeredAt, since), eq(questions.topicId, topicId)));
     return new Set(rows.map((r) => r.questionId));
   },
 
   answersSince: (studentId: string, since: Date) =>
-    prisma.studentAnswer.findMany({ where: { studentId, answeredAt: { gte: since } }, select: { answeredAt: true, isCorrect: true } }),
+    db
+      .select({ answeredAt: studentAnswers.answeredAt, isCorrect: studentAnswers.isCorrect })
+      .from(studentAnswers)
+      .where(and(eq(studentAnswers.studentId, studentId), gte(studentAnswers.answeredAt, since))),
 
-  countAnswers: (studentId: string) =>
-    prisma.studentAnswer.groupBy({ by: ['isCorrect'], where: { studentId }, _count: { _all: true } }),
+  /** Same shape as Prisma's groupBy: [{ isCorrect, _count: { _all } }]. */
+  countAnswers: async (studentId: string) => {
+    const rows = await db
+      .select({ isCorrect: studentAnswers.isCorrect, n: count() })
+      .from(studentAnswers)
+      .where(eq(studentAnswers.studentId, studentId))
+      .groupBy(studentAnswers.isCorrect);
+    return rows.map((r) => ({ isCorrect: r.isCorrect, _count: { _all: r.n } }));
+  },
 
-  createSession: (data: { studentId: string; type: SessionType; chapterId?: string; topicId?: string; assessmentId?: string }) =>
-    prisma.learningSession.create({ data }),
-  findSession: (id: string) => prisma.learningSession.findUnique({ where: { id } }),
-  endSession: (id: string, score?: number, total?: number) =>
-    prisma.learningSession.update({ where: { id }, data: { endedAt: new Date(), score, total } }),
+  createSession: async (data: { studentId: string; type: SessionType; chapterId?: string; topicId?: string; assessmentId?: string; startedAt?: Date; endedAt?: Date }) =>
+    (await db.insert(learningSessions).values(data).returning())[0],
+  findSession: async (id: string) => (await db.query.learningSessions.findFirst({ where: eq(learningSessions.id, id) })) ?? null,
+  endSession: async (id: string, score?: number, total?: number) =>
+    (await db.update(learningSessions).set({ endedAt: new Date(), score, total }).where(eq(learningSessions.id, id)).returning())[0],
 
   recentSessions: (studentId: string, take = 15) =>
-    prisma.learningSession.findMany({
-      where: { studentId },
-      orderBy: { startedAt: 'desc' },
-      take,
-      include: {
-        topic: { select: { slug: true, titleHi: true, titleEn: true } },
-        chapter: { select: { slug: true, nameHi: true, nameEn: true } },
-        assessment: { select: { slug: true, titleHi: true, titleEn: true } },
+    db.query.learningSessions.findMany({
+      where: eq(learningSessions.studentId, studentId),
+      orderBy: (s, { desc }) => [desc(s.startedAt)],
+      limit: take,
+      with: {
+        topic: { columns: { slug: true, titleHi: true, titleEn: true } },
+        chapter: { columns: { slug: true, nameHi: true, nameEn: true } },
+        assessment: { columns: { slug: true, titleHi: true, titleEn: true } },
       },
     }),
 
   activeRecommendations: (studentId: string) =>
-    prisma.adaptiveRecommendation.findMany({
-      where: { studentId, status: 'ACTIVE' },
-      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
-      include: { topic: { select: { slug: true, titleHi: true, titleEn: true, chapter: { select: { slug: true, number: true, nameHi: true, nameEn: true } } } } },
+    db.query.adaptiveRecommendations.findMany({
+      where: and(eq(adaptiveRecommendations.studentId, studentId), eq(adaptiveRecommendations.status, 'ACTIVE')),
+      orderBy: [desc(adaptiveRecommendations.priority), desc(adaptiveRecommendations.createdAt)],
+      with: { topic: recTopic },
     }),
 
+  /** Retires the current active set and writes the new one in a single transaction. */
   replaceRecommendations: (studentId: string, recs: Array<{ topicId: string; kind: RecommendationKind; reasonHi: string; reasonEn: string; priority: number }>) =>
-    prisma.$transaction([
-      prisma.adaptiveRecommendation.updateMany({ where: { studentId, status: 'ACTIVE' }, data: { status: 'DONE' } }),
-      prisma.adaptiveRecommendation.createMany({ data: recs.map((r) => ({ ...r, studentId })) }),
-    ]),
+    db.transaction(async (tx) => {
+      await tx
+        .update(adaptiveRecommendations)
+        .set({ status: 'DONE' })
+        .where(and(eq(adaptiveRecommendations.studentId, studentId), eq(adaptiveRecommendations.status, 'ACTIVE')));
+      if (recs.length) await tx.insert(adaptiveRecommendations).values(recs.map((r) => ({ ...r, studentId })));
+    }),
 
   dismissRecommendation: (studentId: string, id: string) =>
-    prisma.adaptiveRecommendation.updateMany({ where: { id, studentId }, data: { status: 'DISMISSED' } }),
+    db
+      .update(adaptiveRecommendations)
+      .set({ status: 'DISMISSED' })
+      .where(and(eq(adaptiveRecommendations.id, id), eq(adaptiveRecommendations.studentId, studentId))),
 };

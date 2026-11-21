@@ -1,11 +1,14 @@
 /**
- * Integration tests against the configured PostgreSQL database (run `npm run db:setup` first).
- * Creates throwaway users with a unique prefix and deletes them afterwards.
+ * Integration tests against a throwaway libSQL database (built by tests/globalSetup.ts).
+ * Creates users with a unique prefix and deletes them afterwards.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app';
-import { prisma } from '../src/config/prisma';
+import { eq } from 'drizzle-orm';
+import { db } from '../src/db/client';
+import { questions } from '../src/db/schema';
+import { deleteUsersWithPrefix } from './helpers';
 
 const app = createApp();
 const prefix = `t${Date.now().toString(36)}`;
@@ -30,8 +33,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await prisma.user.deleteMany({ where: { username: { startsWith: `${prefix}_` } } });
-  await prisma.$disconnect();
+  await deleteUsersWithPrefix(prefix);
 });
 
 describe('health', () => {
@@ -87,7 +89,7 @@ describe('learning flow', () => {
     const next = await request(app).get('/api/practice/next?topic=laws-of-exponents').set('Authorization', `Bearer ${student.token}`);
     expect(next.status).toBe(200);
     expect(next.body.question.correctAnswer).toBeUndefined();
-    const q = await prisma.question.findUnique({ where: { id: next.body.question.id } });
+    const q = await db.query.questions.findFirst({ where: eq(questions.id, next.body.question.id) });
     const ans = await request(app).post('/api/practice/answer').set('Authorization', `Bearer ${student.token}`).send({ questionId: q!.id, answer: q!.correctAnswer });
     expect(ans.status).toBe(200);
     expect(ans.body.isCorrect).toBe(true);
@@ -107,7 +109,7 @@ describe('learning flow', () => {
   });
 
   it('applies offline sync records once', async () => {
-    const q = await prisma.question.findUnique({ where: { slug: 'cg-cp-1' } });
+    const q = await db.query.questions.findFirst({ where: eq(questions.slug, 'cg-cp-1') });
     const records = [
       { clientId: `${prefix}-rec-0001`, kind: 'answer', createdAt: new Date().toISOString(), payload: { questionId: q!.id, answer: 'b' } },
       { clientId: `${prefix}-rec-0002`, kind: 'lesson-complete', createdAt: new Date().toISOString(), payload: { topicSlug: 'cartesian-plane' } },
