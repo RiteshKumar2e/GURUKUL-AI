@@ -1,109 +1,154 @@
-# GURUKUL AI — the last-mile learning companion
+# GURUKUL AI
 
-A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), built for the ACE Builders Global Hackathon 2026, Problem Statement 3: *The Last-Mile Tutor*.
+**A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), designed for low-cost Android phones and unreliable internet.**
 
-**Status:** prototype. The lesson content is original sample material, not the official JAC syllabus. See [Known limitations](#known-limitations).
+Built for the ACE Builders Global Hackathon 2026, Problem Statement 3: *The Last-Mile Tutor*.
 
-## What it does
+> **Status: working prototype.** Lessons and questions are original sample content written for this project, not official JAC material. Read [Verification status](#verification-status) and [Known limitations](#known-limitations) before relying on it.
 
-- **AI tutor.** Gives a hint first, then a step-by-step solution, then a follow-up question. Replies in Hindi or English.
-- **Answer checking.** When the tutor gives a numeric final answer, a deterministic calculator re-checks it and the app shows whether the two agree. The check covers final numbers only, not reasoning.
-- **Voice tutor (Hindi, English, Telugu).** The student speaks, checks the transcript, then hears the reply. Speech-to-text uses Sarvam AI, Groq Whisper, or the browser. Read-aloud uses Sarvam AI or the device voice. Spoken replies are cached in IndexedDB.
-- **Photo questions.** The photo is compressed on the phone and checked on the server. A vision model extracts the question; the student can edit the text before asking.
-- **Adaptive practice.** Mastery is tracked per topic and difficulty moves up or down. Weak topics are detected and recommendations are generated from stored results. Each mistake comes with an explanation.
-- **Offline learning.** The app is an installable PWA. Students can download chapter packs to IndexedDB, practise offline, and queued answers are sent to the server when the connection returns. The server re-grades them.
-- **Parent and teacher dashboard.** A guardian links to a student with a 6-character code the student shares. Guardians see progress, weak areas and activity, not the content of tutor chats.
+---
 
-## Project structure
+## Contents
+
+- [Why GURUKUL AI](#why-gurukul-ai)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Quick start](#quick-start)
+- [Configuration](#configuration)
+- [Database (Turso)](#database-turso)
+- [AI, voice and photo](#ai-voice-and-photo)
+- [Offline learning and sync](#offline-learning-and-sync)
+- [Security and privacy](#security-and-privacy)
+- [API reference](#api-reference)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Verification status](#verification-status)
+- [Known limitations](#known-limitations)
+- [Project structure](#project-structure)
+
+---
+
+## Why GURUKUL AI
+
+Many Class 9 students in Jharkhand study on a shared, low-cost phone, with patchy mobile data and nobody at home to ask when they get stuck. GURUKUL AI is built around those conditions:
+
+- **Hindi first**, with English one tap away. The tutor can also reply in Telugu.
+- **Hints before answers.** It teaches, step by step, instead of handing out solutions.
+- **Works on a weak network.** Lessons and practice keep working offline and sync later.
+- **Honest about AI.** Numeric answers are re-checked by a calculator, and uncertain or unverified answers are labelled.
+
+## Features
+
+| Feature | What the student gets | Works offline |
+|---|---|---|
+| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question. Hindi, English or Telugu. | No |
+| **Answer checking** | A deterministic calculator re-checks the tutor's final number and shows whether it matched. | No |
+| **Voice tutor** | Speak the question, check and edit the transcript, then listen to the reply with play, pause, replay and stop. Typing always works as a fallback. | No |
+| **Photo questions** | Photograph a question from a book or notebook. The image is compressed on the phone; the student can correct the extracted text before asking. | No |
+| **Lessons** | 12 chapters, 24 short lessons with worked examples, in Hindi and English. | Yes, after download |
+| **Adaptive practice** | 72 questions at three levels. Difficulty moves up or down with each answer; weak topics come first, with an explanation for every mistake. | Yes, after download |
+| **Chapter quizzes** | A timed quiz per chapter, graded on the server. | No |
+| **Progress** | Topic mastery, accuracy, daily streak and recommended next steps. | Read only |
+| **Parent and teacher view** | A guardian links with a 6-character code the student shares, and sees progress, weak topics and activity, but never the tutor conversations. | No |
+| **Installable app** | A PWA that installs to the home screen and caches the app shell. | Yes |
+
+## Architecture
 
 ```
-frontend/   React 18 + Vite + TypeScript + Tailwind (PWA), deployed on Vercel (vercel.json)
-backend/    Node.js + Express + TypeScript + Drizzle ORM + Turso (libSQL)
-  src/        config/, db/ (schema.ts, client.ts), routes/, controllers/, services/, repositories/, middleware/, validators/, utils/
-  drizzle/    SQL migrations generated from src/db/schema.ts
-  scripts/    migrate.ts, seed.ts, db-check.ts
-  content/    class9-maths.json  (editable lessons and questions, with source notes)
-  tests/      Vitest + Supertest tests (run on a throwaway database)
+ ┌──────────────────────────────┐        HTTPS / JSON         ┌──────────────────────────────┐
+ │  Frontend (PWA)              │  ─────────────────────────▶ │  Backend API                 │
+ │  React 18, Vite, TypeScript  │                             │  Node.js, Express, TypeScript│
+ │  Tailwind, TanStack Query    │  ◀───────────────────────── │  Zod validation, JWT auth    │
+ │                              │                             │  Drizzle ORM                 │
+ │  IndexedDB: chapter packs,   │                             └──────┬───────────────┬───────┘
+ │  offline answer queue,       │                                    │               │
+ │  cached voice replies        │                                    ▼               ▼
+ │  Service worker: app shell   │                          ┌──────────────┐  ┌────────────────────┐
+ └──────────────────────────────┘                          │ Turso        │  │ AI providers       │
+   hosted on Vercel                                        │ (libSQL)     │  │ Groq / Gemini      │
+                                                           └──────────────┘  │ Sarvam (voice)     │
+                                                                             └────────────────────┘
 ```
 
-There is no root `package.json`. Install and run each app from its own folder.
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite, TypeScript, Tailwind CSS, React Router, TanStack Query, React Hook Form, Zod, `idb` |
+| Backend | Node.js 20+, Express 4, TypeScript, Zod, JSON Web Tokens, bcrypt, Multer, Helmet, express-rate-limit |
+| Database | Turso (libSQL) with Drizzle ORM and SQL migrations |
+| AI | Groq (default LLM, vision, Whisper), Google Gemini (optional fallback), Sarvam AI (optional speech) |
+| Hosting | Vercel for the frontend; any Node.js host for the backend |
 
-## Requirements
+## Quick start
 
-- Node.js 20 or newer (tested on 22.12).
-- A [Turso](https://turso.tech) database. There is no local database: the backend always talks to Turso.
+**You need:** Node.js 20 or newer, and a [Turso](https://turso.tech) database (free tier is enough). There is no local database; the backend always talks to Turso.
 
-## Database: Turso setup
-
-1. Install the CLI and sign in: `npm i -g @tursodatabase/cli` (or see turso.tech/docs), then `turso auth login`.
-2. Create a database close to your users: `turso db create gurukul-ai --location aws-ap-south-1`.
-3. Get the URL: `turso db show gurukul-ai --url` (looks like `libsql://gurukul-ai-<org>.turso.io`).
-4. Create a token: `turso db tokens create gurukul-ai`.
-5. Put both in `backend/.env` as `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. They stay on the server: the browser never sees them.
-6. Check the connection (read-only): `npm run db:check`.
-7. Create the tables: `npm run db:migrate`.
-8. Load curriculum and the synthetic demo accounts: `npm run db:seed` (`SEED_DEMO=false` skips the demo accounts).
-
-**Migrations are safe by design.** `db:migrate` applies only migrations that are not yet recorded in `__drizzle_migrations`. It refuses to run any migration that contains `DROP TABLE`, `DROP COLUMN`, `DELETE FROM` or a table rebuild unless you set `ALLOW_DESTRUCTIVE_MIGRATION=true` after taking a backup (`turso db shell gurukul-ai .dump > backup.sql`). Nothing in the project resets the database.
-
-**Changing the schema:** edit `src/db/schema.ts`, run `npm run db:generate` to create a new SQL file in `drizzle/`, review it, then `npm run db:migrate`.
-
-## Local setup
-
-Use two terminals.
+### 1. Create the database
 
 ```bash
-# Terminal 1: backend (API on http://localhost:5000)
-cd backend
-cp .env.example .env          # Windows: copy .env.example .env
-# fill in TURSO_DATABASE_URL, TURSO_AUTH_TOKEN, JWT secrets (see Environment below)
-npm install
-npm run db:migrate            # first time only
-npm run db:seed               # first time only
-npm run dev
-
-# Terminal 2: frontend (web app on http://localhost:5173)
-cd frontend
-cp .env.example .env          # Windows: copy .env.example .env
-npm install
-npm run dev
+npm i -g @tursodatabase/cli         # or follow turso.tech/docs
+turso auth login
+turso db create gurukul-ai --location aws-ap-south-1
+turso db show gurukul-ai --url       # -> TURSO_DATABASE_URL
+turso db tokens create gurukul-ai    # -> TURSO_AUTH_TOKEN
 ```
 
-Open http://localhost:5173.
+### 2. Start the backend
 
-Demo accounts hold **synthetic** data only. The password is `Demo@1234` for all three:
+```bash
+cd backend
+cp .env.example .env                 # Windows: copy .env.example .env
+# Fill in TURSO_DATABASE_URL, TURSO_AUTH_TOKEN, JWT_SECRET, JWT_REFRESH_SECRET
+# and (optionally) AI_API_KEY for the live AI tutor.
+npm install
+npm run db:check                     # read-only: is the database reachable?
+npm run db:migrate                   # create tables (first time)
+npm run db:seed                      # curriculum + synthetic demo accounts
+npm run dev                          # http://localhost:5000/api
+```
+
+### 3. Start the frontend
+
+```bash
+cd frontend
+cp .env.example .env                 # Windows: copy .env.example .env
+npm install
+npm run dev                          # http://localhost:5173
+```
+
+### Demo accounts
+
+All three hold **synthetic data only**. Password: `Demo@1234`.
 
 | Username | Role |
 |---|---|
-| `demo.student` | Student with generated practice history |
+| `demo.student` | Student with a generated practice history |
 | `demo.parent` | Parent linked to the demo student |
 | `demo.teacher` | Teacher linked to the demo student |
 
-## Scripts
+Run `SEED_DEMO=false npm run db:seed` to load content without demo accounts.
 
-Run these inside `backend/` or `frontend/`.
+### Scripts
 
 | Command | Backend | Frontend |
 |---|---|---|
-| `npm run dev` | `tsx watch src/server.ts` | `vite` |
-| `npm run build` | `tsc` | `tsc -b` + `vite build` |
-| `npm run lint` | `tsc --noEmit` (src, scripts and tests) | `tsc -b --noEmit` |
-| `npm run test` | `vitest run` on a throwaway temp database | `vitest run` |
-| `npm start` | `node dist/server.js` | — |
-| `npm run preview` | — | `vite preview` (service worker active, port 4173) |
+| `npm run dev` | API with live reload | Vite dev server |
+| `npm run build` | Compile to `dist/` | Type-check and build to `dist/` |
+| `npm start` | Run the compiled API | — |
+| `npm run lint` | Type-check `src`, `scripts` and `tests` | Type-check |
+| `npm test` | Vitest on a throwaway database | Vitest |
+| `npm run preview` | — | Serve the production build (service worker active) |
 | `npm run db:check` | Read-only connection and table check | — |
 | `npm run db:migrate` | Apply pending migrations (non-destructive) | — |
-| `npm run db:seed` | Upsert curriculum + replace the 3 demo accounts | — |
+| `npm run db:seed` | Upsert curriculum and replace the 3 demo accounts | — |
 | `npm run db:generate` | Create a migration from `src/db/schema.ts` | — |
-| `npm run db:studio` | Drizzle Studio (browse data) | — |
+| `npm run db:studio` | Browse data in Drizzle Studio | — |
 
-Backend tests never use the Turso database in `.env`: `tests/globalSetup.ts` creates a temporary libSQL file in the OS temp folder, migrates and seeds it, and deletes it afterwards.
+## Configuration
 
-## Environment
+Each app reads its own `.env`, created from `.env.example`. Real `.env` files are git-ignored. The backend validates every variable at startup and refuses to start if a required one is missing or invalid.
 
-Each app has its own `.env`, created from its `.env.example`. Real `.env` files are git-ignored. The server checks every variable at startup and refuses to start if a required one is missing or invalid.
-
-### backend/.env
+<details>
+<summary><strong>backend/.env</strong>: core settings</summary>
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
@@ -114,41 +159,36 @@ Each app has its own `.env`, created from its `.env.example`. Real `.env` files 
 | `ACCESS_TOKEN_TTL` | no | `15m` | Access token lifetime |
 | `REFRESH_TOKEN_TTL_DAYS` | no | `7` | Refresh token lifetime |
 | `PORT` | no | `5000` | |
-| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed CORS origin(s), comma-separated, e.g. `http://localhost:5173,https://gurukul-ai.vercel.app` |
-| `UPLOAD_DIR` | no | `uploads` | Temporary upload folder; files are deleted after processing |
+| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed CORS origins, comma-separated |
+| `UPLOAD_DIR` | no | `uploads` | Temporary folder; files are deleted after processing |
 | `MAX_UPLOAD_MB` | no | `6` | Upload size limit |
 | `COOKIE_SECURE` | no | off | `true` in production over HTTPS |
 | `COOKIE_SAMESITE` | no | `lax` | `none` when the API and web app are on different sites |
-| `ENFORCE_HTTPS` | no | off | Set with `TRUST_PROXY=true` behind a TLS proxy; adds HSTS |
+| `ENFORCE_HTTPS` | no | off | Use with `TRUST_PROXY=true` behind a TLS proxy; adds HSTS |
 | `TRUST_PROXY` | no | off | |
 
-**AI tutor and vision (Groq by default):**
+Generate secrets with `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`.
+
+</details>
+
+<details>
+<summary><strong>backend/.env</strong>: AI tutor, vision and voice</summary>
 
 | Variable | Default | Notes |
 |---|---|---|
 | `AI_PROVIDER` | `groq` | `groq` or `openai-compatible` |
-| `AI_API_KEY` | empty | Groq key. Empty means no Groq tutor, Whisper or vision. |
+| `AI_API_KEY` | empty | Groq key. Empty means no Groq tutor, Whisper or vision |
 | `AI_MODEL` | `openai/gpt-oss-120b` | Tutor model |
 | `AI_VISION_MODEL` | `qwen/qwen3.8-27b` | Photo question model |
 | `AI_STT_MODEL` | `whisper-large-v3` | Groq Whisper model |
 | `AI_BASE_URL` | `https://api.groq.com/openai/v1` | Any OpenAI-compatible endpoint |
 | `AI_TIMEOUT_MS` | `30000` | |
-
-**Tutor LLM selection:**
-
-| Variable | Default | Notes |
-|---|---|---|
-| `LLM_PROVIDER` | `auto` | `auto` uses Groq if `AI_API_KEY` is set, else Gemini if `GEMINI_API_KEY` is set, else demo mode. Force with `groq` or `gemini`. |
+| `LLM_PROVIDER` | `auto` | `auto`: Groq if `AI_API_KEY` is set, else Gemini if `GEMINI_API_KEY` is set, else demo mode |
 | `GEMINI_API_KEY` | empty | From https://aistudio.google.com/apikey |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` | |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | |
-
-**Voice:**
-
-| Variable | Default | Notes |
-|---|---|---|
-| `STT_PROVIDER` | `auto` | `auto` uses Sarvam if `SARVAM_API_KEY` is set, else Groq Whisper, else browser only. `sarvam`, `groq`, `none` to force. |
-| `TTS_PROVIDER` | `auto` | `auto` uses Sarvam if `SARVAM_API_KEY` is set, else the browser. `sarvam` or `browser`. |
+| `STT_PROVIDER` | `auto` | Sarvam if `SARVAM_API_KEY` is set, else Groq Whisper, else browser only |
+| `TTS_PROVIDER` | `auto` | Sarvam if `SARVAM_API_KEY` is set, else the device voice |
 | `SARVAM_API_KEY` | empty | From https://dashboard.sarvam.ai |
 | `SARVAM_BASE_URL` | `https://api.sarvam.ai` | |
 | `SARVAM_STT_MODEL` | `saarika:v2.5` | |
@@ -156,81 +196,86 @@ Each app has its own `.env`, created from its `.env.example`. Real `.env` files 
 | `SARVAM_TTS_SPEAKER` | `anushka` | |
 | `VOICE_TIMEOUT_MS` | `30000` | |
 
-### frontend/.env
+Groq retires models over time. List what your key can use with `GET https://api.groq.com/openai/v1/models`.
 
-Only public values. Everything here ends up in the browser, so never put secrets in this file.
+</details>
+
+<details>
+<summary><strong>frontend/.env</strong></summary>
+
+Everything here is bundled into the browser, so it must never contain secrets.
 
 | Variable | Notes |
 |---|---|
-| `VITE_API_URL` | Backend API base URL |
+| `VITE_API_URL` | Backend API base URL, e.g. `http://localhost:5000/api` |
+| `VITE_SITE_URL` | Public site URL, used for the sitemap, robots.txt and social preview |
 | `VITE_APP_NAME` | Display name |
-| `VITE_SITE_URL` | Used for sitemap, robots.txt and social image URLs |
-| `VITE_CONTACT_EMAIL` | Footer mailto link; hidden when empty |
+| `VITE_CONTACT_EMAIL` | Public contact address for the footer; hidden when empty |
 
-### Demo mode
+</details>
 
-With no `AI_API_KEY` and no `GEMINI_API_KEY`, the server runs in demo mode and says so. The tutor reply is labelled *"Demo mode — not an AI answer"* and contains only a deterministic calculator result (when the question has arithmetic or a linear equation) and the summary of the linked lesson. Photo reading and server speech-to-text return a "not configured" message. Lessons, practice, quizzes, progress, offline use and the guardian dashboard work without any key.
+## Database (Turso)
 
-`GET /api/health` reports the AI mode (`"ai": {"mode": "live"}` or demo).
+The schema lives in [`backend/src/db/schema.ts`](backend/src/db/schema.ts): 22 tables covering accounts, student, parent and teacher profiles, curriculum (subjects, chapters, topics, lessons, questions, quizzes), learning sessions, answers, progress, recommendations, tutor conversations, sync records and anonymous analytics. Foreign keys, unique constraints and indexes are defined in the schema and in the generated SQL.
 
-## Voice tutor
-
-The voice page (`/app/voice`) has a language switch (हिंदी / English / తెలుగు), a microphone with a recording timer, an editable transcript, hint, solution and explain modes, play/pause/replay/stop on each reply, and a typing fallback. Each reply is labelled with its language so it is read in the right voice.
-
-**How it works**
-- The browser re-encodes each recording to 16 kHz mono WAV before upload.
-- With Sarvam, recordings stop at 30 seconds, because the synchronous API takes short clips.
-- Recordings are deleted from the server right after transcription.
-- Spoken replies are cached in IndexedDB: the newest 40 clips are kept and the cache is cleared on logout.
-
-**Endpoints**
-- `GET /api/voice/capabilities`: which providers are active.
-- `POST /api/voice/transcribe?language=hi|en|te`: multipart field `audio`.
-- `POST /api/voice/speak` with JSON `{ "text", "language" }`: returns `audio/wav`.
-
-Without a Sarvam key, Telugu read-aloud works only if the device has a Telugu voice installed. The page says so when it doesn't.
-
-## Verification status
-
-Be precise about what has and has not been run. Results are recorded here as they were observed, and none are assumed.
-
-- **Groq tutor:** the author's development notes record a live Telugu test on 2026-11-21 using `openai/gpt-oss-120b`. This README revision did not re-run it.
-- **Sarvam and Gemini:** request formats follow their public documentation. They are covered only by mocked tests (`backend/tests/voice.test.ts`). **They have not been tested against the live APIs**, because no keys were available.
-- **Telugu UI strings** written by the server should be reviewed by a native speaker.
-- **Browser journeys** were checked with a headless-browser script during development. That script is not in the repository.
-- **Real low-end Android devices** have not been tested.
-
-To verify on your own machine, run `npm run lint`, `npm run test` and `npm run build` in each folder, then follow the voice testing steps above with your own keys.
-
-## Groq models
-
-Groq retires models over time. The defaults above were chosen because the older ones were no longer available on the development key. To see what your key can use, call `GET https://api.groq.com/openai/v1/models` with your key. Check the IDs at https://console.groq.com/docs/models.
-
-## Deployment
-
-**Frontend (Vercel).** Import the repository, set **Root Directory** to `frontend`. `frontend/vercel.json` sets the build (`npm run build`, output `dist`), the SPA fallback to `index.html`, long caching for hashed assets, no caching for `sw.js` and `index.html`, and security headers. In Vercel → Settings → Environment Variables set:
-
-| Variable | Value |
+| Concern | How it is handled |
 |---|---|
-| `VITE_API_URL` | Your **deployed** backend, e.g. `https://<backend-host>/api` (not `localhost`) |
-| `VITE_SITE_URL` | `https://gurukul-ai.vercel.app` |
-| `VITE_APP_NAME` | `GURUKUL AI` |
+| Connection | One module, [`backend/src/db/client.ts`](backend/src/db/client.ts), checks the connection at startup and reports it on `GET /api/health` without exposing credentials |
+| Migrations | `npm run db:migrate` applies only migrations not yet recorded in `__drizzle_migrations` |
+| Destructive changes | A migration containing `DROP TABLE`, `DROP COLUMN`, `DELETE FROM` or a table rebuild is refused unless `ALLOW_DESTRUCTIVE_MIGRATION=true` is set after a backup (`turso db shell <db> .dump > backup.sql`). Nothing in the project resets the database |
+| Transactions | Registration, account deletion, tutor messages and recommendation updates each run in a single transaction |
+| Retries | Transient network errors are retried with backoff, only for work that is safe to repeat |
+| Errors | Unique violations return `409`, invalid references `400`, an unreachable database `503` |
+| Account deletion | Removes the student's data explicitly in one transaction, so it does not depend on SQLite foreign-key enforcement |
 
-Redeploy after changing them: Vite bakes these values in at build time.
+**To change the schema:** edit `schema.ts`, run `npm run db:generate`, review the new SQL file in `backend/drizzle/`, then run `npm run db:migrate`.
 
-**Backend (any Node host, e.g. Render, Railway, Fly.io).** Root directory `backend`, build `npm ci && npm run build`, start `npm run db:migrate && npm start`. Set the variables from `backend/.env.example`, plus:
+## AI, voice and photo
 
-- `NODE_ENV=production`, `TRUST_PROXY=true`, `ENFORCE_HTTPS=true`, `COOKIE_SECURE=true`
-- `COOKIE_SAMESITE=none`, because the frontend (vercel.app) and the API are on different sites; without it the login refresh cookie is not sent
-- `FRONTEND_URL=https://gurukul-ai.vercel.app`
+**Providers are chosen automatically** from the keys in `backend/.env`:
 
-`GET /api/health` reports `db` (`up`/`down`), whether migrations are applied and the AI mode. It never includes credentials.
+| Task | First choice | Fallback | Last resort |
+|---|---|---|---|
+| Tutor (LLM) | Groq | Gemini | Demo mode |
+| Speech to text | Sarvam | Groq Whisper | Browser speech recognition |
+| Read aloud | Sarvam | — | Device voice |
+| Photo reading | Groq vision model | — | "Not configured" message |
 
-Serve everything over HTTPS. Browsers allow service workers, microphone access and camera capture only on secure origins.
+**Demo mode.** With no AI key, the tutor reply is clearly labelled *"Demo mode — not an AI answer"*. It contains only a calculator result (for arithmetic or a linear equation) and the summary of the linked lesson. Lessons, practice, quizzes, progress, offline use and the guardian view all work without any key.
 
-## API
+**Voice tutor** (`/app/voice`):
+- Languages: हिंदी, English, తెలుగు.
+- Recordings are re-encoded to 16 kHz mono WAV in the browser and deleted from the server right after transcription.
+- With Sarvam, recordings stop at 30 seconds.
+- The newest 40 spoken replies are cached on the phone and cleared on logout.
+- Without a Sarvam key, read-aloud needs a Hindi or Telugu voice installed on the device; the page says when one is missing.
 
-All routes are under `/api`. Protected routes need `Authorization: Bearer <access token>`. The refresh token is an httpOnly cookie scoped to `/api/auth`, rotated on every use. If an old refresh token is reused, all of that user's sessions are revoked.
+## Offline learning and sync
+
+1. A student downloads a chapter pack (lessons, questions and answer keys) into IndexedDB.
+2. Offline, practice is graded on the phone and every answer is queued locally.
+3. When the connection returns, the queue is sent to `POST /api/sync` in batches.
+4. The server re-grades every answer. The phone's own grading is never trusted, and future timestamps are clamped.
+5. Each record is applied **exactly once**. It is first claimed through a unique `(student, clientId)` key, so a record sent twice, even at the same moment, is reported as `DUPLICATE`.
+6. If the database is briefly unreachable, the record comes back as `RETRY` and stays queued on the phone instead of being lost.
+
+AI features (tutor, voice, photo) always need internet, and the app says so.
+
+## Security and privacy
+
+- **Minimal data from minors.** Students give a name and username only. No email, phone number, Aadhaar or school ID.
+- **Passwords** are hashed with bcrypt (cost 12). Login gives the same error and similar timing whether or not the username exists.
+- **Sessions.** Short-lived access tokens, plus a refresh token in an httpOnly cookie that rotates on every use. Reuse of an old refresh token revokes all of that user's sessions.
+- **Access control.** Role checks on every route. Guardians see only students who shared a code with them, and never the content of tutor conversations.
+- **Abuse protection.** Rate limits on the API, login and registration, AI calls and speech. A honeypot field on registration. Zod validation on every request body.
+- **Secrets.** Database and AI keys stay on the server. The frontend bundle contains only public settings.
+- **Uploads.** Type and size checked, stored temporarily, then deleted.
+- **Analytics.** Anonymous page counts, sent only after the visitor opts in through the cookie banner.
+- **Shared phones.** Logging out clears personal data cached on the device.
+
+## API reference
+
+All routes are under `/api`. Protected routes need `Authorization: Bearer <access token>`.
 
 | Module | Endpoints |
 |---|---|
@@ -241,22 +286,112 @@ All routes are under `/api`. Protected routes need `Authorization: Bearer <acces
 | parents / teachers | `POST /parents/link`, `GET /parents/students`, `GET /parents/students/:id/report`, `DELETE /parents/students/:id` |
 | curriculum | `GET /curriculum`, `GET /curriculum/sources`, `GET /chapters`, `GET /chapters/:slug`, `GET /chapters/:slug/offline-pack`, `GET /topics/:slug`, `POST /topics/:slug/complete` |
 | tutor | `GET/POST /tutor/conversations`, `GET/DELETE /tutor/conversations/:id`, `POST /tutor/conversations/:id/messages` |
-| voice / vision | `GET /voice/capabilities`, `POST /voice/transcribe`, `POST /voice/speak`, `POST /vision/extract` (multipart `image`) |
+| voice / vision | `GET /voice/capabilities`, `POST /voice/transcribe?language=hi\|en\|te`, `POST /voice/speak`, `POST /vision/extract` |
 | practice | `GET /practice/next?topic=`, `POST /practice/answer`, `POST /practice/sessions`, `POST /practice/sessions/:id/end` |
 | assessments | `GET /assessments`, `GET /assessments/:slug`, `POST /assessments/:slug/start`, `POST /assessments/sessions/:id/submit` |
 | adaptive | `GET /adaptive/recommendations`, `POST /adaptive/recommendations/recompute`, `POST /adaptive/recommendations/:id/dismiss`, `GET /adaptive/weak-topics` |
 | progress | `GET /progress/me`, `GET /progress/me/activity` |
-| sync | `POST /sync` (idempotent batch of offline records) |
-| analytics | `POST /analytics/pageview` (anonymous; sent only after consent) |
+| sync | `POST /sync` (exactly-once batch of offline records) |
+| analytics | `POST /analytics/pageview` (anonymous, consent-based) |
+
+## Testing
+
+```bash
+cd backend && npm run lint && npm test && npm run build
+cd frontend && npm run lint && npm test && npm run build
+```
+
+Backend tests never touch the Turso database in `.env`. [`tests/globalSetup.ts`](backend/tests/globalSetup.ts) builds a temporary libSQL database in the OS temp folder, applies the real migrations, seeds it and deletes it afterwards.
+
+| Suite | Covers |
+|---|---|
+| `backend/tests/api.test.ts` | Registration, login, refresh-token rotation and reuse detection, practice, quizzes, offline sync, demo-mode tutor, guardian access control |
+| `backend/tests/db.test.ts` | Health check, CRUD, unique constraints, transaction rollback, JSON columns, progress upsert, nested relations, full account deletion, concurrent duplicate sync, retry policy |
+| `backend/tests/voice.test.ts` | WAV helpers, Sarvam and Gemini request formats (mocked), provider selection, voice API without keys, Telugu demo reply |
+| `backend/tests/logic.test.ts` | Calculator, answer grading, adaptive difficulty, AI answer verification, streaks |
+| `frontend/src/**/*.test.ts` | Audio encoding and cache keys |
+
+## Deployment
+
+### Frontend on Vercel
+
+1. Import the repository and set **Root Directory** to `frontend`.
+2. [`frontend/vercel.json`](frontend/vercel.json) already configures:
+   - the build (`npm run build`, output `dist`);
+   - the SPA fallback to `index.html`;
+   - long caching for hashed assets, and no caching for `sw.js` and `index.html`;
+   - security headers.
+3. Add these environment variables, then redeploy. Vite fixes them at build time.
+
+| Variable | Value |
+|---|---|
+| `VITE_API_URL` | Your **deployed** backend, e.g. `https://<backend-host>/api` (not `localhost`) |
+| `VITE_SITE_URL` | `https://gurukul-ai.vercel.app` |
+| `VITE_APP_NAME` | `GURUKUL AI` |
+
+### Backend on any Node.js host (Render, Railway, Fly.io…)
+
+- **Root directory:** `backend`
+- **Build:** `npm ci && npm run build`
+- **Start:** `npm run db:migrate && npm start`
+- **Environment:** everything from `backend/.env.example`, plus:
+
+```
+NODE_ENV=production
+TRUST_PROXY=true
+ENFORCE_HTTPS=true
+COOKIE_SECURE=true
+COOKIE_SAMESITE=none          # frontend and API are on different sites
+FRONTEND_URL=https://gurukul-ai.vercel.app
+```
+
+Serve everything over HTTPS. Browsers allow service workers, the microphone and the camera only on secure origins.
+
+## Verification status
+
+What has and has not been checked, as observed during development:
+
+| Item | Status |
+|---|---|
+| Backend: lint, 59/59 tests, production build | Passing (2026-11-21) |
+| Frontend: lint, 5/5 tests, production build | Passing (2026-11-21) |
+| Turso database: migration, seed, health check, login and curriculum API | Verified against a live Turso database (2026-11-21) |
+| Groq tutor | Live Hindi and Telugu replies observed during development (2026-11-21) |
+| Browser journeys (register, practice, quiz, offline and reconnect, every route on mobile and desktop) | Checked with a headless-browser script during development; the script is not in the repository |
+| Sarvam and Gemini | Request formats follow their public docs and are covered by mocked tests only. **Not tested against the live APIs** |
+| Telugu strings written by the server | Need review by a native speaker |
+| Real low-end Android devices | **Not tested yet** |
 
 ## Known limitations
 
-- **Curriculum alignment.** The chapter list was checked against secondary sources only, not the official JAC notified syllabus (see `backend/content/class9-maths.json`, `meta`). All lessons are original *sample* content and too few for a full course.
-- **Telugu content.** Lessons and questions are in Hindi and English only. Telugu is supported in the voice and text tutor replies, not in lesson content.
-- **Password reset.** Students give no email address, so there is no password reset.
+- **Curriculum alignment.** The chapter list was checked against secondary sources, not the official JAC notified syllabus (see `backend/content/class9-maths.json`, `meta`). All lessons are original sample content and not enough for a full course.
+- **Telugu.** Lessons and questions are in Hindi and English only. Telugu is supported in tutor replies, not in lesson content.
+- **Password reset.** Students give no email address, so there is no self-service reset.
 - **Answer checking.** The calculator confirms only the final number of arithmetic or one-variable linear answers. It does not check reasoning or geometry proofs.
-- **Device voices.** Without a Sarvam key, read-aloud depends on the device having a Hindi or Telugu voice. Browser speech recognition needs internet and works best in Chrome on Android.
-- **Background sync.** It runs in open tabs. With no tab open, the queue syncs on the next visit. iOS Safari has no Background Sync API, so syncing happens on reconnect or app open.
-- **Tests.** Tests cover logic and APIs. Browser journeys are not in the test suite.
+- **Device voices.** Without a Sarvam key, read-aloud depends on the device's installed voices. Browser speech recognition needs internet and works best in Chrome on Android.
+- **Background sync.** Sync runs while the app is open. iOS Safari has no Background Sync API, so syncing happens on reconnect or app open.
 - **Legal review.** The privacy policy and terms need legal review (for example against India's DPDP Act 2023) before public use.
-- **No licence yet.** A licence will be chosen after the organisers' ownership terms are reviewed.
+- **Licence.** Not chosen yet; it will follow a review of the organisers' ownership terms.
+
+## Project structure
+
+```
+frontend/                 React PWA (deployed on Vercel)
+  src/pages/              Routes: public site, auth, student app, guardian app
+  src/features/           Tutor, voice, practice and learning components
+  src/components/         Shared UI (buttons, fields, layout)
+  src/lib/                IndexedDB, offline sync, constants
+  public/                 Service worker, manifest, icons
+  vercel.json             Build, routing, caching and security headers
+
+backend/                  Express API
+  src/db/                 Drizzle schema and the Turso connection
+  src/routes/ controllers/ services/ repositories/
+  src/middleware/         Auth, security, uploads, errors
+  drizzle/                SQL migrations
+  scripts/                migrate, seed, db-check
+  content/                Curriculum source (class9-maths.json)
+  tests/                  Vitest + Supertest
+```
+
+There is no root `package.json`. Install and run each app from its own folder.

@@ -41,6 +41,8 @@ export const ttsLimiter = rateLimit({
 /** Redirects plain HTTP to HTTPS when running behind a TLS-terminating proxy. */
 export function enforceHttps(req: Request, res: Response, next: NextFunction) {
   if (!env.ENFORCE_HTTPS) return next();
+  // Hosting platforms (e.g. Render) probe the health check over internal HTTP; it returns no private data
+  if (req.path === '/api/health') return next();
   if (req.secure || req.headers['x-forwarded-proto'] === 'https') return next();
   if (req.method === 'GET' || req.method === 'HEAD') return res.redirect(308, `https://${req.headers.host}${req.originalUrl}`);
   return res.status(403).json({ error: { code: 'HTTPS_REQUIRED', message: 'Use HTTPS.' } });
