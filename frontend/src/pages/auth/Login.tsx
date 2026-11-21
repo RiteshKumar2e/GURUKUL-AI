@@ -3,13 +3,12 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff } from 'lucide-react';
 import { useLang } from '@/context/LanguageContext';
 import { homePathFor, useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
 import { ApiError } from '@/services/api';
-import { Alert, Button, Input } from '@/components/ui';
+import { Alert, Button, Input, PasswordInput } from '@/components/ui';
 
 export default function Login() {
   const { tx } = useLang();
@@ -18,7 +17,6 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [serverError, setServerError] = useState<string | null>(null);
-  const [showPw, setShowPw] = useState(false);
   useDocumentTitle(tx('लॉग इन', 'Log in'), tx('अपने GURUKUL AI खाते में लॉग इन करें।', 'Log in to your GURUKUL AI account.'));
 
   const schema = z.object({
@@ -59,12 +57,7 @@ export default function Login() {
         <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
           {serverError && <Alert tone="error">{serverError}</Alert>}
           <Input id="username" label={tx('यूज़रनेम', 'Username')} autoComplete="username" autoCapitalize="none" spellCheck={false} error={formState.errors.username?.message} {...register('username')} />
-          <div className="relative">
-            <Input id="password" label={tx('पासवर्ड', 'Password')} type={showPw ? 'text' : 'password'} autoComplete="current-password" error={formState.errors.password?.message} className="pr-11" {...register('password')} />
-            <button type="button" className="absolute right-2 top-[2.1rem] rounded p-1.5 text-ink-600 hover:text-ink-900" onClick={() => setShowPw((s) => !s)} aria-label={showPw ? tx('पासवर्ड छिपाएँ', 'Hide password') : tx('पासवर्ड दिखाएँ', 'Show password')}>
-              {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-          </div>
+          <PasswordInput id="password" label={tx('पासवर्ड', 'Password')} autoComplete="current-password" error={formState.errors.password?.message} {...register('password')} />
           <Button type="submit" className="w-full" size="lg" loading={formState.isSubmitting}>
             {tx('लॉग इन करें', 'Log in')}
           </Button>
@@ -89,7 +82,7 @@ export default function Login() {
             ['demo.parent', tx('अभिभावक', 'Parent')],
             ['demo.teacher', tx('शिक्षक', 'Teacher')],
           ].map(([u, label]) => (
-            <button key={u} type="button" onClick={() => fillDemo(u)} className="flex items-center justify-between rounded border border-line px-3 py-2 text-left hover:border-ink-400 hover:bg-ink-50">
+            <button key={u} type="button" onClick={() => fillDemo(u)} className="flex items-center justify-between rounded-md border-2 border-ink-950 px-3 py-2 text-left hover:bg-saffron-50">
               <span className="font-semibold">{label}</span>
               <span className="text-sm text-ink-600">{u}</span>
             </button>

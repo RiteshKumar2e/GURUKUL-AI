@@ -96,7 +96,7 @@ export default function Topic() {
             </EmptyState>
           )}
 
-          <div className="mt-8 rounded border border-line bg-white p-4">
+          <div className="mt-8 border-2 border-ink-950 bg-white p-4">
             <p className="font-semibold">{tx('समझ आया?', 'Got it?')}</p>
             <p className="text-sm text-ink-700">{tx(`${t.questionCount} प्रश्नों से जाँचिए। गलत होने पर समझाया जाएगा।`, `Check yourself with ${t.questionCount} questions. Mistakes are explained.`)}</p>
             <div className="mt-3 flex flex-wrap gap-2">

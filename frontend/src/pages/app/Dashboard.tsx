@@ -34,7 +34,7 @@ export default function Dashboard() {
     <>
       <header className="mb-6">
         <p className="text-ink-600">{greeting(tx)},</p>
-        <h1 className="text-[1.6rem] sm:text-[1.85rem]">{user?.displayName}</h1>
+        <h1 className="text-[1.9rem] sm:text-[2.4rem]"><span className="mark">{user?.displayName}</span></h1>
       </header>
 
       {q.isLoading && (
@@ -48,16 +48,16 @@ export default function Dashboard() {
       {q.data && (
         <>
           {q.data.continueTopic ? (
-            <Link to={`/app/learn/topics/${q.data.continueTopic.slug}`} className="mb-8 flex items-center gap-4 rounded border border-ink-900 bg-ink-900 px-5 py-4 text-white no-underline hover:bg-ink-800">
+            <Link to={`/app/learn/topics/${q.data.continueTopic.slug}`} className="mb-8 flex items-center gap-4 rounded-lg border-2 border-ink-950 bg-ink-900 px-5 py-5 text-white no-underline shadow-brut-saffron hover:bg-ink-800">
               <BookOpen className="h-6 w-6 shrink-0 text-saffron-400" aria-hidden />
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-ink-200">{tx('जहाँ छोड़ा था', 'Continue where you left off')}</span>
-                <span className="block truncate text-lg font-semibold">{pick(q.data.continueTopic, 'title')}</span>
+                <span className="block truncate font-display text-xl font-bold">{pick(q.data.continueTopic, 'title')}</span>
               </span>
               <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
             </Link>
           ) : (
-            <div className="mb-8 rounded border border-line bg-white px-5 py-4">
+            <div className="mb-8 border-2 border-ink-950 bg-white px-5 py-4">
               <p className="font-semibold">{tx('पहला पाठ आपका इंतज़ार कर रहा है', 'Your first lesson is waiting')}</p>
               <p className="text-sm text-ink-700">{tx('अध्याय 1 से शुरू करें या अपनी पसंद का अध्याय चुनें।', 'Start with Chapter 1 or pick any chapter.')}</p>
               <ButtonLink to="/app/learn" className="mt-3" size="sm">
@@ -68,8 +68,8 @@ export default function Dashboard() {
 
           <nav className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label={tx('जल्दी पहुँच', 'Quick actions')}>
             {quick.map((a) => (
-              <Link key={a.to} to={a.to} className="flex items-center gap-2.5 rounded border border-line bg-white px-3 py-3 font-semibold text-ink-900 no-underline hover:border-ink-400">
-                <a.icon className="h-5 w-5 shrink-0 text-saffron-600" aria-hidden />
+              <Link key={a.to} to={a.to} className="flex min-h-[52px] items-center gap-2.5 rounded-md border-2 border-ink-950 bg-white px-3 py-3 font-bold text-ink-950 no-underline shadow-brut-sm hover:bg-saffron-100 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
+                <a.icon className="h-5 w-5 shrink-0 text-ink-950" aria-hidden />
                 <span className="text-[0.95rem]">{tx(a.hi, a.en)}</span>
               </Link>
             ))}

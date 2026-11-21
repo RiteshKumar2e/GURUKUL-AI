@@ -1,21 +1,24 @@
-import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { forwardRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { Link, type LinkProps } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, Info, Loader2, TriangleAlert } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, Info, Loader2, TriangleAlert } from 'lucide-react';
+import { useLang } from '@/context/LanguageContext';
 
 /* --------------------------------- Button --------------------------------- */
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
-const base = 'inline-flex items-center justify-center gap-2 rounded font-semibold no-underline transition-colors disabled:cursor-not-allowed disabled:opacity-60 select-none';
+const base =
+  'inline-flex min-h-[44px] items-center justify-center gap-2 rounded border-2 font-extrabold no-underline select-none transition-[transform,box-shadow,background-color] duration-100 disabled:cursor-not-allowed disabled:opacity-55 disabled:shadow-none';
+// Raised buttons lift on hover and press flat on click, like a physical key
+const press = 'shadow-brut-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_#111111] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none';
 const variants: Record<Variant, string> = {
-  // Dark ink text on saffron keeps contrast above WCAG AA (≈7:1)
-  primary: 'bg-saffron-400 text-ink-950 hover:bg-saffron-500 active:bg-saffron-500 border border-saffron-500/40',
-  secondary: 'bg-white text-ink-900 border border-ink-200 hover:border-ink-400 hover:bg-ink-50',
-  ghost: 'bg-transparent text-ink-800 hover:bg-ink-50 border border-transparent',
-  danger: 'bg-white text-bad-700 border border-bad-600/40 hover:bg-bad-50',
+  primary: `border-ink-950 bg-red-600 text-white hover:bg-red-600 ${press}`,
+  secondary: `border-ink-950 bg-white text-ink-950 hover:bg-saffron-400 ${press}`,
+  ghost: 'border-transparent bg-transparent text-ink-950 underline decoration-2 underline-offset-4 hover:bg-lemon-100',
+  danger: 'border-bad-700 bg-white text-bad-700 hover:bg-bad-50',
 };
-const sizes: Record<Size, string> = { sm: 'px-3 py-1.5 text-sm', md: 'px-4 py-2.5 text-[0.98rem]', lg: 'px-5 py-3 text-base' };
+const sizes: Record<Size, string> = { sm: '!min-h-[36px] px-3 py-1 text-sm', md: 'px-4 py-2 text-[0.98rem]', lg: 'min-h-[50px] px-6 py-3 text-base' };
 
 export const btnClass = (variant: Variant = 'primary', size: Size = 'md', extra = '') => `${base} ${variants[variant]} ${sizes[size]} ${extra}`;
 
@@ -80,6 +83,41 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ l
   );
 });
 
+/** Password field with a show/hide (eye) button. The button sits inside the input box, so a hint
+ *  or error below the field never shifts it. */
+export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type'>>(function PasswordInput({ label, error, hint, id, className = '', ...rest }, ref) {
+  const { tx } = useLang();
+  const [show, setShow] = useState(false);
+  return (
+    <FieldWrap id={id} label={label} error={error} hint={hint}>
+      <div className="relative">
+        <input
+          ref={ref}
+          id={id}
+          type={show ? 'text' : 'password'}
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          className={`field pr-12 ${error ? 'field-error' : ''} ${className}`}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+          {...rest}
+        />
+        <button
+          type="button"
+          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r text-ink-600 hover:text-ink-900"
+          onClick={() => setShow((s) => !s)}
+          aria-label={show ? tx('पासवर्ड छिपाएँ', 'Hide password') : tx('पासवर्ड दिखाएँ', 'Show password')}
+          aria-pressed={show}
+          aria-controls={id}
+        >
+          {show ? <EyeOff className="h-5 w-5" aria-hidden /> : <Eye className="h-5 w-5" aria-hidden />}
+        </button>
+      </div>
+    </FieldWrap>
+  );
+});
+
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & { label: string; error?: string; hint?: string; id: string };
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select({ label, error, hint, id, className = '', children, ...rest }, ref) {
   return (
@@ -104,10 +142,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 
 type Tone = 'info' | 'success' | 'error' | 'warning';
 const toneStyle: Record<Tone, string> = {
-  info: 'border-ink-200 bg-ink-50 text-ink-900',
-  success: 'border-good-600/30 bg-good-50 text-ink-900',
-  error: 'border-bad-600/30 bg-bad-50 text-ink-900',
-  warning: 'border-saffron-400/60 bg-saffron-50 text-ink-900',
+  info: 'border-ink-950 bg-sky text-ink-950',
+  success: 'border-good-700 bg-good-50 text-ink-950',
+  error: 'border-bad-700 bg-bad-50 text-ink-950',
+  warning: 'border-ink-950 bg-saffron-100 text-ink-950',
 };
 const toneIcon = { info: Info, success: CheckCircle2, error: AlertCircle, warning: TriangleAlert };
 const toneIconColor: Record<Tone, string> = { info: 'text-ink-600', success: 'text-good-600', error: 'text-bad-600', warning: 'text-saffron-600' };
@@ -115,7 +153,7 @@ const toneIconColor: Record<Tone, string> = { info: 'text-ink-600', success: 'te
 export function Alert({ tone = 'info', title, children, action }: { tone?: Tone; title?: string; children?: ReactNode; action?: ReactNode }) {
   const Icon = toneIcon[tone];
   return (
-    <div className={`flex gap-3 rounded border px-4 py-3 ${toneStyle[tone]}`} role={tone === 'error' ? 'alert' : undefined}>
+    <div className={`flex gap-3 rounded-md border-2 px-4 py-3 ${toneStyle[tone]}`} role={tone === 'error' ? 'alert' : undefined}>
       <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${toneIconColor[tone]}`} aria-hidden />
       <div className="min-w-0 flex-1 text-[0.97rem]">
         {title && <p className="font-semibold">{title}</p>}
@@ -164,10 +202,10 @@ export function EmptyState({ icon, title, children, action }: { icon?: ReactNode
 
 export function PageHeader({ title, subtitle, eyebrow, actions }: { title: string; subtitle?: ReactNode; eyebrow?: string; actions?: ReactNode }) {
   return (
-    <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <header className="mb-7 flex flex-col gap-3 border-b-2 border-ink-950 pb-5 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         {eyebrow && <p className="eyebrow mb-1">{eyebrow}</p>}
-        <h1 className="text-[1.6rem] sm:text-[1.85rem]">{title}</h1>
+        <h1 className="text-[1.75rem] sm:text-[2.2rem]">{title}</h1>
         {subtitle && <p className="mt-1 max-w-prose text-ink-700">{subtitle}</p>}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
@@ -180,7 +218,7 @@ export function Section({ title, action, children, className = '' }: { title?: s
     <section className={`mb-8 ${className}`}>
       {(title || action) && (
         <div className="mb-3 flex items-baseline justify-between gap-3">
-          {title && <h2 className="text-lg">{title}</h2>}
+          {title && <h2 className="flex items-center gap-2 text-xl"><span className="h-3 w-3 shrink-0 rounded-sm bg-saffron-400 outline outline-2 outline-ink-950" aria-hidden />{title}</h2>}
           {action}
         </div>
       )}
@@ -191,12 +229,12 @@ export function Section({ title, action, children, className = '' }: { title?: s
 
 export function Badge({ children, tone = 'neutral' }: { children: ReactNode; tone?: 'neutral' | 'saffron' | 'good' | 'bad' }) {
   const t = {
-    neutral: 'bg-ink-50 text-ink-700 border-ink-100',
-    saffron: 'bg-saffron-50 text-saffron-700 border-saffron-200',
-    good: 'bg-good-50 text-good-700 border-good-600/20',
-    bad: 'bg-bad-50 text-bad-700 border-bad-600/20',
+    neutral: 'bg-white text-ink-950 border-ink-950',
+    saffron: 'bg-lemon-300 text-ink-950 border-ink-950',
+    good: 'bg-good-50 text-good-700 border-good-700 before:bg-good-700',
+    bad: 'bg-bad-50 text-bad-700 border-bad-700 before:bg-bad-700',
   }[tone];
-  return <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded border px-2 py-0.5 text-xs font-semibold ${t}`}>{children}</span>;
+  return <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[1.5px] px-2.5 py-0.5 text-xs font-bold ${t} ${tone === 'good' || tone === 'bad' ? "before:h-1.5 before:w-1.5 before:rounded-full before:content-['']" : ''}`}>{children}</span>;
 }
 
 /** Mastery shown as a thin bar plus the exact percentage; no colour-only meaning. */
@@ -205,7 +243,7 @@ export function MasteryBar({ value, label }: { value: number; label?: string }) 
   const color = pct >= 70 ? 'bg-good-600' : pct >= 40 ? 'bg-saffron-400' : pct > 0 ? 'bg-bad-600/80' : 'bg-ink-200';
   return (
     <div className="flex items-center gap-2">
-      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-100" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
+      <div className="h-2.5 flex-1 overflow-hidden rounded-full border-[1.5px] border-ink-950 bg-white" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
         <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <span className="w-10 text-right text-sm tabular-nums text-ink-700">{pct}%</span>
@@ -215,7 +253,7 @@ export function MasteryBar({ value, label }: { value: number; label?: string }) 
 
 export function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: Array<{ value: T; label: string }>; label: string }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap rounded border border-ink-200 bg-white p-0.5">
+    <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap overflow-hidden rounded-md border-2 border-ink-950 bg-white">
       {options.map((o) => (
         <button
           key={o.value}
@@ -223,7 +261,7 @@ export function Segmented<T extends string>({ value, onChange, options, label }:
           role="radio"
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`rounded-[4px] px-3 py-1.5 text-sm font-semibold transition-colors ${value === o.value ? 'bg-ink-900 text-white' : 'text-ink-700 hover:bg-ink-50'}`}
+          className={`min-h-[40px] border-r-2 border-ink-950 px-3 py-1.5 text-sm font-bold last:border-r-0 ${value === o.value ? 'bg-ink-900 text-white' : 'text-ink-950 hover:bg-saffron-100'}`}
         >
           {o.label}
         </button>
@@ -236,7 +274,7 @@ export function Stat({ label, value, note }: { label: string; value: ReactNode; 
   return (
     <div className="min-w-0">
       <p className="text-sm text-ink-600">{label}</p>
-      <p className="text-2xl font-semibold tabular-nums text-ink-900">{value}</p>
+      <p className="text-3xl font-extrabold tabular-nums text-ink-950">{value}</p>
       {note && <p className="text-xs text-ink-500">{note}</p>}
     </div>
   );

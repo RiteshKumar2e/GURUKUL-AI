@@ -14,7 +14,7 @@ export function ChapterProgressList({ chapters, linkable = true }: { chapters: P
   const { tx, pick } = useLang();
   const [open, setOpen] = useState<string | null>(null);
   return (
-    <ul className="divide-y divide-line rounded border border-line bg-white">
+    <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
       {chapters.map((c) => (
         <li key={c.slug}>
           <button className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-ink-50" onClick={() => setOpen(open === c.slug ? null : c.slug)} aria-expanded={open === c.slug}>
@@ -60,7 +60,7 @@ export function SessionList({ sessions }: { sessions: SessionRow[] }) {
     PHOTO: ['फोटो', 'Photo'],
   };
   return (
-    <ul className="divide-y divide-line rounded border border-line bg-white">
+    <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
       {sessions.map((s) => (
         <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5">
           <Badge>{tx(...label[s.type])}</Badge>

@@ -62,7 +62,7 @@ export default function Chapters() {
         <ul className="grid gap-3 md:grid-cols-2">
           {list.map((c) => (
             <li key={c.slug}>
-              <Link to={`/app/learn/chapters/${c.slug}`} className="panel flex h-full flex-col px-4 py-4 text-ink-900 no-underline hover:border-ink-400">
+              <Link to={`/app/learn/chapters/${c.slug}`} className="panel flex h-full flex-col px-4 py-4 text-ink-900 no-underline hover:bg-saffron-50">
                 <span className="text-xs font-semibold uppercase tracking-wide text-saffron-700">
                   {tx('अध्याय', 'Chapter')} {c.number}
                 </span>

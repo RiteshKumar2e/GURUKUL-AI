@@ -11,9 +11,9 @@ interface Toast {
 const Ctx = createContext<{ toast: (message: string, kind?: Kind) => void } | null>(null);
 
 const STYLE: Record<Kind, string> = {
-  success: 'border-good-600 bg-white text-ink-900',
-  error: 'border-bad-600 bg-white text-ink-900',
-  info: 'border-ink-600 bg-white text-ink-900',
+  success: 'border-l-good-600 bg-white text-ink-900',
+  error: 'border-l-bad-600 bg-white text-ink-900',
+  info: 'border-l-saffron-400 bg-white text-ink-900',
 };
 const ICON = { success: CheckCircle2, error: AlertCircle, info: Info };
 const ICON_COLOR: Record<Kind, string> = { success: 'text-good-600', error: 'text-bad-600', info: 'text-ink-600' };
@@ -37,7 +37,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => {
           const Icon = ICON[t.kind];
           return (
-            <div key={t.id} className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded border-l-4 px-4 py-3 shadow-md ${STYLE[t.kind]}`}>
+            <div key={t.id} className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-md border-2 border-l-8 border-ink-950 px-4 py-3 shadow-brut ${STYLE[t.kind]}`}>
               <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${ICON_COLOR[t.kind]}`} aria-hidden />
               <p className="flex-1 text-[0.95rem]">{t.message}</p>
               <button onClick={() => dismiss(t.id)} className="text-ink-500 hover:text-ink-900" aria-label="Close">

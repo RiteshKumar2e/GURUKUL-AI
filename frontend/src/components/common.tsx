@@ -14,8 +14,8 @@ export function Logo({ to = '/', compact = false }: { to?: string; compact?: boo
     <Link to={to} className="flex items-center gap-2 text-ink-900 no-underline" aria-label="GURUKUL AI — home">
       <img src="/favicon.svg" alt="" width={32} height={32} className="h-8 w-8" />
       {!compact && (
-        <span className="text-[1.15rem] font-bold tracking-tight">
-          GURUKUL<span className="text-saffron-600"> AI</span>
+        <span className="text-[1.2rem] font-extrabold tracking-tight text-ink-950">
+          GURUKUL<span className="ml-1 rounded-sm bg-saffron-400 px-1">AI</span>
         </span>
       )}
     </Link>
@@ -25,14 +25,14 @@ export function Logo({ to = '/', compact = false }: { to?: string; compact?: boo
 export function LanguageToggle({ className = '' }: { className?: string }) {
   const { lang, setLang } = useLang();
   return (
-    <div className={`inline-flex rounded border border-ink-200 bg-white p-0.5 text-sm ${className}`} role="group" aria-label="Language / भाषा">
+    <div className={`inline-flex overflow-hidden rounded-md border-2 border-ink-950 bg-white text-sm ${className}`} role="group" aria-label="Language / भाषा">
       {(['hi', 'en'] as const).map((l) => (
         <button
           key={l}
           type="button"
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
-          className={`rounded-[4px] px-2.5 py-1 font-semibold ${lang === l ? 'bg-ink-900 text-white' : 'text-ink-700 hover:bg-ink-50'}`}
+          className={`min-h-[36px] px-2.5 py-1 font-bold first:border-r-2 first:border-ink-950 ${lang === l ? 'bg-ink-900 text-white' : 'text-ink-950 hover:bg-saffron-100'}`}
         >
           {l === 'hi' ? 'हिंदी' : 'English'}
         </button>
@@ -83,7 +83,7 @@ export function CookieBanner() {
   }, []);
   if (!show) return null;
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-200 bg-white px-4 py-4 shadow-[0_-2px_8px_rgba(16,42,67,0.06)]" role="dialog" aria-label={tx('कुकी सूचना', 'Cookie notice')}>
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink-950 bg-white px-4 py-4" role="dialog" aria-label={tx('कुकी सूचना', 'Cookie notice')}>
       <div className="mx-auto flex max-w-6xl flex-col gap-3 md:flex-row md:items-center">
         <p className="flex-1 text-sm text-ink-800">
           {tx(

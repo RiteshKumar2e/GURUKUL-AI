@@ -138,7 +138,7 @@ export default function Photo() {
       {stage !== 'pick' && (
         <div className="grid gap-5 md:grid-cols-[minmax(0,16rem)_1fr]">
           <div>
-            {preview && <img src={preview} alt={tx('आपकी चुनी हुई फोटो', 'Your selected photo')} className="max-h-72 w-full rounded border border-line bg-white object-contain" />}
+            {preview && <img src={preview} alt={tx('आपकी चुनी हुई फोटो', 'Your selected photo')} className="max-h-72 w-full rounded-lg border-2 border-ink-950 bg-white object-contain" />}
             <p className="mt-1 text-xs text-ink-600">{sizeNote}</p>
             <Button variant="ghost" size="sm" className="mt-2" onClick={reset} icon={<RotateCcw className="h-4 w-4" />}>
               {tx('दूसरी फोटो', 'Another photo')}

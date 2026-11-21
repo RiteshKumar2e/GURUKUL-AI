@@ -52,7 +52,7 @@ const KIND = {
 export function RecommendationList({ items }: { items: Recommendation[] }) {
   const { tx, pick } = useLang();
   return (
-    <ul className="divide-y divide-line rounded border border-line bg-white">
+    <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
       {items.map((r) => {
         const k = KIND[r.kind];
         const to = r.kind === 'PRACTICE' ? `/app/practice?topic=${r.topic.slug}` : `/app/learn/topics/${r.topic.slug}`;
@@ -79,7 +79,7 @@ export function RecommendationList({ items }: { items: Recommendation[] }) {
 export function WeakTopicList({ items, linkable = true }: { items: WeakTopic[]; linkable?: boolean }) {
   const { tx, pick } = useLang();
   return (
-    <ul className="divide-y divide-line rounded border border-line bg-white">
+    <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
       {items.map((w) => {
         const body = (
           <>

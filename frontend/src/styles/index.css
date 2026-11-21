@@ -1,11 +1,11 @@
+/* Latin: Archivo (one variable file, ~35 KB, all weights). */
+@import '@fontsource-variable/archivo/wght.css';
+/* Devanagari: Mukta. Archivo has no Hindi glyphs, so the browser falls through to Mukta and only
+   downloads these files on pages that show Hindi. */
 @import '@fontsource/mukta/devanagari-400.css';
 @import '@fontsource/mukta/devanagari-600.css';
 @import '@fontsource/mukta/devanagari-700.css';
-@import '@fontsource/mukta/latin-400.css';
-@import '@fontsource/mukta/latin-600.css';
-@import '@fontsource/mukta/latin-700.css';
-/* Telugu for the voice tutor (~36 KB woff2). It sits after Mukta in the font stack, so browsers
-   only fetch it when they meet a character Mukta cannot draw, i.e. Telugu text. */
+/* Telugu for the voice tutor (~36 KB woff2), fetched only when Telugu text is on screen. */
 @import '@fontsource/noto-sans-telugu/telugu-400.css';
 @import '@fontsource/noto-sans-telugu/telugu-600.css';
 
@@ -13,28 +13,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Colour values are written as plain CSS here (not @apply with theme colours) so a dev server that
+   has not yet reloaded tailwind.config.js still compiles this file. */
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-paper text-ink-900 font-sans antialiased;
+    @apply font-sans antialiased;
+    background: #FFFFFF;
+    color: #111111;
     overflow-x: hidden;
   }
   h1, h2, h3, h4 {
-    @apply font-semibold text-ink-900;
-    line-height: 1.3;
+    color: #111111;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
   }
   a {
-    @apply text-ink-800 underline decoration-saffron-400 decoration-2 underline-offset-4 hover:text-ink-900;
+    color: #111111;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
   :focus-visible {
-    outline: 3px solid #F0A23B;
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 2px #111111, 0 0 0 5px #FFD60A;
   }
   ::selection {
-    background: #FAD49E;
+    background: #FFD60A;
+    color: #111111;
   }
   img, svg, video {
     max-width: 100%;
@@ -46,28 +57,66 @@
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
   }
   .label {
-    @apply mb-1 block text-sm font-semibold text-ink-800;
+    @apply mb-1.5 block text-sm;
+    font-weight: 750;
+    color: #111111;
   }
   .field {
-    @apply block w-full rounded border border-ink-200 bg-white px-3 py-2.5 text-base text-ink-900 placeholder:text-ink-400
-      focus:border-ink-600 focus:outline-none focus:ring-2 focus:ring-saffron-200 disabled:bg-ink-50;
+    @apply block w-full rounded border-2 bg-white px-3 py-2.5 text-base disabled:opacity-60;
+    border-color: #111111;
+    color: #111111;
+  }
+  .field::placeholder {
+    color: #6B6B66;
+  }
+  .field:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #111111, 0 0 0 5px #FFD60A;
   }
   .field-error {
-    @apply border-bad-600 focus:border-bad-600 focus:ring-bad-50;
+    border-color: #AD0014;
+    background: #FFF5F5;
   }
-  .panel {
-    @apply rounded border border-line bg-white;
+  /* Outlined component: ink border + hard shadow */
+  .panel,
+  .panel-raised {
+    @apply rounded-lg border-2 bg-white;
+    border-color: #111111;
+    box-shadow: 4px 4px 0 0 #111111;
   }
+  /* Same outline without the shadow, for boxes nested inside a panel */
+  .panel-flat {
+    @apply rounded-lg border-2 bg-white;
+    border-color: #111111;
+  }
+  /* Soft yellow summary box */
+  .callout {
+    @apply rounded-lg border-2 px-4 py-3;
+    border-color: #111111;
+    background: #FFF6C4;
+  }
+  /* Small meta text (dates, counts, ids) */
+  .meta {
+    @apply font-mono text-[0.8rem];
+    color: #5A5A5A;
+  }
+  /* Small uppercase section label */
   .eyebrow {
-    @apply text-sm font-semibold uppercase tracking-wide text-saffron-700;
+    @apply text-xs uppercase tracking-[0.12em];
+    font-weight: 800;
+    color: #5A5A5A;
   }
-  /* Graph-paper texture: a quiet nod to maths notebooks */
-  .graph-paper {
-    background-color: #FAF8F4;
-    background-image:
-      linear-gradient(to right, rgba(16, 42, 67, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(16, 42, 67, 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
+  /* Highlighter behind selected words */
+  .mark {
+    @apply rounded-sm px-1;
+    background: #FFD60A;
+    color: #111111;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .dots {
+    background-image: radial-gradient(#11111122 1px, transparent 1px);
+    background-size: 14px 14px;
   }
 }
 

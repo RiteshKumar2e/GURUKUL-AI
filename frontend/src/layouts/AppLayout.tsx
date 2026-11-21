@@ -51,7 +51,7 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
       </a>
 
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-white md:flex">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r-2 border-ink-950 bg-white md:flex">
         <div className="px-5 py-5">
           <Logo to={home} />
         </div>
@@ -62,7 +62,7 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `mb-0.5 flex items-center gap-3 rounded px-3 py-2 text-[0.97rem] no-underline ${isActive ? 'bg-ink-900 font-semibold text-white' : 'text-ink-800 hover:bg-ink-50'}`
+                `mb-1 flex items-center gap-3 rounded-md border-2 px-3 py-2 text-[0.97rem] no-underline ${isActive ? 'border-ink-950 bg-ink-900 font-bold text-white shadow-brut-sm' : 'border-transparent text-ink-950 hover:bg-lemon-100'}`
               }
             >
               <item.icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
@@ -70,7 +70,7 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
             </NavLink>
           ))}
         </nav>
-        <div className="border-t border-line px-5 py-4">
+        <div className="border-t-2 border-ink-950 px-5 py-4">
           <p className="truncate text-sm font-semibold text-ink-900">{user?.displayName}</p>
           <p className="truncate text-xs text-ink-600">
             @{user?.username} · {user?.role === 'STUDENT' ? tx('विद्यार्थी', 'Student') : user?.role === 'PARENT' ? tx('अभिभावक', 'Parent') : tx('शिक्षक', 'Teacher')}
@@ -86,7 +86,7 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-white px-4 md:hidden">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b-2 border-ink-950 bg-white px-4 md:hidden">
           <Logo to={home} />
           <div className="flex items-center gap-1">
             <LanguageToggle />
@@ -104,7 +104,7 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
       </div>
 
       {/* Mobile bottom navigation: large touch targets, five items max */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden" style={{ gridTemplateColumns: `repeat(${nav.filter((n) => n.mobile).length}, minmax(0, 1fr))` }} aria-label={tx('ऐप नेविगेशन', 'App navigation')}>
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid border-t-2 border-ink-950 bg-white pb-[env(safe-area-inset-bottom)] md:hidden" style={{ gridTemplateColumns: `repeat(${nav.filter((n) => n.mobile).length}, minmax(0, 1fr))` }} aria-label={tx('ऐप नेविगेशन', 'App navigation')}>
         {nav
           .filter((n) => n.mobile)
           .map((item) => (
@@ -112,11 +112,11 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
               key={item.to}
               to={item.to}
               end={item.end}
-              className={({ isActive }) => `flex flex-col items-center gap-0.5 py-2 text-[0.72rem] no-underline ${isActive ? 'font-semibold text-ink-900' : 'text-ink-600'}`}
+              className={({ isActive }) => `flex flex-col items-center gap-0.5 border-t-4 py-2 text-[0.72rem] no-underline ${isActive ? 'border-saffron-400 font-bold text-ink-950' : 'border-transparent text-ink-700'}`}
             >
               {({ isActive }) => (
                 <>
-                  <item.icon className={`h-[22px] w-[22px] ${isActive ? 'text-saffron-600' : ''}`} aria-hidden />
+                  <item.icon className={`h-[22px] w-[22px] ${isActive ? 'text-ink-950' : ''}`} aria-hidden strokeWidth={isActive ? 2.4 : 2} />
                   {tx(item.hi, item.en)}
                 </>
               )}

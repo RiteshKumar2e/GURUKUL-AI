@@ -134,7 +134,7 @@ export default function ChapterDetail() {
           )}
 
           {q.data.assessment && (
-            <div className="mt-8 flex flex-col gap-3 rounded border border-ink-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-8 flex flex-col gap-3 border-2 border-ink-950 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-semibold">{pick(q.data.assessment, 'title')}</p>
                 <p className="text-sm text-ink-600">{tx(`${q.data.assessment.questionCount} प्रश्न · ${q.data.assessment.durationMinutes} मिनट · संकेत नहीं मिलेंगे`, `${q.data.assessment.questionCount} questions · ${q.data.assessment.durationMinutes} minutes · no hints`)}</p>

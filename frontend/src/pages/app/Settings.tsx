@@ -12,7 +12,7 @@ import { useDocumentTitle, writeConsent, readConsent } from '@/hooks';
 import { api, ApiError } from '@/services/api';
 import type { TeachingLevel, User } from '@/types/api';
 import { DISTRICTS } from '@/lib/constants';
-import { Alert, Button, Input, PageHeader, Section, Segmented, Select } from '@/components/ui';
+import { Alert, Button, Input, PageHeader, PasswordInput, Section, Segmented, Select } from '@/components/ui';
 
 interface StudentProfile {
   linkCode: string;
@@ -162,7 +162,7 @@ export default function Settings() {
             {profile.data && (
               <>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <code className="rounded border border-ink-200 bg-ink-50 px-3 py-1.5 text-xl font-bold tracking-[0.2em]">{profile.data.linkCode}</code>
+                  <code className="rounded-md border-2 border-ink-950 bg-ink-50 px-3 py-1.5 text-xl font-bold tracking-[0.2em]">{profile.data.linkCode}</code>
                   <Button variant="secondary" size="sm" onClick={() => copyCode(profile.data!.linkCode)} icon={<Copy className="h-4 w-4" />}>
                     {tx('कॉपी', 'Copy')}
                   </Button>
@@ -222,9 +222,9 @@ export default function Settings() {
 
       <Section title={tx('पासवर्ड बदलें', 'Change password')}>
         <form className="panel space-y-4 p-4" onSubmit={pwForm.handleSubmit(changePassword)} noValidate>
-          <Input id="currentPassword" type="password" autoComplete="current-password" label={tx('मौजूदा पासवर्ड', 'Current password')} error={pwForm.formState.errors.currentPassword?.message} {...pwForm.register('currentPassword')} />
-          <Input id="newPassword" type="password" autoComplete="new-password" label={tx('नया पासवर्ड', 'New password')} error={pwForm.formState.errors.newPassword?.message} {...pwForm.register('newPassword')} />
-          <Input id="confirm" type="password" autoComplete="new-password" label={tx('नया पासवर्ड दोबारा', 'Repeat new password')} error={pwForm.formState.errors.confirm?.message} {...pwForm.register('confirm')} />
+          <PasswordInput id="currentPassword" autoComplete="current-password" label={tx('मौजूदा पासवर्ड', 'Current password')} error={pwForm.formState.errors.currentPassword?.message} {...pwForm.register('currentPassword')} />
+          <PasswordInput id="newPassword" autoComplete="new-password" label={tx('नया पासवर्ड', 'New password')} error={pwForm.formState.errors.newPassword?.message} {...pwForm.register('newPassword')} />
+          <PasswordInput id="confirm" autoComplete="new-password" label={tx('नया पासवर्ड दोबारा', 'Repeat new password')} error={pwForm.formState.errors.confirm?.message} {...pwForm.register('confirm')} />
           <Button type="submit" variant="secondary" loading={pwForm.formState.isSubmitting}>
             {tx('पासवर्ड बदलें', 'Change password')}
           </Button>
@@ -246,7 +246,7 @@ export default function Settings() {
             )}
             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
               <div className="flex-1">
-                <Input id="delete-pw" type="password" autoComplete="current-password" label={tx('पुष्टि के लिए पासवर्ड', 'Password to confirm')} value={deletePw} onChange={(e) => setDeletePw(e.target.value)} />
+                <PasswordInput id="delete-pw" autoComplete="current-password" label={tx('पुष्टि के लिए पासवर्ड', 'Password to confirm')} value={deletePw} onChange={(e) => setDeletePw(e.target.value)} />
               </div>
               <Button variant="danger" onClick={deleteAccount} disabled={!deletePw}>
                 {tx('हमेशा के लिए मिटाएँ', 'Delete permanently')}

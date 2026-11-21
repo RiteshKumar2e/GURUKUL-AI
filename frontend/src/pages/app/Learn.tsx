@@ -42,7 +42,7 @@ export default function Learn() {
               <ul className="grid gap-2 sm:grid-cols-2">
                 {inProgress.slice(0, 4).map((c) => (
                   <li key={c.slug}>
-                    <Link to={`/app/learn/chapters/${c.slug}`} className="panel block px-4 py-3 text-ink-900 no-underline hover:border-ink-400">
+                    <Link to={`/app/learn/chapters/${c.slug}`} className="panel block px-4 py-3 text-ink-900 no-underline hover:bg-saffron-50">
                       <span className="text-xs font-semibold text-saffron-700">
                         {tx('अध्याय', 'Chapter')} {c.number}
                       </span>
@@ -58,7 +58,7 @@ export default function Learn() {
           )}
 
           <Section title={tx('सभी अध्याय', 'All chapters')}>
-            <ol className="divide-y divide-line rounded border border-line bg-white">
+            <ol className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
               {chapters.map((c) => (
                 <li key={c.slug}>
                   <Link to={`/app/learn/chapters/${c.slug}`} className="flex items-center gap-4 px-4 py-3 text-ink-900 no-underline hover:bg-ink-50">

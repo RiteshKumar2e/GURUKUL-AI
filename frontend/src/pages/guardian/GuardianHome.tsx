@@ -83,7 +83,7 @@ export default function GuardianHome() {
           </EmptyState>
         )}
         {q.data && q.data.length > 0 && (
-          <ul className="divide-y divide-line rounded border border-line bg-white">
+          <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
             {q.data.map((s) => (
               <li key={s.id}>
                 <Link to={`/guardian/students/${s.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-ink-900 no-underline hover:bg-ink-50">

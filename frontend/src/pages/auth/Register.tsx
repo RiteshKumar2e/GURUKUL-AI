@@ -8,7 +8,7 @@ import { homePathFor, useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
 import { ApiError } from '@/services/api';
-import { Alert, Button, Input } from '@/components/ui';
+import { Alert, Button, Input, PasswordInput } from '@/components/ui';
 
 type RoleOption = 'STUDENT' | 'PARENT' | 'TEACHER';
 
@@ -98,7 +98,7 @@ export default function Register() {
             <legend className="label">{tx('आप कौन हैं?', 'Who are you?')}</legend>
             <div className="grid gap-2 sm:grid-cols-3">
               {roles.map((r) => (
-                <label key={r.value} className={`cursor-pointer rounded border px-3 py-2.5 ${role === r.value ? 'border-ink-900 bg-ink-50 ring-1 ring-ink-900' : 'border-ink-200 bg-white hover:border-ink-400'}`}>
+                <label key={r.value} className={`cursor-pointer border-2 px-3 py-2.5 ${role === r.value ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`}>
                   <input type="radio" value={r.value} className="sr-only" checked={role === r.value} onChange={() => setValue('role', r.value)} />
                   <span className="block font-semibold">{tx(r.hi, r.en)}</span>
                   <span className="block text-sm text-ink-600">{tx(r.dhi, r.den)}</span>
@@ -111,7 +111,7 @@ export default function Register() {
           <Input id="username" label={tx('यूज़रनेम (लॉग इन के लिए)', 'Username (for logging in)')} hint={tx('जैसे: riya_9b', 'e.g. riya_9b')} autoCapitalize="none" spellCheck={false} autoComplete="username" error={formState.errors.username?.message} {...register('username')} />
           {role !== 'STUDENT' && <Input id="email" type="email" label={tx('ईमेल', 'Email')} autoComplete="email" error={formState.errors.email?.message} {...register('email')} />}
           {role === 'TEACHER' && <Input id="schoolName" label={tx('विद्यालय का नाम (वैकल्पिक)', 'School name (optional)')} error={formState.errors.schoolName?.message} {...register('schoolName')} />}
-          <Input id="password" type="password" label={tx('पासवर्ड', 'Password')} hint={tx('कम से कम 8 अक्षर। इसे लिखकर सुरक्षित रखें।', 'At least 8 characters. Write it down somewhere safe.')} autoComplete="new-password" error={formState.errors.password?.message} {...register('password')} />
+          <PasswordInput id="password" label={tx('पासवर्ड', 'Password')} hint={tx('कम से कम 8 अक्षर। इसे लिखकर सुरक्षित रखें।', 'At least 8 characters. Write it down somewhere safe.')} autoComplete="new-password" error={formState.errors.password?.message} {...register('password')} />
 
           {/* Honeypot: hidden from people, filled by bots */}
           <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">

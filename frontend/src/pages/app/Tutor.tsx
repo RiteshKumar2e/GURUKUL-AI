@@ -118,7 +118,7 @@ export default function Tutor() {
             <h1 className="text-[1.6rem]">{tx('AI ट्यूटर', 'AI tutor')}</h1>
             <p className="text-ink-700">{tx('सवाल पूछिए — पहले संकेत मिलेगा, ज़रूरत हो तो पूरा हल।', 'Ask a question — you get a hint first, and the full solution if you need it.')}</p>
           </div>
-          <button className="rounded border border-ink-200 bg-white p-2 lg:hidden" onClick={() => setShowHistory((s) => !s)} aria-expanded={showHistory} aria-label={tx('पिछली बातचीत', 'Past conversations')}>
+          <button className="rounded-lg border-2 border-ink-950 bg-white p-2 lg:hidden" onClick={() => setShowHistory((s) => !s)} aria-expanded={showHistory} aria-label={tx('पिछली बातचीत', 'Past conversations')}>
             <History className="h-5 w-5" />
           </button>
         </header>
@@ -166,7 +166,7 @@ export default function Tutor() {
         </div>
 
         <form
-          className="mt-6 rounded border border-ink-200 bg-white p-3 shadow-sm md:sticky md:bottom-4"
+          className="mt-6 rounded-lg border-2 border-ink-950 bg-white p-3 shadow-brut md:sticky md:bottom-4"
           onSubmit={(e) => {
             e.preventDefault();
             void send();

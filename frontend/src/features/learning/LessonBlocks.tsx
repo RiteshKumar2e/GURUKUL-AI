@@ -10,7 +10,7 @@ export function LessonBlocks({ blocks }: { blocks: LessonBlock[] }) {
         const text = bi(b);
         if (b.kind === 'formula') {
           return (
-            <div key={i} className="rounded border border-ink-200 bg-ink-50 px-4 py-3">
+            <div key={i} className="rounded-md border-2 border-ink-950 bg-ink-50 px-4 py-3">
               <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-600">
                 <Sigma className="h-4 w-4" aria-hidden />
                 {tx('सूत्र', 'Formula')}

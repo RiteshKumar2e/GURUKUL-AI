@@ -29,7 +29,7 @@ export default function Quizzes() {
       {list.error && <QueryError error={list.error} onRetry={() => list.refetch()} />}
       {list.data && list.data.length === 0 && <EmptyState title={tx('अभी कोई क्विज़ नहीं', 'No quizzes yet')} />}
       {list.data && list.data.length > 0 && (
-        <ul className="divide-y divide-line rounded border border-line bg-white">
+        <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
           {list.data.map((qz) => {
             const b = best.get(qz.slug);
             return (

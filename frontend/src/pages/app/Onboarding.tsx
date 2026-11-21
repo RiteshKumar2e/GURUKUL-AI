@@ -51,7 +51,7 @@ export default function Onboarding() {
       body: (
         <div className="grid gap-2 sm:grid-cols-2">
           {(['hi', 'en'] as const).map((l) => (
-            <button key={l} type="button" onClick={() => setLang(l)} className={`rounded border px-4 py-4 text-left ${lang === l ? 'border-ink-900 bg-ink-50 ring-1 ring-ink-900' : 'border-ink-200 bg-white hover:border-ink-400'}`} aria-pressed={lang === l}>
+            <button key={l} type="button" onClick={() => setLang(l)} className={`rounded-md border-2 px-4 py-4 text-left ${lang === l ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`} aria-pressed={lang === l}>
               <span className="block text-lg font-semibold">{l === 'hi' ? 'हिंदी' : 'English'}</span>
               <span className="block text-sm text-ink-600">{l === 'hi' ? 'पाठ, संकेत और ट्यूटर हिंदी में' : 'Lessons, hints and tutor in English'}</span>
             </button>
@@ -64,7 +64,7 @@ export default function Onboarding() {
       body: (
         <div className="grid gap-2">
           {levels.map((l) => (
-            <button key={l.v} type="button" onClick={() => setLevel(l.v)} className={`rounded border px-4 py-3 text-left ${level === l.v ? 'border-ink-900 bg-ink-50 ring-1 ring-ink-900' : 'border-ink-200 bg-white hover:border-ink-400'}`} aria-pressed={level === l.v}>
+            <button key={l.v} type="button" onClick={() => setLevel(l.v)} className={`rounded-md border-2 px-4 py-3 text-left ${level === l.v ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`} aria-pressed={level === l.v}>
               <span className="block font-semibold">{tx(l.hi, l.en)}</span>
               <span className="block text-sm text-ink-600">{tx(l.dhi, l.den)}</span>
             </button>
@@ -89,7 +89,7 @@ export default function Onboarding() {
             <p className="label">{tx('रोज़ कितनी देर पढ़ेंगे?', 'Daily study goal')}</p>
             <div className="flex flex-wrap gap-2">
               {[10, 20, 30, 45].map((m) => (
-                <button key={m} type="button" onClick={() => setGoal(m)} className={`rounded border px-4 py-2 font-semibold ${goal === m ? 'border-ink-900 bg-ink-900 text-white' : 'border-ink-200 bg-white text-ink-800 hover:border-ink-400'}`} aria-pressed={goal === m}>
+                <button key={m} type="button" onClick={() => setGoal(m)} className={`rounded-md border-2 px-4 py-2 font-semibold ${goal === m ? 'border-ink-900 bg-ink-900 text-white' : 'border-ink-950 bg-white text-ink-950 hover:bg-saffron-50'}`} aria-pressed={goal === m}>
                   {m} {tx('मिनट', 'min')}
                 </button>
               ))}

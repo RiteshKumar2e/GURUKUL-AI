@@ -1,193 +1,232 @@
 # GURUKUL AI — the last-mile learning companion
 
-A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board). It was built for ACE Builders Global Hackathon 2026, Problem Statement 3: *The Last-Mile Tutor*.
+A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), built for the ACE Builders Global Hackathon 2026, Problem Statement 3: *The Last-Mile Tutor*.
 
-- **AI tutor.** Gives a hint first, then a step-by-step solution, then a follow-up question. It explains at three levels and replies in Hindi or English.
-- **Answer checking.** When the tutor gives a numeric final answer, a separate calculator re-checks it and the app shows whether the two agree.
-- **Voice tutor in Hindi, English and Telugu.** The student speaks, checks the transcript, then hears the reply. Speech-to-text uses Sarvam AI, Groq Whisper or the browser. Read-aloud uses Sarvam AI or the device's own voice. Spoken replies are cached in IndexedDB, so replaying one costs no data.
-- **Photo questions.** The photo is compressed on the phone and checked on the server. A vision model extracts the question, and the student can edit the text before asking.
-- **Adaptive practice.** Mastery is tracked per topic and the question level moves up or down. Weak topics are detected, recommendations are generated, and every mistake comes with an explanation.
-- **Offline learning.** The app is an installable PWA. Students can download chapter packs to IndexedDB, practise offline, and queued answers sync (and are re-graded on the server) when the connection returns.
-- **Parent and teacher dashboard.** A guardian links to a student with a 6-character code the student shares. Guardians see progress, weak areas and activity, but not the content of tutor chats.
+**Status:** prototype. The lesson content is original sample material, not the official JAC syllabus. See [Known limitations](#known-limitations).
 
-## Structure
+## What it does
+
+- **AI tutor.** Gives a hint first, then a step-by-step solution, then a follow-up question. Replies in Hindi or English.
+- **Answer checking.** When the tutor gives a numeric final answer, a deterministic calculator re-checks it and the app shows whether the two agree. The check covers final numbers only, not reasoning.
+- **Voice tutor (Hindi, English, Telugu).** The student speaks, checks the transcript, then hears the reply. Speech-to-text uses Sarvam AI, Groq Whisper, or the browser. Read-aloud uses Sarvam AI or the device voice. Spoken replies are cached in IndexedDB.
+- **Photo questions.** The photo is compressed on the phone and checked on the server. A vision model extracts the question; the student can edit the text before asking.
+- **Adaptive practice.** Mastery is tracked per topic and difficulty moves up or down. Weak topics are detected and recommendations are generated from stored results. Each mistake comes with an explanation.
+- **Offline learning.** The app is an installable PWA. Students can download chapter packs to IndexedDB, practise offline, and queued answers are sent to the server when the connection returns. The server re-grades them.
+- **Parent and teacher dashboard.** A guardian links to a student with a 6-character code the student shares. Guardians see progress, weak areas and activity, not the content of tutor chats.
+
+## Project structure
 
 ```
-.
-├── frontend/          React 18 + Vite + TypeScript + Tailwind (PWA)
-│   ├── public/        favicon, icons, manifest, sw.js (service worker), og-image
-│   └── src/           pages/, layouts/, components/, features/, context/, hooks/, services/, lib/, types/, utils/, styles/
-├── backend/           Node.js + Express + TypeScript + Prisma
-│   ├── src/           config/, routes/, controllers/, services/{ai,tutor,vision,voice,adaptive-learning,sync}, repositories/, middleware/, validators/, utils/, types/
-│   ├── prisma/        schema.prisma, migrations/, seed.ts
-│   ├── content/       class9-maths.json  ← editable lessons and questions, with source notes
-│   ├── tests/         unit and API integration tests (Vitest + Supertest)
-│   └── uploads/       temporary upload folder (files are deleted after processing)
-├── docker-compose.yml local PostgreSQL
-├── .gitignore
-└── README.md
+frontend/   React 18 + Vite + TypeScript + Tailwind (PWA)
+backend/    Node.js + Express + TypeScript + Prisma
+  src/        config/, routes/, controllers/, services/{ai,tutor,vision,voice,adaptive-learning,sync}, repositories/, middleware/, validators/, utils/
+  prisma/     schema.prisma, migrations/, seed.ts
+  content/    class9-maths.json  (editable lessons and questions, with source notes)
+  tests/      Vitest + Supertest tests
+docker-compose.yml   local PostgreSQL 16 (host port 5433)
 ```
 
-## Run it locally
+There is no root `package.json`. Install and run each app from its own folder.
 
-You need Node.js 20+ (tested on 22.12) and Docker. If you don't have Docker, any PostgreSQL 14+ server works.
+## Requirements
 
-Run the backend and the frontend in two separate terminals.
+- Node.js 20 or newer (the author reports testing on 22.12).
+- PostgreSQL 14 or newer. Docker Compose is the easiest route (see below).
+
+## Local setup
+
+Use two terminals.
 
 ```bash
-# from the project root: start PostgreSQL 16 on localhost:5433
+# From the project root: start PostgreSQL on localhost:5433
 docker compose up -d db
 
-# terminal 1 — backend (API on :5000)
+# Terminal 1: backend (API on http://localhost:5000)
 cd backend
+cp .env.example .env          # Windows: copy .env.example .env
+# edit backend/.env (see Environment below)
 npm install
-npm run db:migrate           # create the tables
-npm run db:seed              # lessons, questions and synthetic demo accounts
+npm run db:migrate            # first time only: create tables
+npm run db:seed               # first time only: lessons, questions, synthetic demo accounts
 npm run dev
 
-# terminal 2 — frontend (web app on :5173)
+# Terminal 2: frontend (web app on http://localhost:5173)
 cd frontend
+cp .env.example .env          # Windows: copy .env.example .env
 npm install
 npm run dev
 ```
 
-`npm install`, `db:migrate` and `db:seed` are only needed the first time. After that, `npm run dev` in each folder is enough. Stop a server with Ctrl + C.
+Open http://localhost:5173.
 
-Open http://localhost:5173. Demo accounts hold **synthetic** data only. The password for all three is `Demo@1234`:
+Demo accounts hold **synthetic** data only. The password is `Demo@1234` for all three:
 
 | Username | Role |
 |---|---|
-| `demo.student` | Student with about 6 days of generated practice history |
+| `demo.student` | Student with generated practice history |
 | `demo.parent` | Parent linked to the demo student |
 | `demo.teacher` | Teacher linked to the demo student |
 
-Other commands:
+To seed without demo accounts, set `SEED_DEMO=false` before `npm run db:seed`.
 
-Run these inside `backend/` or `frontend/`:
+## Scripts
 
-```bash
-npm run build    # production build (stop the backend dev server first on Windows)
-npm run lint     # TypeScript check
-npm run test     # backend: unit + API tests (needs the database); frontend: unit tests
-npm run preview  # frontend only: serve the production build (service worker active) on :4173
-```
+Run these inside `backend/` or `frontend/`.
+
+| Command | Backend | Frontend |
+|---|---|---|
+| `npm run dev` | `tsx watch src/server.ts` | `vite` |
+| `npm run build` | `prisma generate` + `tsc` | `tsc -b` + `vite build` |
+| `npm run lint` | `tsc --noEmit` | `tsc -b --noEmit` |
+| `npm run test` | `vitest run` (API tests need the database) | `vitest run` |
+| `npm start` | `node dist/server.js` | — |
+| `npm run preview` | — | `vite preview` (service worker active, port 4173) |
+| `npm run db:migrate` / `db:deploy` / `db:seed` / `db:reset` | Prisma dev migrate / deploy / seed / reset | — |
+
+On Windows, stop the backend dev server before `npm run build`, because the Prisma client file may be locked.
 
 ## Environment
 
-Each app has its own `.env` file, created from `.env.example`. Real `.env` files are git-ignored.
+Each app has its own `.env`, created from its `.env.example`. Real `.env` files are git-ignored. The server checks every variable at startup and refuses to start if a required one is missing or invalid.
 
-**backend/.env**
+### backend/.env
+
+| Variable | Required | Default | Notes |
+|---|---|---|---|
+| `DATABASE_URL` | yes | — | PostgreSQL connection string |
+| `JWT_SECRET` | yes | — | At least 32 characters |
+| `JWT_REFRESH_SECRET` | yes | — | At least 32 characters; must differ from `JWT_SECRET` |
+| `ACCESS_TOKEN_TTL` | no | `15m` | Access token lifetime |
+| `REFRESH_TOKEN_TTL_DAYS` | no | `7` | Refresh token lifetime |
+| `PORT` | no | `5000` | |
+| `FRONTEND_URL` | no | `http://localhost:5173` | Allowed CORS origin(s), comma-separated |
+| `UPLOAD_DIR` | no | `uploads` | Temporary upload folder; files are deleted after processing |
+| `MAX_UPLOAD_MB` | no | `6` | Upload size limit |
+| `COOKIE_SECURE` | no | off | `true` in production over HTTPS |
+| `COOKIE_SAMESITE` | no | `lax` | `none` when the API and web app are on different sites |
+| `ENFORCE_HTTPS` | no | off | Set with `TRUST_PROXY=true` behind a TLS proxy; adds HSTS |
+| `TRUST_PROXY` | no | off | |
+
+**AI tutor and vision (Groq by default):**
+
+| Variable | Default | Notes |
+|---|---|---|
+| `AI_PROVIDER` | `groq` | `groq` or `openai-compatible` |
+| `AI_API_KEY` | empty | Groq key. Empty means no Groq tutor, Whisper or vision. |
+| `AI_MODEL` | `openai/gpt-oss-120b` | Tutor model |
+| `AI_VISION_MODEL` | `qwen/qwen3.8-27b` | Photo question model |
+| `AI_STT_MODEL` | `whisper-large-v3` | Groq Whisper model |
+| `AI_BASE_URL` | `https://api.groq.com/openai/v1` | Any OpenAI-compatible endpoint |
+| `AI_TIMEOUT_MS` | `30000` | |
+
+**Tutor LLM selection:**
+
+| Variable | Default | Notes |
+|---|---|---|
+| `LLM_PROVIDER` | `auto` | `auto` uses Groq if `AI_API_KEY` is set, else Gemini if `GEMINI_API_KEY` is set, else demo mode. Force with `groq` or `gemini`. |
+| `GEMINI_API_KEY` | empty | From https://aistudio.google.com/apikey |
+| `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` | |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | |
+
+**Voice:**
+
+| Variable | Default | Notes |
+|---|---|---|
+| `STT_PROVIDER` | `auto` | `auto` uses Sarvam if `SARVAM_API_KEY` is set, else Groq Whisper, else browser only. `sarvam`, `groq`, `none` to force. |
+| `TTS_PROVIDER` | `auto` | `auto` uses Sarvam if `SARVAM_API_KEY` is set, else the browser. `sarvam` or `browser`. |
+| `SARVAM_API_KEY` | empty | From https://dashboard.sarvam.ai |
+| `SARVAM_BASE_URL` | `https://api.sarvam.ai` | |
+| `SARVAM_STT_MODEL` | `saarika:v2.5` | |
+| `SARVAM_TTS_MODEL` | `bulbul:v2` | |
+| `SARVAM_TTS_SPEAKER` | `anushka` | |
+| `VOICE_TIMEOUT_MS` | `30000` | |
+
+### frontend/.env
+
+Only public values. Everything here ends up in the browser, so never put secrets in this file.
+
 | Variable | Notes |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_SECRET`, `JWT_REFRESH_SECRET` | At least 32 characters each, and they must differ. The local `.env` was generated with random values. |
-| `AI_API_KEY` | Your Groq key. **If this is empty, the server runs in a clearly labelled demo mode** (see below). |
-| `AI_MODEL`, `AI_VISION_MODEL`, `AI_STT_MODEL`, `AI_BASE_URL` | Defaults point to Groq. Any OpenAI-compatible endpoint works. |
-| `FRONTEND_URL` | Allowed CORS origin(s), comma-separated |
-| `COOKIE_SECURE`, `COOKIE_SAMESITE` | Use `true` and `none` when the API and web app are on different sites over HTTPS |
-| `ENFORCE_HTTPS`, `TRUST_PROXY` | Set both to `true` behind a TLS-terminating proxy. HTTP is then redirected and HSTS is sent. |
+| `VITE_API_URL` | Backend API base URL |
+| `VITE_APP_NAME` | Display name |
+| `VITE_SITE_URL` | Used for sitemap, robots.txt and social image URLs |
+| `VITE_CONTACT_EMAIL` | Footer mailto link; hidden when empty |
 
-The server validates every variable at startup and refuses to start if a required one is missing or invalid.
+### Demo mode
 
-**frontend/.env** contains only public values: `VITE_API_URL`, `VITE_APP_NAME`, `VITE_SITE_URL` (used for the sitemap, robots.txt and social image URLs) and `VITE_CONTACT_EMAIL` (the footer mailto link, hidden when empty). Never put secrets here, because everything in this file ends up in the browser.
+With no `AI_API_KEY` and no `GEMINI_API_KEY`, the server runs in demo mode and says so. The tutor reply is labelled *"Demo mode — not an AI answer"* and contains only a deterministic calculator result (when the question has arithmetic or a linear equation) and the summary of the linked lesson. Photo reading and server speech-to-text return a "not configured" message. Lessons, practice, quizzes, progress, offline use and the guardian dashboard work without any key.
 
-### Enabling the AI (Groq)
+`GET /api/health` reports the AI mode (`"ai": {"mode": "live"}` or demo).
 
-1. Create a key at https://console.groq.com/keys.
-2. Set `AI_API_KEY=...` in `backend/.env` and restart. `/api/health` then reports `"ai": {"mode": "live"}`.
-3. Check that the model IDs in `.env` are still listed at https://console.groq.com/docs/models.
+## Voice tutor
 
-**Demo mode** (no key) does not imitate an AI. In demo mode the tutor reply is labelled *"Demo mode — not an AI answer"* and contains only:
-- a deterministic calculator result, when the question contains arithmetic or a linear equation;
-- the summary of the linked lesson.
+The voice page (`/app/voice`) has a language switch (हिंदी / English / తెలుగు), a microphone with a recording timer, an editable transcript, hint, solution and explain modes, play/pause/replay/stop on each reply, and a typing fallback. Each reply is labelled with its language so it is read in the right voice.
 
-Photo reading and server speech-to-text return a clear "not configured" message. Lessons, practice, quizzes, progress, offline and the guardian dashboards work fully without a key.
+**How it works**
+- The browser re-encodes each recording to 16 kHz mono WAV before upload.
+- With Sarvam, recordings stop at 30 seconds, because the synchronous API takes short clips.
+- Recordings are deleted from the server right after transcription.
+- Spoken replies are cached in IndexedDB: the newest 40 clips are kept and the cache is cleared on logout.
 
-## Voice tutor (Hindi, English, Telugu)
+**Endpoints**
+- `GET /api/voice/capabilities`: which providers are active.
+- `POST /api/voice/transcribe?language=hi|en|te`: multipart field `audio`.
+- `POST /api/voice/speak` with JSON `{ "text", "language" }`: returns `audio/wav`.
 
-The voice page (`/app/voice`) has:
-- a language switch (हिंदी / English / తెలుగు);
-- a microphone with a recording timer, and an editable transcript;
-- hint, solution and explain modes;
-- the full conversation transcript, with play, pause, replay and stop on every reply;
-- a typing fallback.
+Without a Sarvam key, Telugu read-aloud works only if the device has a Telugu voice installed. The page says so when it doesn't.
 
-Every reply is labelled with its language, so it is read aloud in the right voice.
+## Verification status
 
-| Step | Provider (chosen automatically from the keys in `backend/.env`) |
-|---|---|
-| Speech → text | `SARVAM_API_KEY` → Sarvam Saarika (best for Telugu). Otherwise `AI_API_KEY` → Groq Whisper. Otherwise the browser's speech recognition (Chrome/Edge). |
-| Tutor reply | `AI_API_KEY` → Groq. Otherwise `GEMINI_API_KEY` → Gemini. Otherwise demo mode. Force one with `LLM_PROVIDER=groq\|gemini`. |
-| Text → speech | `SARVAM_API_KEY` → Sarvam Bulbul (natural Telugu/Hindi voices), returned as one WAV file. Otherwise the device's `speechSynthesis`. |
+Be precise about what has and has not been run. Results are recorded here as they were observed, and none are assumed.
 
-**How it works:**
-- **Recording:** the browser re-encodes each recording to 16 kHz mono WAV before upload, a format every provider accepts. With Sarvam, recordings stop at 30 seconds, because the synchronous API takes short clips.
-- **Audio cache:** spoken replies are stored in IndexedDB. The newest 40 clips are kept, and the cache is cleared on logout.
-- **Privacy:** recordings are deleted from the server right after transcription.
+- **Groq tutor:** the author's development notes record a live Telugu test on 2026-11-21 using `openai/gpt-oss-120b`. This README revision did not re-run it.
+- **Sarvam and Gemini:** request formats follow their public documentation. They are covered only by mocked tests (`backend/tests/voice.test.ts`). **They have not been tested against the live APIs**, because no keys were available.
+- **Telugu UI strings** written by the server should be reviewed by a native speaker.
+- **Browser journeys** were checked with a headless-browser script during development. That script is not in the repository.
+- **Real low-end Android devices** have not been tested.
 
-**Endpoints:**
-- `GET /api/voice/capabilities` reports which providers are active.
-- `POST /api/voice/transcribe?language=hi|en|te` takes multipart `audio`.
-- `POST /api/voice/speak {text, language}` returns `audio/wav`.
+To verify on your own machine, run `npm run lint`, `npm run test` and `npm run build` in each folder, then follow the voice testing steps above with your own keys.
 
-**Testing it:**
-1. Add a key to `backend/.env`:
-   - `SARVAM_API_KEY` from https://dashboard.sarvam.ai for voice;
-   - or `GEMINI_API_KEY` from https://aistudio.google.com/apikey for the tutor.
-2. Restart the backend.
-3. Check `GET /api/voice/capabilities`.
-4. Open the voice page in Chrome on Android, choose తెలుగు, and ask a question.
+## Groq models
 
-Without a Sarvam key, Telugu read-aloud only works if the phone has a Telugu voice installed. The page tells you when it doesn't.
-
-**Verification status:**
-- The Groq tutor was tested live in Telugu on 2026-11-21, using `openai/gpt-oss-120b`.
-- The Sarvam and Gemini request formats follow their public docs. They are covered by mocked tests (`backend/tests/voice.test.ts`) but **were not tested against the live APIs** (no keys).
-- The Telugu UI strings written by the server should be reviewed by a native speaker.
-
-**Groq models:** Groq retires models over time. In November 2026, `llama-3.3-70b-versatile` and `llama-4-scout` were no longer available on the development key, so the defaults are now:
-- `AI_MODEL=openai/gpt-oss-120b` (tutor);
-- `AI_VISION_MODEL=qwen/qwen3.8-27b` (photo questions; checked to accept images);
-- `AI_STT_MODEL=whisper-large-v3`.
-
-To see what your key can use, check `GET https://api.groq.com/openai/v1/models`.
+Groq retires models over time. The defaults above were chosen because the older ones were no longer available on the development key. To see what your key can use, call `GET https://api.groq.com/openai/v1/models` with your key. Check the IDs at https://console.groq.com/docs/models.
 
 ## Production notes
 
-- **Database:** run `npm --prefix backend run db:deploy` (applies migrations), then `npm --prefix backend run db:seed`. Set `SEED_DEMO=false` to skip the demo accounts.
-- **Backend:** run `npm --prefix backend run build && npm --prefix backend start`. Behind a proxy, set `NODE_ENV=production`, `TRUST_PROXY=true`, `ENFORCE_HTTPS=true` and `COOKIE_SECURE=true`.
-- **Frontend:** `npm --prefix frontend run build` produces `frontend/dist`. Deploy it as a static site with SPA fallback to `index.html`, and set `VITE_SITE_URL` and `VITE_API_URL` before building. The build writes `sitemap.xml`, `robots.txt` and the service worker precache list.
-- Serve the frontend over HTTPS. Browsers only allow service workers, microphone access and camera capture on secure origins.
+- **Database:** `npm --prefix backend run db:deploy`, then `npm --prefix backend run db:seed`. Set `SEED_DEMO=false` to skip demo accounts.
+- **Backend:** `npm --prefix backend run build && npm --prefix backend start`. Behind a proxy set `NODE_ENV=production`, `TRUST_PROXY=true`, `ENFORCE_HTTPS=true` and `COOKIE_SECURE=true`.
+- **Frontend:** `npm --prefix frontend run build` writes `frontend/dist`. Deploy it as a static site with SPA fallback to `index.html`. Set `VITE_SITE_URL` and `VITE_API_URL` before building. The build also writes `sitemap.xml`, `robots.txt` and the service worker precache list.
+- Serve over HTTPS. Browsers allow service workers, microphone access and camera capture only on secure origins.
 
 ## API
 
-All routes are under `/api`. Protected routes need `Authorization: Bearer <access token>`. The refresh token is an httpOnly cookie scoped to `/api/auth`, and it is rotated on every use; if an old token is reused, all of that user's sessions are revoked.
+All routes are under `/api`. Protected routes need `Authorization: Bearer <access token>`. The refresh token is an httpOnly cookie scoped to `/api/auth`, rotated on every use. If an old refresh token is reused, all of that user's sessions are revoked.
 
 | Module | Endpoints |
 |---|---|
-| health | `GET /health` — reports database and AI mode |
+| health | `GET /health` |
 | auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
 | users | `GET/PATCH/DELETE /users/me`, `POST /users/me/password` |
 | students | `GET/PATCH /students/me`, `GET /students/me/dashboard`, `POST /students/me/link-code` |
-| parents (parents and teachers) | `POST /parents/link`, `GET /parents/students`, `GET /parents/students/:id/report`, `DELETE /parents/students/:id` |
-| curriculum / chapters / topics | `GET /curriculum`, `GET /curriculum/sources`, `GET /chapters`, `GET /chapters/:slug`, `GET /chapters/:slug/offline-pack`, `GET /topics/:slug`, `POST /topics/:slug/complete` |
+| parents / teachers | `POST /parents/link`, `GET /parents/students`, `GET /parents/students/:id/report`, `DELETE /parents/students/:id` |
+| curriculum | `GET /curriculum`, `GET /curriculum/sources`, `GET /chapters`, `GET /chapters/:slug`, `GET /chapters/:slug/offline-pack`, `GET /topics/:slug`, `POST /topics/:slug/complete` |
 | tutor | `GET/POST /tutor/conversations`, `GET/DELETE /tutor/conversations/:id`, `POST /tutor/conversations/:id/messages` |
-| voice / vision | `GET /voice/capabilities`, `POST /voice/transcribe` (multipart `audio`), `POST /vision/extract` (multipart `image`) |
+| voice / vision | `GET /voice/capabilities`, `POST /voice/transcribe`, `POST /voice/speak`, `POST /vision/extract` (multipart `image`) |
 | practice | `GET /practice/next?topic=`, `POST /practice/answer`, `POST /practice/sessions`, `POST /practice/sessions/:id/end` |
 | assessments | `GET /assessments`, `GET /assessments/:slug`, `POST /assessments/:slug/start`, `POST /assessments/sessions/:id/submit` |
 | adaptive | `GET /adaptive/recommendations`, `POST /adaptive/recommendations/recompute`, `POST /adaptive/recommendations/:id/dismiss`, `GET /adaptive/weak-topics` |
 | progress | `GET /progress/me`, `GET /progress/me/activity` |
-| sync | `POST /sync` — idempotent batch of offline records |
-| analytics | `POST /analytics/pageview` — anonymous, sent only after the user consents |
+| sync | `POST /sync` (idempotent batch of offline records) |
+| analytics | `POST /analytics/pageview` (anonymous; sent only after consent) |
 
 ## Known limitations
 
-- **Curriculum alignment.** The chapter list was checked against secondary sources only, not the official JAC notified syllabus (see `backend/content/class9-maths.json` → `meta`). All lessons are original *sample* content: 24 short lessons and 72 questions, which is too few for a full course.
-- **Password reset.** Students do not give an email address, so there is no password reset.
-- **Answer checking.** The calculator check confirms only the final number of arithmetic or one-variable linear answers. It does not check the reasoning, and it does not cover geometry proofs.
+- **Curriculum alignment.** The chapter list was checked against secondary sources only, not the official JAC notified syllabus (see `backend/content/class9-maths.json`, `meta`). All lessons are original *sample* content and too few for a full course.
+- **Telugu content.** Lessons and questions are in Hindi and English only. Telugu is supported in the voice and text tutor replies, not in lesson content.
+- **Password reset.** Students give no email address, so there is no password reset.
+- **Answer checking.** The calculator confirms only the final number of arithmetic or one-variable linear answers. It does not check reasoning or geometry proofs.
 - **Device voices.** Without a Sarvam key, read-aloud depends on the device having a Hindi or Telugu voice. Browser speech recognition needs internet and works best in Chrome on Android.
-- **Telugu content.** Lessons and questions are written in Hindi and English only. Telugu is supported in the voice/text tutor's replies, not in the lesson content.
-- **Background sync.** It wakes open tabs; with no tab open, the queue syncs on the next visit. iOS Safari does not support the Background Sync API, so syncing there happens on reconnect or app open.
-- **Tests.** The tests cover logic and APIs. Browser journeys were checked with a headless-browser script during development, which is not checked in. Real low-end Android devices have not been tested.
-- **Legal review.** The privacy policy and terms need a legal review (e.g. against India's DPDP Act 2023) before public use.
-- **No project licence yet.** The licence will be chosen after the organisers' ownership terms are reviewed.
+- **Background sync.** It runs in open tabs. With no tab open, the queue syncs on the next visit. iOS Safari has no Background Sync API, so syncing happens on reconnect or app open.
+- **Tests.** Tests cover logic and APIs. Browser journeys are not in the test suite.
+- **Legal review.** The privacy policy and terms need legal review (for example against India's DPDP Act 2023) before public use.
+- **No licence yet.** A licence will be chosen after the organisers' ownership terms are reviewed.

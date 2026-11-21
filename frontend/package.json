@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.1.0",
     "@fontsource/mukta": "^5.1.0",
     "@fontsource/noto-sans-telugu": "^5.1.0",
     "@hookform/resolvers": "^3.9.1",

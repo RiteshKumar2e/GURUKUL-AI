@@ -100,7 +100,7 @@ export function TutorReply({ message, onFollowUp, player: external }: { message:
         )}
 
         {s.finalAnswer && (
-          <p className="rounded border border-ink-200 px-3 py-2">
+          <p className="rounded-md border-2 border-ink-950 px-3 py-2">
             <span className="text-sm text-ink-600">{tx('उत्तर: ', 'Answer: ')}</span>
             <span className="font-semibold">{s.finalAnswer}</span>
           </p>

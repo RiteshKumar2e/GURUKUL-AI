@@ -188,7 +188,7 @@ export default function Offline() {
 
       {online && curriculum.data && (
         <Section title={tx('और अध्याय सहेजें', 'Save more chapters')}>
-          <ul className="divide-y divide-line rounded border border-line bg-white">
+          <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
             {curriculum.data.chapters
               .filter((c) => !savedSlugs.has(c.slug))
               .map((c) => (

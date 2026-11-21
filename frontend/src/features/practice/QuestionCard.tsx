@@ -84,8 +84,8 @@ export function QuestionCard({ question, onSubmit, onNext, nextLabel, showHint =
               return (
                 <label
                   key={o.id}
-                  className={`flex cursor-pointer items-center gap-3 rounded border px-3 py-3 ${
-                    isRight ? 'border-good-600 bg-good-50' : isWrongChoice ? 'border-bad-600 bg-bad-50' : chosen ? 'border-ink-900 bg-ink-50' : 'border-ink-200 bg-white hover:border-ink-400'
+                  className={`flex cursor-pointer items-center gap-3 rounded-md border-2 px-3 py-3 ${
+                    isRight ? 'border-good-600 bg-good-50' : isWrongChoice ? 'border-bad-600 bg-bad-50' : chosen ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'
                   }`}
                 >
                   <input type="radio" name={`q-${question.id}`} value={o.id} checked={chosen} onChange={() => setAnswer(o.id)} className="h-4 w-4 accent-ink-900" />
@@ -139,7 +139,7 @@ export function QuestionCard({ question, onSubmit, onNext, nextLabel, showHint =
         )}
 
         {feedback && (
-          <div className={`mt-5 rounded border px-4 py-3 ${feedback.isCorrect ? 'border-good-600/30 bg-good-50' : 'border-bad-600/30 bg-bad-50'}`} role="status" aria-live="polite">
+          <div className={`mt-5 border-2 px-4 py-3 ${feedback.isCorrect ? 'border-good-700 bg-good-50' : 'border-bad-700 bg-bad-50'}`} role="status" aria-live="polite">
             <p className="flex items-center gap-2 font-semibold">
               {feedback.isCorrect ? <CheckCircle2 className="h-5 w-5 text-good-600" aria-hidden /> : <XCircle className="h-5 w-5 text-bad-600" aria-hidden />}
               {feedback.isCorrect ? tx('सही उत्तर!', 'Correct!') : tx(`सही उत्तर: ${bi(feedback.correctAnswerDisplay)}`, `Correct answer: ${bi(feedback.correctAnswerDisplay)}`)}
