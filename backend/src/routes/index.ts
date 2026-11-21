@@ -1,0 +1,31 @@
+import { Router } from 'express';
+import { authRouter, usersRouter } from './auth.routes';
+import { parentsRouter, studentsRouter } from './people.routes';
+import { chaptersRouter, curriculumRouter, topicsRouter } from './curriculum.routes';
+import { adaptiveRouter, assessmentsRouter, practiceRouter, progressRouter, syncRouter } from './learning.routes';
+import { tutorRouter, visionRouter, voiceRouter } from './ai.routes';
+import { analyticsController, healthController } from '../controllers/miscController';
+import { validate } from '../middleware/validate';
+import { asyncHandler as h } from '../utils/errors';
+import { pageviewSchema } from '../validators';
+
+const api = Router();
+api.get('/health', h(healthController.health));
+api.use('/auth', authRouter);
+api.use('/users', usersRouter);
+api.use('/students', studentsRouter);
+api.use('/parents', parentsRouter);
+api.use('/curriculum', curriculumRouter);
+api.use('/chapters', chaptersRouter);
+api.use('/topics', topicsRouter);
+api.use('/tutor', tutorRouter);
+api.use('/voice', voiceRouter);
+api.use('/vision', visionRouter);
+api.use('/practice', practiceRouter);
+api.use('/assessments', assessmentsRouter);
+api.use('/adaptive', adaptiveRouter);
+api.use('/progress', progressRouter);
+api.use('/sync', syncRouter);
+api.post('/analytics/pageview', validate(pageviewSchema), h(analyticsController.pageview));
+
+export default api;

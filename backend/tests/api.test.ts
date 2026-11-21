@@ -1,0 +1,154 @@
+/**
+ * Integration tests against the configured PostgreSQL database (run `npm run db:setup` first).
+ * Creates throwaway users with a unique prefix and deletes them afterwards.
+ */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import request from 'supertest';
+import { createApp } from '../src/app';
+import { prisma } from '../src/config/prisma';
+
+const app = createApp();
+const prefix = `t${Date.now().toString(36)}`;
+const pw = 'Test@12345';
+
+async function register(role: 'STUDENT' | 'PARENT' | 'TEACHER', name: string) {
+  const res = await request(app)
+    .post('/api/auth/register')
+    .send({ role, username: `${prefix}_${name}`, displayName: `Test ${name}`, password: pw, email: role === 'STUDENT' ? undefined : `${prefix}_${name}@example.com`, preferredLanguage: 'HI', acceptTerms: true });
+  expect(res.status).toBe(201);
+  return { token: res.body.accessToken as string, user: res.body.user, cookie: res.headers['set-cookie'] as unknown as string[] };
+}
+
+let student: Awaited<ReturnType<typeof register>>;
+let parent: Awaited<ReturnType<typeof register>>;
+let stranger: Awaited<ReturnType<typeof register>>;
+
+beforeAll(async () => {
+  student = await register('STUDENT', 'stu');
+  parent = await register('PARENT', 'par');
+  stranger = await register('TEACHER', 'tea');
+});
+
+afterAll(async () => {
+  await prisma.user.deleteMany({ where: { username: { startsWith: `${prefix}_` } } });
+  await prisma.$disconnect();
+});
+
+describe('health', () => {
+  it('reports db and ai mode', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.status).toBe(200);
+    expect(res.body.db).toBe('up');
+    expect(['live', 'demo']).toContain(res.body.ai.mode);
+  });
+});
+
+describe('auth', () => {
+  it('rejects duplicate usernames', async () => {
+    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_stu`, displayName: 'Dup', password: pw, acceptTerms: true });
+    expect(res.status).toBe(409);
+  });
+  it('rejects the honeypot field', async () => {
+    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_bot`, displayName: 'Bot', password: pw, acceptTerms: true, website: 'http://spam' });
+    expect(res.status).toBe(400);
+  });
+  it('validates input', async () => {
+    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: 'a', password: '1' });
+    expect(res.status).toBe(400);
+    expect(res.body.error.details.length).toBeGreaterThan(0);
+  });
+  it('logs in with a generic error on failure', async () => {
+    const bad = await request(app).post('/api/auth/login').send({ username: `${prefix}_stu`, password: 'wrong-password' });
+    expect(bad.status).toBe(401);
+    const ok = await request(app).post('/api/auth/login').send({ username: `${prefix}_stu`, password: pw });
+    expect(ok.status).toBe(200);
+    expect(ok.body.accessToken).toBeTruthy();
+  });
+  it('rotates refresh tokens and detects reuse', async () => {
+    const first = await request(app).post('/api/auth/refresh').set('Cookie', student.cookie);
+    expect(first.status).toBe(200);
+    const reuse = await request(app).post('/api/auth/refresh').set('Cookie', student.cookie);
+    expect(reuse.status).toBe(401);
+  });
+  it('requires a token for protected routes', async () => {
+    expect((await request(app).get('/api/progress/me')).status).toBe(401);
+  });
+});
+
+describe('learning flow', () => {
+  it('lists the curriculum publicly', async () => {
+    const res = await request(app).get('/api/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.chapters.length).toBe(12);
+    expect(res.body.meta.curriculumVerification.status).toBeTruthy();
+  });
+
+  it('serves a practice question without its answer, then grades it', async () => {
+    const next = await request(app).get('/api/practice/next?topic=laws-of-exponents').set('Authorization', `Bearer ${student.token}`);
+    expect(next.status).toBe(200);
+    expect(next.body.question.correctAnswer).toBeUndefined();
+    const q = await prisma.question.findUnique({ where: { id: next.body.question.id } });
+    const ans = await request(app).post('/api/practice/answer').set('Authorization', `Bearer ${student.token}`).send({ questionId: q!.id, answer: q!.correctAnswer });
+    expect(ans.status).toBe(200);
+    expect(ans.body.isCorrect).toBe(true);
+    expect(ans.body.progress.attempts).toBe(1);
+  });
+
+  it('runs a chapter quiz end to end', async () => {
+    const start = await request(app).post('/api/assessments/polynomials-quiz/start').set('Authorization', `Bearer ${student.token}`);
+    expect(start.status).toBe(201);
+    const quiz = await request(app).get('/api/assessments/polynomials-quiz');
+    const answers = quiz.body.questions.map((q: { id: string }) => ({ questionId: q.id, answer: '0' }));
+    const submit = await request(app).post(`/api/assessments/sessions/${start.body.sessionId}/submit`).set('Authorization', `Bearer ${student.token}`).send({ answers });
+    expect(submit.status).toBe(200);
+    expect(submit.body.total).toBe(6);
+    const again = await request(app).post(`/api/assessments/sessions/${start.body.sessionId}/submit`).set('Authorization', `Bearer ${student.token}`).send({ answers });
+    expect(again.status).toBe(400);
+  });
+
+  it('applies offline sync records once', async () => {
+    const q = await prisma.question.findUnique({ where: { slug: 'cg-cp-1' } });
+    const records = [
+      { clientId: `${prefix}-rec-0001`, kind: 'answer', createdAt: new Date().toISOString(), payload: { questionId: q!.id, answer: 'b' } },
+      { clientId: `${prefix}-rec-0002`, kind: 'lesson-complete', createdAt: new Date().toISOString(), payload: { topicSlug: 'cartesian-plane' } },
+    ];
+    const first = await request(app).post('/api/sync').set('Authorization', `Bearer ${student.token}`).send({ records });
+    expect(first.body.applied).toBe(2);
+    const second = await request(app).post('/api/sync').set('Authorization', `Bearer ${student.token}`).send({ records });
+    expect(second.body.duplicates).toBe(2);
+  });
+
+  it('answers in demo mode honestly when no AI key is set', async () => {
+    const conv = await request(app).post('/api/tutor/conversations').set('Authorization', `Bearer ${student.token}`).send({});
+    expect(conv.status).toBe(201);
+    const res = await request(app).post(`/api/tutor/conversations/${conv.body.id}/messages`).set('Authorization', `Bearer ${student.token}`).send({ content: '2x + 3 = 7 हल करो', intent: 'solution' });
+    if (res.body.assistantMessage?.provider === 'demo') {
+      expect(res.body.assistantMessage.structured.demo).toBe(true);
+      expect(res.body.assistantMessage.structured.computed).toBe(2);
+    } else {
+      expect([200, 503]).toContain(res.status);
+    }
+  });
+});
+
+describe('guardian access control', () => {
+  it('blocks students from the guardian API', async () => {
+    expect((await request(app).get('/api/parents/students').set('Authorization', `Bearer ${student.token}`)).status).toBe(403);
+  });
+  it('blocks guardians from student-only APIs', async () => {
+    expect((await request(app).get('/api/progress/me').set('Authorization', `Bearer ${parent.token}`)).status).toBe(403);
+  });
+  it('links with a code and only then exposes the report', async () => {
+    const studentId = student.user.student.id;
+    const before = await request(app).get(`/api/parents/students/${studentId}/report`).set('Authorization', `Bearer ${parent.token}`);
+    expect(before.status).toBe(404);
+    const link = await request(app).post('/api/parents/link').set('Authorization', `Bearer ${parent.token}`).send({ code: student.user.student.linkCode });
+    expect(link.status).toBe(201);
+    const after = await request(app).get(`/api/parents/students/${studentId}/report`).set('Authorization', `Bearer ${parent.token}`);
+    expect(after.status).toBe(200);
+    expect(after.body.totals.answered).toBeGreaterThan(0);
+    expect(after.body).not.toHaveProperty('messages');
+    const other = await request(app).get(`/api/parents/students/${studentId}/report`).set('Authorization', `Bearer ${stranger.token}`);
+    expect(other.status).toBe(404);
+  });
+});

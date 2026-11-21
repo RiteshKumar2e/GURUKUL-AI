@@ -1,0 +1,1183 @@
+{
+  "meta": {
+    "description": "Class 9 Mathematics content for GURUKUL AI. Chapter titles follow the 12-chapter list of the rationalised NCERT Class 9 Mathematics textbook, which JAC is reported to follow. All lesson text, examples and questions below are ORIGINAL SAMPLE material written for this project. They are not copied from, and are not, official JAC or NCERT material.",
+    "curriculumVerification": {
+      "status": "secondary-sources-only",
+      "verifiedOn": "2026-11-21",
+      "note": "Chapter list checked against secondary sources only. The official JAC notified syllabus PDF (jac.jharkhand.gov.in) could not be accessed during development. Check against it before any claim of syllabus alignment.",
+      "sources": [
+        "https://school.careers360.com/boards/jac/jac-9th-syllabus",
+        "https://www.pw.live/state-boards/jac/exams/jac-class-9-maths-syllabus",
+        "https://byjus.com/jac/class-9-maths-syllabus",
+        "https://jac.jharkhand.gov.in (official, not accessed)"
+      ]
+    },
+    "contentLicence": "Original sample content created for GURUKUL AI. Licence to be decided after reviewing hackathon ownership terms."
+  },
+  "subject": {
+    "slug": "class-9-maths",
+    "nameHi": "गणित — कक्षा 9",
+    "nameEn": "Mathematics — Class 9",
+    "classLevel": 9,
+    "board": "JAC"
+  },
+  "chapters": [
+    {
+      "number": 1,
+      "slug": "number-systems",
+      "nameHi": "संख्या पद्धति",
+      "nameEn": "Number Systems",
+      "summaryHi": "परिमेय और अपरिमेय संख्याएँ, दशमलव प्रसार और वास्तविक संख्याओं के घातांक नियम।",
+      "summaryEn": "Rational and irrational numbers, decimal expansions and laws of exponents for real numbers.",
+      "topics": [
+        {
+          "slug": "rational-and-irrational",
+          "titleHi": "परिमेय और अपरिमेय संख्याएँ",
+          "titleEn": "Rational and irrational numbers",
+          "summaryHi": "p/q रूप वाली संख्याएँ और वे जो इस रूप में नहीं लिखी जा सकतीं।",
+          "summaryEn": "Numbers of the form p/q, and numbers that cannot be written that way.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "जो संख्या p/q के रूप में लिखी जा सके, जहाँ p और q पूर्णांक हों और q ≠ 0, उसे परिमेय संख्या कहते हैं। जैसे 3/4, −2, 0.5 (= 1/2)।", "en": "A number that can be written as p/q, where p and q are integers and q ≠ 0, is a rational number. Examples: 3/4, −2, 0.5 (= 1/2)." },
+              { "kind": "para", "hi": "जो संख्या p/q रूप में नहीं लिखी जा सकती, वह अपरिमेय है। इसका दशमलव प्रसार न तो समाप्त होता है और न ही दोहराता है। जैसे √2 = 1.41421356…, π।", "en": "A number that cannot be written as p/q is irrational. Its decimal expansion neither ends nor repeats. Examples: √2 = 1.41421356…, π." },
+              { "kind": "example", "hi": "क्या 0.333… परिमेय है? मान लीजिए x = 0.333…। तब 10x = 3.333…। घटाने पर 9x = 3, अतः x = 1/3। हाँ, यह परिमेय है।", "en": "Is 0.333… rational? Let x = 0.333…. Then 10x = 3.333…. Subtracting, 9x = 3, so x = 1/3. Yes, it is rational." },
+              { "kind": "note", "hi": "हर वास्तविक संख्या या तो परिमेय होती है या अपरिमेय — दोनों एक साथ नहीं।", "en": "Every real number is either rational or irrational — never both." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "ns-ri-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "इनमें से कौन-सी संख्या अपरिमेय है?", "promptEn": "Which of these numbers is irrational?",
+              "options": [
+                { "id": "a", "hi": "3/4", "en": "3/4" },
+                { "id": "b", "hi": "√9", "en": "√9" },
+                { "id": "c", "hi": "√5", "en": "√5" },
+                { "id": "d", "hi": "0.25", "en": "0.25" }
+              ],
+              "answer": "c",
+              "hintHi": "√9 को सरल कीजिए। क्या √5 किसी पूर्ण वर्ग का मूल है?", "hintEn": "Simplify √9. Is 5 a perfect square?",
+              "explHi": "√9 = 3 (परिमेय), 3/4 और 0.25 = 1/4 भी परिमेय हैं। 5 पूर्ण वर्ग नहीं है, इसलिए √5 अपरिमेय है।", "explEn": "√9 = 3 (rational); 3/4 and 0.25 = 1/4 are rational too. 5 is not a perfect square, so √5 is irrational."
+            },
+            {
+              "slug": "ns-ri-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "0.666… (6 दोहराता हुआ) को p/q रूप में लिखिए।", "promptEn": "Write 0.666… (6 repeating) in the form p/q.",
+              "options": [
+                { "id": "a", "hi": "6/10", "en": "6/10" },
+                { "id": "b", "hi": "2/3", "en": "2/3" },
+                { "id": "c", "hi": "3/5", "en": "3/5" },
+                { "id": "d", "hi": "1/6", "en": "1/6" }
+              ],
+              "answer": "b",
+              "hintHi": "x = 0.666… लीजिए और 10x − x निकालिए।", "hintEn": "Let x = 0.666… and compute 10x − x.",
+              "explHi": "10x = 6.666…, x = 0.666…। घटाने पर 9x = 6, x = 6/9 = 2/3।", "explEn": "10x = 6.666…, x = 0.666…. Subtracting, 9x = 6, so x = 6/9 = 2/3."
+            },
+            {
+              "slug": "ns-ri-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "1/3 और 1/2 के बीच एक परिमेय संख्या है जिसका हर 12 है। उसका अंश लिखिए।", "promptEn": "There is a rational number between 1/3 and 1/2 whose denominator is 12. Write its numerator.",
+              "answer": "5",
+              "hintHi": "दोनों भिन्नों को हर 12 वाली भिन्नों में बदलिए।", "hintEn": "Convert both fractions to twelfths.",
+              "explHi": "1/3 = 4/12 और 1/2 = 6/12। इनके बीच 5/12 है, इसलिए अंश 5 है।", "explEn": "1/3 = 4/12 and 1/2 = 6/12. Between them is 5/12, so the numerator is 5."
+            }
+          ]
+        },
+        {
+          "slug": "laws-of-exponents",
+          "titleHi": "वास्तविक संख्याओं के घातांक नियम",
+          "titleEn": "Laws of exponents for real numbers",
+          "summaryHi": "घातों को गुणा, भाग और परिमेय घातांक के साथ सरल करना।",
+          "summaryEn": "Simplifying powers with multiplication, division and rational exponents.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "formula", "hi": "aᵐ × aⁿ = aᵐ⁺ⁿ    (aᵐ)ⁿ = aᵐⁿ    aᵐ ÷ aⁿ = aᵐ⁻ⁿ    a⁰ = 1", "en": "aᵐ × aⁿ = aᵐ⁺ⁿ    (aᵐ)ⁿ = aᵐⁿ    aᵐ ÷ aⁿ = aᵐ⁻ⁿ    a⁰ = 1" },
+              { "kind": "para", "hi": "a^(1/n) का अर्थ है a का n-वाँ मूल। उदाहरण: 8^(1/3) = ∛8 = 2।", "en": "a^(1/n) means the n-th root of a. Example: 8^(1/3) = ∛8 = 2." },
+              { "kind": "example", "hi": "8^(2/3) निकालिए। पहले मूल लें: 8^(1/3) = 2। फिर वर्ग करें: 2² = 4।", "en": "Find 8^(2/3). Take the root first: 8^(1/3) = 2. Then square it: 2² = 4." },
+              { "kind": "note", "hi": "हर का परिमेयीकरण: 1/(√a + √b) को (√a − √b) से गुणा-भाग करें, क्योंकि (√a + √b)(√a − √b) = a − b।", "en": "Rationalising: multiply 1/(√a + √b) above and below by (√a − √b), because (√a + √b)(√a − √b) = a − b." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "ns-ex-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "2³ × 2² का मान क्या है?", "promptEn": "What is the value of 2³ × 2²?",
+              "answer": "32",
+              "hintHi": "समान आधार वाली घातों के गुणा में घातांक जुड़ते हैं।", "hintEn": "When multiplying powers with the same base, add the exponents.",
+              "explHi": "2³ × 2² = 2⁵ = 32।", "explEn": "2³ × 2² = 2⁵ = 32."
+            },
+            {
+              "slug": "ns-ex-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "16^(3/4) का मान ज्ञात कीजिए।", "promptEn": "Find the value of 16^(3/4).",
+              "answer": "8",
+              "hintHi": "पहले 16 का चौथा मूल निकालिए।", "hintEn": "First find the fourth root of 16.",
+              "explHi": "16^(1/4) = 2, इसलिए 16^(3/4) = 2³ = 8।", "explEn": "16^(1/4) = 2, so 16^(3/4) = 2³ = 8."
+            },
+            {
+              "slug": "ns-ex-3", "type": "MCQ", "difficulty": 3,
+              "promptHi": "1/(√3 + √2) के हर का परिमेयीकरण करने पर क्या मिलता है?", "promptEn": "Rationalise the denominator of 1/(√3 + √2).",
+              "options": [
+                { "id": "a", "hi": "√3 + √2", "en": "√3 + √2" },
+                { "id": "b", "hi": "√3 − √2", "en": "√3 − √2" },
+                { "id": "c", "hi": "(√3 − √2)/5", "en": "(√3 − √2)/5" },
+                { "id": "d", "hi": "1/5", "en": "1/5" }
+              ],
+              "answer": "b",
+              "hintHi": "अंश और हर दोनों को (√3 − √2) से गुणा कीजिए।", "hintEn": "Multiply numerator and denominator by (√3 − √2).",
+              "explHi": "हर = (√3)² − (√2)² = 3 − 2 = 1। अतः उत्तर √3 − √2 है।", "explEn": "Denominator = (√3)² − (√2)² = 3 − 2 = 1. So the answer is √3 − √2."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "slug": "polynomials",
+      "nameHi": "बहुपद",
+      "nameEn": "Polynomials",
+      "summaryHi": "एक चर वाले बहुपद, घात, शून्यक, गुणनखंड प्रमेय और बीजीय सर्वसमिकाएँ।",
+      "summaryEn": "Polynomials in one variable, degree, zeroes, the factor theorem and algebraic identities.",
+      "topics": [
+        {
+          "slug": "degree-and-zeroes",
+          "titleHi": "बहुपद की घात और शून्यक",
+          "titleEn": "Degree and zeroes of a polynomial",
+          "summaryHi": "सबसे बड़ी घात पहचानना और p(a) = 0 वाले मान खोजना।",
+          "summaryEn": "Finding the highest power and the values where p(a) = 0.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "एक चर x वाले बहुपद में x की घातें केवल पूर्ण संख्याएँ (0, 1, 2, …) होती हैं। जैसे 5x³ − 2x + 7।", "en": "In a polynomial in one variable x, the powers of x are whole numbers (0, 1, 2, …). Example: 5x³ − 2x + 7." },
+              { "kind": "para", "hi": "बहुपद में चर की सबसे बड़ी घात को उसकी घात कहते हैं। 5x³ − 2x + 7 की घात 3 है।", "en": "The highest power of the variable is the degree. The degree of 5x³ − 2x + 7 is 3." },
+              { "kind": "para", "hi": "यदि p(a) = 0 हो, तो a को बहुपद p(x) का शून्यक कहते हैं।", "en": "If p(a) = 0, then a is called a zero of the polynomial p(x)." },
+              { "kind": "example", "hi": "p(x) = x − 3 का शून्यक: x − 3 = 0 रखें, x = 3। जाँच: p(3) = 3 − 3 = 0।", "en": "Zero of p(x) = x − 3: set x − 3 = 0, x = 3. Check: p(3) = 3 − 3 = 0." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "pl-dz-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "5x³ − 2x + 7 की घात क्या है?", "promptEn": "What is the degree of 5x³ − 2x + 7?",
+              "options": [
+                { "id": "a", "hi": "1", "en": "1" },
+                { "id": "b", "hi": "2", "en": "2" },
+                { "id": "c", "hi": "3", "en": "3" },
+                { "id": "d", "hi": "7", "en": "7" }
+              ],
+              "answer": "c",
+              "hintHi": "x की सबसे बड़ी घात देखिए, गुणांक नहीं।", "hintEn": "Look at the highest power of x, not the coefficients.",
+              "explHi": "पदों में x की घातें 3, 1 और 0 हैं। सबसे बड़ी 3 है।", "explEn": "The powers of x in the terms are 3, 1 and 0. The highest is 3."
+            },
+            {
+              "slug": "pl-dz-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "p(x) = x² − 5x + 6 हो, तो p(2) का मान क्या है?", "promptEn": "If p(x) = x² − 5x + 6, what is p(2)?",
+              "answer": "0",
+              "hintHi": "x की जगह 2 रखिए।", "hintEn": "Substitute x = 2.",
+              "explHi": "p(2) = 4 − 10 + 6 = 0। इसलिए 2 इस बहुपद का एक शून्यक है।", "explEn": "p(2) = 4 − 10 + 6 = 0. So 2 is a zero of this polynomial."
+            },
+            {
+              "slug": "pl-dz-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "2x + 5 का शून्यक ज्ञात कीजिए। (भिन्न या दशमलव में लिख सकते हैं)", "promptEn": "Find the zero of 2x + 5. (You may write a fraction or decimal.)",
+              "answer": "-5/2",
+              "hintHi": "2x + 5 = 0 रखकर x निकालिए।", "hintEn": "Set 2x + 5 = 0 and solve for x.",
+              "explHi": "2x = −5, अतः x = −5/2 = −2.5।", "explEn": "2x = −5, so x = −5/2 = −2.5."
+            }
+          ]
+        },
+        {
+          "slug": "factor-theorem-identities",
+          "titleHi": "गुणनखंड प्रमेय और सर्वसमिकाएँ",
+          "titleEn": "Factor theorem and identities",
+          "summaryHi": "(x − a) कब गुणनखंड है, और गणना को आसान बनाने वाली सर्वसमिकाएँ।",
+          "summaryEn": "When (x − a) is a factor, and identities that make calculation easier.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "para", "hi": "गुणनखंड प्रमेय: यदि p(a) = 0 है, तो (x − a), p(x) का एक गुणनखंड है। उल्टा भी सत्य है।", "en": "Factor theorem: if p(a) = 0, then (x − a) is a factor of p(x). The converse is also true." },
+              { "kind": "formula", "hi": "(a + b)² = a² + 2ab + b²\n(a − b)² = a² − 2ab + b²\na² − b² = (a + b)(a − b)", "en": "(a + b)² = a² + 2ab + b²\n(a − b)² = a² − 2ab + b²\na² − b² = (a + b)(a − b)" },
+              { "kind": "example", "hi": "99² = (100 − 1)² = 10000 − 200 + 1 = 9801।", "en": "99² = (100 − 1)² = 10000 − 200 + 1 = 9801." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "pl-ft-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "सर्वसमिका a² − b² का उपयोग करके 103 × 97 का मान निकालिए।", "promptEn": "Use the identity a² − b² to find 103 × 97.",
+              "answer": "9991",
+              "hintHi": "103 = 100 + 3 और 97 = 100 − 3।", "hintEn": "103 = 100 + 3 and 97 = 100 − 3.",
+              "explHi": "(100 + 3)(100 − 3) = 100² − 3² = 10000 − 9 = 9991।", "explEn": "(100 + 3)(100 − 3) = 100² − 3² = 10000 − 9 = 9991."
+            },
+            {
+              "slug": "pl-ft-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "x² − 5x + 6 का एक गुणनखंड कौन-सा है?", "promptEn": "Which of these is a factor of x² − 5x + 6?",
+              "options": [
+                { "id": "a", "hi": "x − 1", "en": "x − 1" },
+                { "id": "b", "hi": "x − 2", "en": "x − 2" },
+                { "id": "c", "hi": "x + 2", "en": "x + 2" },
+                { "id": "d", "hi": "x + 3", "en": "x + 3" }
+              ],
+              "answer": "b",
+              "hintHi": "हर विकल्प के लिए p(a) निकालिए। जहाँ p(a) = 0, वही गुणनखंड है।", "hintEn": "Compute p(a) for each option. The one with p(a) = 0 is a factor.",
+              "explHi": "p(2) = 4 − 10 + 6 = 0, इसलिए (x − 2) गुणनखंड है। p(1) = 2, p(−2) = 20, p(−3) = 30।", "explEn": "p(2) = 4 − 10 + 6 = 0, so (x − 2) is a factor. p(1) = 2, p(−2) = 20, p(−3) = 30."
+            },
+            {
+              "slug": "pl-ft-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "यदि (x + 1), x² + kx − 3 का गुणनखंड है, तो k का मान क्या है?", "promptEn": "If (x + 1) is a factor of x² + kx − 3, find k.",
+              "answer": "-2",
+              "hintHi": "(x + 1) गुणनखंड है, तो p(−1) = 0।", "hintEn": "If (x + 1) is a factor, then p(−1) = 0.",
+              "explHi": "p(−1) = 1 − k − 3 = 0, अतः −k = 2, k = −2।", "explEn": "p(−1) = 1 − k − 3 = 0, so −k = 2, k = −2."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "slug": "coordinate-geometry",
+      "nameHi": "निर्देशांक ज्यामिति",
+      "nameEn": "Coordinate Geometry",
+      "summaryHi": "कार्तीय तल, अक्ष, चतुर्थांश और बिंदुओं को आलेखित करना।",
+      "summaryEn": "The Cartesian plane, axes, quadrants and plotting points.",
+      "topics": [
+        {
+          "slug": "cartesian-plane",
+          "titleHi": "कार्तीय तल और चतुर्थांश",
+          "titleEn": "Cartesian plane and quadrants",
+          "summaryHi": "x-अक्ष, y-अक्ष, मूल बिंदु और चारों चतुर्थांशों के चिह्न।",
+          "summaryEn": "The x-axis, y-axis, origin and the signs in each quadrant.",
+          "lesson": {
+            "estMinutes": 7,
+            "blocks": [
+              { "kind": "para", "hi": "दो लंब रेखाएँ — क्षैतिज x-अक्ष और ऊर्ध्वाधर y-अक्ष — तल को चार भागों में बाँटती हैं। ये जहाँ मिलती हैं, वह मूल बिंदु (0, 0) है।", "en": "Two perpendicular lines — the horizontal x-axis and vertical y-axis — divide the plane into four parts. They meet at the origin (0, 0)." },
+              { "kind": "formula", "hi": "चतुर्थांश I: (+, +)   II: (−, +)   III: (−, −)   IV: (+, −)", "en": "Quadrant I: (+, +)   II: (−, +)   III: (−, −)   IV: (+, −)" },
+              { "kind": "note", "hi": "अक्ष पर स्थित बिंदु किसी भी चतुर्थांश में नहीं होता।", "en": "A point on an axis does not lie in any quadrant." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "cg-cp-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "बिंदु (−3, 4) किस चतुर्थांश में है?", "promptEn": "In which quadrant does the point (−3, 4) lie?",
+              "options": [
+                { "id": "a", "hi": "पहला", "en": "First" },
+                { "id": "b", "hi": "दूसरा", "en": "Second" },
+                { "id": "c", "hi": "तीसरा", "en": "Third" },
+                { "id": "d", "hi": "चौथा", "en": "Fourth" }
+              ],
+              "answer": "b",
+              "hintHi": "x ऋणात्मक है और y धनात्मक।", "hintEn": "x is negative and y is positive.",
+              "explHi": "(−, +) चिह्न दूसरे चतुर्थांश के हैं।", "explEn": "The signs (−, +) belong to the second quadrant."
+            },
+            {
+              "slug": "cg-cp-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "बिंदु (0, −5) कहाँ स्थित है?", "promptEn": "Where does the point (0, −5) lie?",
+              "options": [
+                { "id": "a", "hi": "x-अक्ष पर", "en": "On the x-axis" },
+                { "id": "b", "hi": "y-अक्ष पर", "en": "On the y-axis" },
+                { "id": "c", "hi": "मूल बिंदु पर", "en": "At the origin" },
+                { "id": "d", "hi": "चौथे चतुर्थांश में", "en": "In the fourth quadrant" }
+              ],
+              "answer": "b",
+              "hintHi": "जिस बिंदु का x-निर्देशांक 0 हो, वह किस अक्ष पर होगा?", "hintEn": "Where does a point with x-coordinate 0 lie?",
+              "explHi": "x = 0 वाले सभी बिंदु y-अक्ष पर होते हैं। यह मूल बिंदु से 5 इकाई नीचे है।", "explEn": "All points with x = 0 lie on the y-axis. This one is 5 units below the origin."
+            },
+            {
+              "slug": "cg-cp-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "बिंदु (−6, 2) की y-अक्ष से दूरी कितनी इकाई है?", "promptEn": "How many units is the point (−6, 2) from the y-axis?",
+              "answer": "6",
+              "hintHi": "y-अक्ष से दूरी x-निर्देशांक के आकार (चिह्न छोड़कर) के बराबर होती है।", "hintEn": "Distance from the y-axis equals the size of the x-coordinate (ignore the sign).",
+              "explHi": "|−6| = 6, इसलिए दूरी 6 इकाई है।", "explEn": "|−6| = 6, so the distance is 6 units."
+            }
+          ]
+        },
+        {
+          "slug": "plotting-points",
+          "titleHi": "बिंदुओं को आलेखित करना",
+          "titleEn": "Plotting points",
+          "summaryHi": "भुज, कोटि और क्रम का महत्व।",
+          "summaryEn": "Abscissa, ordinate and why order matters.",
+          "lesson": {
+            "estMinutes": 7,
+            "blocks": [
+              { "kind": "para", "hi": "बिंदु (x, y) में x को भुज और y को कोटि कहते हैं। (2, 3) और (3, 2) अलग-अलग बिंदु हैं।", "en": "In the point (x, y), x is the abscissa and y is the ordinate. (2, 3) and (3, 2) are different points." },
+              { "kind": "example", "hi": "(2, 3) आलेखित करने के लिए मूल बिंदु से 2 इकाई दाएँ जाएँ, फिर 3 इकाई ऊपर।", "en": "To plot (2, 3), move 2 units right from the origin, then 3 units up." },
+              { "kind": "note", "hi": "ऋणात्मक x के लिए बाएँ, ऋणात्मक y के लिए नीचे जाइए।", "en": "For negative x move left; for negative y move down." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "cg-pp-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "बिंदु (7, −2) की कोटि क्या है?", "promptEn": "What is the ordinate of the point (7, −2)?",
+              "answer": "-2",
+              "hintHi": "कोटि दूसरा निर्देशांक है।", "hintEn": "The ordinate is the second coordinate.",
+              "explHi": "(x, y) में y कोटि है, यहाँ y = −2।", "explEn": "In (x, y), y is the ordinate; here y = −2."
+            },
+            {
+              "slug": "cg-pp-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "जिन बिंदुओं का भुज 0 है, वे कहाँ होते हैं?", "promptEn": "Points whose abscissa is 0 lie on:",
+              "options": [
+                { "id": "a", "hi": "x-अक्ष", "en": "the x-axis" },
+                { "id": "b", "hi": "y-अक्ष", "en": "the y-axis" },
+                { "id": "c", "hi": "पहले चतुर्थांश", "en": "the first quadrant" },
+                { "id": "d", "hi": "कहीं भी", "en": "anywhere" }
+              ],
+              "answer": "b",
+              "hintHi": "भुज = x-निर्देशांक।", "hintEn": "Abscissa = x-coordinate.",
+              "explHi": "x = 0 का अर्थ है बिंदु न दाएँ है न बाएँ, अर्थात y-अक्ष पर।", "explEn": "x = 0 means the point is neither left nor right of the y-axis, so it is on the y-axis."
+            },
+            {
+              "slug": "cg-pp-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "शीर्ष (0, 0), (4, 0), (4, 3) और (0, 3) वाले आयत का क्षेत्रफल कितने वर्ग इकाई है?", "promptEn": "What is the area (in square units) of the rectangle with vertices (0, 0), (4, 0), (4, 3) and (0, 3)?",
+              "answer": "12",
+              "hintHi": "लंबाई x-अक्ष पर और चौड़ाई y-अक्ष पर गिनिए।", "hintEn": "Count the length along the x-axis and the width along the y-axis.",
+              "explHi": "लंबाई = 4, चौड़ाई = 3, क्षेत्रफल = 4 × 3 = 12 वर्ग इकाई।", "explEn": "Length = 4, width = 3, area = 4 × 3 = 12 square units."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "slug": "linear-equations-two-variables",
+      "nameHi": "दो चरों वाले रैखिक समीकरण",
+      "nameEn": "Linear Equations in Two Variables",
+      "summaryHi": "ax + by + c = 0 रूप के समीकरण, उनके हल और आलेख।",
+      "summaryEn": "Equations of the form ax + by + c = 0, their solutions and graphs.",
+      "topics": [
+        {
+          "slug": "forming-linear-equations",
+          "titleHi": "रैखिक समीकरण बनाना",
+          "titleEn": "Forming linear equations",
+          "summaryHi": "शब्दों में दी गई स्थिति को ax + by + c = 0 में लिखना।",
+          "summaryEn": "Writing a situation in words as ax + by + c = 0.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "ax + by + c = 0, जहाँ a और b दोनों शून्य न हों, दो चरों वाला रैखिक समीकरण है।", "en": "ax + by + c = 0, where a and b are not both zero, is a linear equation in two variables." },
+              { "kind": "example", "hi": "एक पेन की कीमत (x) एक कॉपी की कीमत (y) की दोगुनी है: x = 2y, अर्थात x − 2y = 0। यहाँ a = 1, b = −2, c = 0।", "en": "The price of a pen (x) is twice that of a notebook (y): x = 2y, i.e. x − 2y = 0. Here a = 1, b = −2, c = 0." },
+              { "kind": "note", "hi": "x², xy या 1/y जैसे पद होने पर समीकरण रैखिक नहीं रहता।", "en": "Terms such as x², xy or 1/y make an equation non-linear." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "le-fe-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "इनमें से कौन दो चरों वाला रैखिक समीकरण है?", "promptEn": "Which of these is a linear equation in two variables?",
+              "options": [
+                { "id": "a", "hi": "x² + y = 3", "en": "x² + y = 3" },
+                { "id": "b", "hi": "2x + 3y = 6", "en": "2x + 3y = 6" },
+                { "id": "c", "hi": "xy = 4", "en": "xy = 4" },
+                { "id": "d", "hi": "x + 1/y = 2", "en": "x + 1/y = 2" }
+              ],
+              "answer": "b",
+              "hintHi": "हर चर की घात 1 होनी चाहिए और चरों का गुणनफल नहीं होना चाहिए।", "hintEn": "Each variable must have power 1 and variables must not be multiplied together.",
+              "explHi": "केवल 2x + 3y = 6 में दोनों चर घात 1 में अलग-अलग हैं।", "explEn": "Only 2x + 3y = 6 has both variables separately with power 1."
+            },
+            {
+              "slug": "le-fe-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "3x − 5y + 7 = 0 में b का मान क्या है?", "promptEn": "In 3x − 5y + 7 = 0, what is the value of b?",
+              "answer": "-5",
+              "hintHi": "b, y का गुणांक है — चिह्न सहित।", "hintEn": "b is the coefficient of y, including its sign.",
+              "explHi": "ax + by + c = 0 से तुलना करने पर b = −5।", "explEn": "Comparing with ax + by + c = 0 gives b = −5."
+            },
+            {
+              "slug": "le-fe-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "यदि (2, k), समीकरण 3x + y = 10 का हल है, तो k ज्ञात कीजिए।", "promptEn": "If (2, k) is a solution of 3x + y = 10, find k.",
+              "answer": "4",
+              "hintHi": "x = 2 और y = k रखिए।", "hintEn": "Substitute x = 2 and y = k.",
+              "explHi": "3(2) + k = 10, अतः k = 4।", "explEn": "3(2) + k = 10, so k = 4."
+            }
+          ]
+        },
+        {
+          "slug": "solutions-and-graph",
+          "titleHi": "हल और आलेख",
+          "titleEn": "Solutions and graph",
+          "summaryHi": "अनगिनत हल, और हर हल रेखा पर एक बिंदु।",
+          "summaryEn": "Infinitely many solutions, each one a point on a line.",
+          "lesson": {
+            "estMinutes": 9,
+            "blocks": [
+              { "kind": "para", "hi": "दो चरों वाले रैखिक समीकरण के अनगिनत हल होते हैं। हर हल (x, y) उसकी रेखा पर एक बिंदु है।", "en": "A linear equation in two variables has infinitely many solutions. Each solution (x, y) is a point on its line." },
+              { "kind": "example", "hi": "x + y = 5 के कुछ हल: x = 0 पर y = 5; x = 5 पर y = 0; x = 2 पर y = 3। इन बिंदुओं को मिलाने पर सीधी रेखा मिलती है।", "en": "Some solutions of x + y = 5: x = 0 gives y = 5; x = 5 gives y = 0; x = 2 gives y = 3. Joining these points gives a straight line." },
+              { "kind": "note", "hi": "किसी बिंदु की जाँच के लिए उसके निर्देशांक समीकरण में रखिए। दोनों पक्ष बराबर हों तो बिंदु रेखा पर है।", "en": "To check a point, substitute its coordinates. If both sides are equal, the point is on the line." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "le-sg-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "2x + y = 7 के कितने हल हैं?", "promptEn": "How many solutions does 2x + y = 7 have?",
+              "options": [
+                { "id": "a", "hi": "एक", "en": "One" },
+                { "id": "b", "hi": "दो", "en": "Two" },
+                { "id": "c", "hi": "कोई नहीं", "en": "None" },
+                { "id": "d", "hi": "अनगिनत", "en": "Infinitely many" }
+              ],
+              "answer": "d",
+              "hintHi": "x का कोई भी मान चुनिए — क्या हर बार y मिलता है?", "hintEn": "Pick any value of x — do you always get a y?",
+              "explHi": "हर x के लिए y = 7 − 2x मिलता है, इसलिए हल अनगिनत हैं।", "explEn": "Every x gives y = 7 − 2x, so there are infinitely many solutions."
+            },
+            {
+              "slug": "le-sg-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "x + 2y = 8 में x = 0 हो, तो y कितना है?", "promptEn": "In x + 2y = 8, what is y when x = 0?",
+              "answer": "4",
+              "hintHi": "x = 0 रखकर बचे समीकरण को हल कीजिए।", "hintEn": "Put x = 0 and solve what remains.",
+              "explHi": "2y = 8, अतः y = 4।", "explEn": "2y = 8, so y = 4."
+            },
+            {
+              "slug": "le-sg-3", "type": "MCQ", "difficulty": 3,
+              "promptHi": "कौन-सा बिंदु रेखा 2x − y = 4 पर है?", "promptEn": "Which point lies on the line 2x − y = 4?",
+              "options": [
+                { "id": "a", "hi": "(1, 2)", "en": "(1, 2)" },
+                { "id": "b", "hi": "(2, 1)", "en": "(2, 1)" },
+                { "id": "c", "hi": "(1, −2)", "en": "(1, −2)" },
+                { "id": "d", "hi": "(0, 4)", "en": "(0, 4)" }
+              ],
+              "answer": "c",
+              "hintHi": "हर बिंदु के लिए 2x − y निकालिए।", "hintEn": "Compute 2x − y for each point.",
+              "explHi": "(1, −2): 2(1) − (−2) = 4 ✓। बाकी के मान 0, 3 और −4 आते हैं।", "explEn": "(1, −2): 2(1) − (−2) = 4 ✓. The others give 0, 3 and −4."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "slug": "euclids-geometry",
+      "nameHi": "यूक्लिड की ज्यामिति का परिचय",
+      "nameEn": "Introduction to Euclid's Geometry",
+      "summaryHi": "परिभाषाएँ, अभिगृहीत और अभिधारणाएँ, और उनसे तर्क करना।",
+      "summaryEn": "Definitions, axioms and postulates, and reasoning with them.",
+      "topics": [
+        {
+          "slug": "axioms-and-postulates",
+          "titleHi": "अभिगृहीत और अभिधारणाएँ",
+          "titleEn": "Axioms and postulates",
+          "summaryHi": "सामान्य सत्य और ज्यामिति-विशेष मान्यताएँ।",
+          "summaryEn": "Common truths and geometry-specific assumptions.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "अभिगृहीत ऐसी मान्यताएँ हैं जो पूरे गणित में लागू होती हैं, जैसे 'पूर्ण अपने भाग से बड़ा होता है'।", "en": "Axioms are assumptions used throughout mathematics, such as 'the whole is greater than the part'." },
+              { "kind": "para", "hi": "अभिधारणाएँ केवल ज्यामिति से जुड़ी मान्यताएँ हैं, जैसे 'किसी एक बिंदु से किसी दूसरे बिंदु तक एक सीधी रेखा खींची जा सकती है'।", "en": "Postulates are assumptions specific to geometry, such as 'a straight line may be drawn from any one point to any other point'." },
+              { "kind": "note", "hi": "दो भिन्न बिंदुओं से होकर एक और केवल एक रेखा गुजरती है।", "en": "Through two distinct points there is exactly one line." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "eg-ap-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "'पूर्ण अपने भाग से बड़ा होता है' — यह क्या है?", "promptEn": "'The whole is greater than the part' is:",
+              "options": [
+                { "id": "a", "hi": "एक अभिगृहीत", "en": "an axiom" },
+                { "id": "b", "hi": "एक प्रमेय", "en": "a theorem" },
+                { "id": "c", "hi": "एक परिभाषा", "en": "a definition" },
+                { "id": "d", "hi": "एक अनुमान", "en": "a guess" }
+              ],
+              "answer": "a",
+              "hintHi": "क्या यह केवल ज्यामिति में लागू होता है या हर जगह?", "hintEn": "Does it apply only to geometry, or everywhere?",
+              "explHi": "यह सिद्ध नहीं किया जाता, सामान्य सत्य मान लिया जाता है — इसलिए अभिगृहीत है।", "explEn": "It is assumed as a general truth, not proved — so it is an axiom."
+            },
+            {
+              "slug": "eg-ap-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "यदि A = B और B = C, तो क्या निष्कर्ष निकलता है?", "promptEn": "If A = B and B = C, what follows?",
+              "options": [
+                { "id": "a", "hi": "A > C", "en": "A > C" },
+                { "id": "b", "hi": "A = C", "en": "A = C" },
+                { "id": "c", "hi": "A < C", "en": "A < C" },
+                { "id": "d", "hi": "कुछ नहीं कहा जा सकता", "en": "Nothing can be said" }
+              ],
+              "answer": "b",
+              "hintHi": "जो वस्तुएँ एक ही वस्तु के बराबर हों…", "hintEn": "Things equal to the same thing…",
+              "explHi": "जो वस्तुएँ एक ही वस्तु के बराबर होती हैं, वे आपस में बराबर होती हैं। इसलिए A = C।", "explEn": "Things equal to the same thing are equal to one another, so A = C."
+            },
+            {
+              "slug": "eg-ap-3", "type": "MCQ", "difficulty": 3,
+              "promptHi": "दो भिन्न बिंदुओं से होकर कितनी रेखाएँ खींची जा सकती हैं?", "promptEn": "How many lines pass through two distinct points?",
+              "options": [
+                { "id": "a", "hi": "कोई नहीं", "en": "None" },
+                { "id": "b", "hi": "ठीक एक", "en": "Exactly one" },
+                { "id": "c", "hi": "दो", "en": "Two" },
+                { "id": "d", "hi": "अनगिनत", "en": "Infinitely many" }
+              ],
+              "answer": "b",
+              "hintHi": "एक बिंदु से अनगिनत रेखाएँ जाती हैं। दूसरा बिंदु जोड़ने पर क्या होता है?", "hintEn": "Infinitely many lines pass through one point. What changes with a second point?",
+              "explHi": "दो भिन्न बिंदुओं से होकर एक अद्वितीय रेखा गुजरती है।", "explEn": "A unique line passes through two distinct points."
+            }
+          ]
+        },
+        {
+          "slug": "reasoning-with-axioms",
+          "titleHi": "अभिगृहीतों से तर्क करना",
+          "titleEn": "Reasoning with axioms",
+          "summaryHi": "रोज़मर्रा और ज्यामितीय स्थितियों में अभिगृहीतों का प्रयोग।",
+          "summaryEn": "Applying axioms to everyday and geometric situations.",
+          "lesson": {
+            "estMinutes": 7,
+            "blocks": [
+              { "kind": "para", "hi": "बराबर में बराबर जोड़ें तो पूर्ण बराबर रहते हैं; बराबर में से बराबर घटाएँ तो शेष बराबर रहते हैं।", "en": "If equals are added to equals, the wholes are equal; if equals are subtracted from equals, the remainders are equal." },
+              { "kind": "example", "hi": "रेखा पर बिंदु A, B, C, D इसी क्रम में हैं और AC = BD। दोनों में से BC घटाने पर AB = CD।", "en": "Points A, B, C, D lie on a line in that order, and AC = BD. Subtracting BC from both gives AB = CD." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "eg-ra-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "x + 5 = y + 5 से x = y निकालने में कौन-सा अभिगृहीत लगता है?", "promptEn": "Which axiom gives x = y from x + 5 = y + 5?",
+              "options": [
+                { "id": "a", "hi": "बराबर में से बराबर घटाने पर शेष बराबर", "en": "Equals subtracted from equals give equal remainders" },
+                { "id": "b", "hi": "पूर्ण भाग से बड़ा होता है", "en": "The whole is greater than the part" },
+                { "id": "c", "hi": "दो बिंदुओं से एक रेखा", "en": "One line through two points" },
+                { "id": "d", "hi": "सभी समकोण बराबर होते हैं", "en": "All right angles are equal" }
+              ],
+              "answer": "a",
+              "hintHi": "दोनों पक्षों से 5 हटाया जा रहा है।", "hintEn": "5 is being removed from both sides.",
+              "explHi": "दोनों पक्षों से बराबर मात्रा (5) घटाई गई है, इसलिए शेष बराबर हैं।", "explEn": "The same amount (5) is subtracted from both sides, so the remainders are equal."
+            },
+            {
+              "slug": "eg-ra-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "दो लोगों का वेतन बराबर है। दोनों को ₹500 बोनस मिला। अब एक का वेतन ₹12500 है। दूसरे का कितना है?", "promptEn": "Two people earn equal salaries. Each gets a ₹500 bonus. One now earns ₹12500. How much does the other earn?",
+              "answer": "12500",
+              "hintHi": "बराबर में बराबर जोड़ने पर क्या होता है?", "hintEn": "What happens when equals are added to equals?",
+              "explHi": "बराबर वेतन में बराबर बोनस जोड़ा गया, इसलिए दोनों के नए वेतन बराबर हैं: ₹12500।", "explEn": "Equal bonuses were added to equal salaries, so the new salaries are equal: ₹12500."
+            },
+            {
+              "slug": "eg-ra-3", "type": "MCQ", "difficulty": 3,
+              "promptHi": "जो वस्तुएँ एक-दूसरे को पूरी तरह ढक लेती हैं (संपाती होती हैं), वे—", "promptEn": "Things which coincide with one another are:",
+              "options": [
+                { "id": "a", "hi": "आपस में बराबर होती हैं", "en": "equal to one another" },
+                { "id": "b", "hi": "समांतर होती हैं", "en": "parallel" },
+                { "id": "c", "hi": "लंब होती हैं", "en": "perpendicular" },
+                { "id": "d", "hi": "असमान होती हैं", "en": "unequal" }
+              ],
+              "answer": "a",
+              "hintHi": "यह यूक्लिड का एक अभिगृहीत है।", "hintEn": "This is one of Euclid's axioms.",
+              "explHi": "संपाती वस्तुएँ आपस में बराबर होती हैं — यह यूक्लिड का अभिगृहीत है।", "explEn": "Things which coincide are equal to one another — one of Euclid's axioms."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "slug": "lines-and-angles",
+      "nameHi": "रेखाएँ और कोण",
+      "nameEn": "Lines and Angles",
+      "summaryHi": "कोणों के युग्म, शीर्षाभिमुख कोण, और समांतर रेखाओं पर तिर्यक रेखा।",
+      "summaryEn": "Angle pairs, vertically opposite angles, and transversals on parallel lines.",
+      "topics": [
+        {
+          "slug": "angle-pairs",
+          "titleHi": "कोणों के युग्म",
+          "titleEn": "Pairs of angles",
+          "summaryHi": "पूरक, संपूरक, रैखिक युग्म और शीर्षाभिमुख कोण।",
+          "summaryEn": "Complementary, supplementary, linear pairs and vertically opposite angles.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "formula", "hi": "पूरक कोण: योग 90°    संपूरक कोण: योग 180°", "en": "Complementary: sum 90°    Supplementary: sum 180°" },
+              { "kind": "para", "hi": "रैखिक युग्म के दोनों कोणों का योग 180° होता है। दो रेखाएँ काटें तो शीर्षाभिमुख कोण बराबर होते हैं।", "en": "The two angles of a linear pair add to 180°. When two lines intersect, vertically opposite angles are equal." },
+              { "kind": "example", "hi": "दो रेखाएँ काटती हैं और एक कोण 3x तथा उसका शीर्षाभिमुख कोण x + 40° है। 3x = x + 40 ⇒ x = 20°।", "en": "Two lines intersect; one angle is 3x and its vertically opposite angle is x + 40°. 3x = x + 40 ⇒ x = 20°." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "la-ap-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "35° का पूरक कोण कितने अंश का है?", "promptEn": "What is the complement of 35° (in degrees)?",
+              "answer": "55",
+              "hintHi": "पूरक कोणों का योग 90° होता है।", "hintEn": "Complementary angles add to 90°.",
+              "explHi": "90° − 35° = 55°।", "explEn": "90° − 35° = 55°."
+            },
+            {
+              "slug": "la-ap-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "112° का संपूरक कोण कितने अंश का है?", "promptEn": "What is the supplement of 112° (in degrees)?",
+              "answer": "68",
+              "hintHi": "संपूरक कोणों का योग 180° होता है।", "hintEn": "Supplementary angles add to 180°.",
+              "explHi": "180° − 112° = 68°।", "explEn": "180° − 112° = 68°."
+            },
+            {
+              "slug": "la-ap-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "रैखिक युग्म के दो कोण (2x + 20)° और (x + 10)° हैं। x का मान ज्ञात कीजिए।", "promptEn": "The angles of a linear pair are (2x + 20)° and (x + 10)°. Find x.",
+              "answer": "50",
+              "hintHi": "रैखिक युग्म का योग 180° होता है।", "hintEn": "A linear pair adds to 180°.",
+              "explHi": "2x + 20 + x + 10 = 180 ⇒ 3x = 150 ⇒ x = 50।", "explEn": "2x + 20 + x + 10 = 180 ⇒ 3x = 150 ⇒ x = 50."
+            }
+          ]
+        },
+        {
+          "slug": "parallel-lines-transversal",
+          "titleHi": "समांतर रेखाएँ और तिर्यक रेखा",
+          "titleEn": "Parallel lines and a transversal",
+          "summaryHi": "संगत, एकांतर और अंतः कोणों के संबंध।",
+          "summaryEn": "Relations between corresponding, alternate and co-interior angles.",
+          "lesson": {
+            "estMinutes": 9,
+            "blocks": [
+              { "kind": "para", "hi": "जब एक तिर्यक रेखा दो समांतर रेखाओं को काटती है:", "en": "When a transversal cuts two parallel lines:" },
+              { "kind": "formula", "hi": "संगत कोण बराबर    एकांतर अंतः कोण बराबर    एक ही ओर के अंतः कोणों का योग 180°", "en": "Corresponding angles equal    Alternate interior angles equal    Co-interior angles add to 180°" },
+              { "kind": "note", "hi": "इनका उल्टा भी सत्य है: यदि एकांतर कोण बराबर हों, तो रेखाएँ समांतर हैं।", "en": "The converse is also true: if alternate angles are equal, the lines are parallel." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "la-pt-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "दो समांतर रेखाओं पर एक एकांतर अंतः कोण 65° है। दूसरा एकांतर अंतः कोण कितना है?", "promptEn": "One alternate interior angle on two parallel lines is 65°. What is the other?",
+              "answer": "65",
+              "hintHi": "एकांतर अंतः कोण बराबर होते हैं।", "hintEn": "Alternate interior angles are equal.",
+              "explHi": "एकांतर अंतः कोण बराबर होते हैं, इसलिए 65°।", "explEn": "Alternate interior angles are equal, so 65°."
+            },
+            {
+              "slug": "la-pt-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "तिर्यक रेखा की एक ही ओर का एक अंतः कोण 110° है। दूसरा अंतः कोण कितना है?", "promptEn": "One co-interior angle is 110°. What is the other co-interior angle?",
+              "answer": "70",
+              "hintHi": "एक ही ओर के अंतः कोणों का योग 180° होता है।", "hintEn": "Co-interior angles add to 180°.",
+              "explHi": "180° − 110° = 70°।", "explEn": "180° − 110° = 70°."
+            },
+            {
+              "slug": "la-pt-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "एक ही ओर के दो अंतः कोण (2x + 10)° और (3x − 5)° हैं। x ज्ञात कीजिए।", "promptEn": "Two co-interior angles are (2x + 10)° and (3x − 5)°. Find x.",
+              "answer": "35",
+              "hintHi": "दोनों का योग 180° रखिए।", "hintEn": "Set their sum equal to 180°.",
+              "explHi": "5x + 5 = 180 ⇒ 5x = 175 ⇒ x = 35।", "explEn": "5x + 5 = 180 ⇒ 5x = 175 ⇒ x = 35."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "slug": "triangles",
+      "nameHi": "त्रिभुज",
+      "nameEn": "Triangles",
+      "summaryHi": "सर्वांगसमता के नियम और समद्विबाहु त्रिभुज के गुण।",
+      "summaryEn": "Congruence criteria and properties of isosceles triangles.",
+      "topics": [
+        {
+          "slug": "congruence-criteria",
+          "titleHi": "सर्वांगसमता के नियम",
+          "titleEn": "Congruence criteria",
+          "summaryHi": "SAS, ASA, AAS, SSS और RHS।",
+          "summaryEn": "SAS, ASA, AAS, SSS and RHS.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "para", "hi": "दो त्रिभुज सर्वांगसम हैं यदि उनकी संगत भुजाएँ और संगत कोण बराबर हों। यह जाँचने के लिए सभी छह भाग देखने की ज़रूरत नहीं — कुछ नियम पर्याप्त हैं।", "en": "Two triangles are congruent if their corresponding sides and angles are equal. You do not need all six parts — some criteria are enough." },
+              { "kind": "formula", "hi": "SAS: दो भुजाएँ और उनके बीच का कोण\nASA / AAS: दो कोण और एक भुजा\nSSS: तीनों भुजाएँ\nRHS: समकोण त्रिभुज में कर्ण और एक भुजा", "en": "SAS: two sides and the included angle\nASA / AAS: two angles and one side\nSSS: all three sides\nRHS: right angle, hypotenuse and one side" },
+              { "kind": "note", "hi": "AAA सर्वांगसमता का नियम नहीं है — समान कोण वाले त्रिभुज अलग-अलग आकार के हो सकते हैं।", "en": "AAA is not a congruence criterion — triangles with equal angles can be different sizes." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "tr-cc-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "दो भुजाएँ और उनके बीच का कोण बराबर हों, तो कौन-सा नियम लगता है?", "promptEn": "Two sides and the included angle are equal. Which criterion applies?",
+              "options": [
+                { "id": "a", "hi": "SSS", "en": "SSS" },
+                { "id": "b", "hi": "SAS", "en": "SAS" },
+                { "id": "c", "hi": "ASA", "en": "ASA" },
+                { "id": "d", "hi": "RHS", "en": "RHS" }
+              ],
+              "answer": "b",
+              "hintHi": "क्रम देखिए: भुजा–कोण–भुजा।", "hintEn": "Look at the order: side–angle–side.",
+              "explHi": "भुजा, बीच का कोण, भुजा = SAS।", "explEn": "Side, included angle, side = SAS."
+            },
+            {
+              "slug": "tr-cc-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "दो समकोण त्रिभुजों में कर्ण और एक भुजा बराबर है। कौन-सा नियम?", "promptEn": "In two right triangles the hypotenuse and one side are equal. Which criterion?",
+              "options": [
+                { "id": "a", "hi": "RHS", "en": "RHS" },
+                { "id": "b", "hi": "SAS", "en": "SAS" },
+                { "id": "c", "hi": "AAA", "en": "AAA" },
+                { "id": "d", "hi": "ASA", "en": "ASA" }
+              ],
+              "answer": "a",
+              "hintHi": "R = Right angle, H = Hypotenuse, S = Side।", "hintEn": "R = Right angle, H = Hypotenuse, S = Side.",
+              "explHi": "समकोण, कर्ण और एक भुजा — यही RHS है।", "explEn": "Right angle, hypotenuse and one side — that is RHS."
+            },
+            {
+              "slug": "tr-cc-3", "type": "MCQ", "difficulty": 3,
+              "promptHi": "इनमें से कौन सर्वांगसमता का नियम नहीं है?", "promptEn": "Which of these is NOT a congruence criterion?",
+              "options": [
+                { "id": "a", "hi": "SAS", "en": "SAS" },
+                { "id": "b", "hi": "ASA", "en": "ASA" },
+                { "id": "c", "hi": "AAA", "en": "AAA" },
+                { "id": "d", "hi": "SSS", "en": "SSS" }
+              ],
+              "answer": "c",
+              "hintHi": "क्या एक ही कोणों वाला छोटा और बड़ा त्रिभुज बन सकता है?", "hintEn": "Can a small and a large triangle have the same angles?",
+              "explHi": "AAA से केवल आकृति समान होती है, आकार नहीं। इसलिए यह सर्वांगसमता का नियम नहीं है।", "explEn": "AAA fixes only shape, not size, so it is not a congruence criterion."
+            }
+          ]
+        },
+        {
+          "slug": "isosceles-triangles",
+          "titleHi": "समद्विबाहु त्रिभुज के गुण",
+          "titleEn": "Properties of isosceles triangles",
+          "summaryHi": "बराबर भुजाओं के सामने के कोण बराबर।",
+          "summaryEn": "Angles opposite equal sides are equal.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "समद्विबाहु त्रिभुज में बराबर भुजाओं के सामने के कोण बराबर होते हैं। उल्टा भी सत्य है।", "en": "In an isosceles triangle, the angles opposite the equal sides are equal. The converse is also true." },
+              { "kind": "formula", "hi": "त्रिभुज के तीनों कोणों का योग = 180°", "en": "Sum of the angles of a triangle = 180°" },
+              { "kind": "example", "hi": "शीर्ष कोण 40° है, तो दोनों आधार कोण (180 − 40)/2 = 70° होंगे।", "en": "If the vertex angle is 40°, each base angle is (180 − 40)/2 = 70°." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "tr-is-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "समद्विबाहु त्रिभुज का शीर्ष कोण 40° है। प्रत्येक आधार कोण कितना है?", "promptEn": "An isosceles triangle has a vertex angle of 40°. What is each base angle?",
+              "answer": "70",
+              "hintHi": "180° में से 40° घटाकर दो बराबर भागों में बाँटिए।", "hintEn": "Subtract 40° from 180° and split into two equal parts.",
+              "explHi": "(180 − 40)/2 = 70°।", "explEn": "(180 − 40)/2 = 70°."
+            },
+            {
+              "slug": "tr-is-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "समद्विबाहु त्रिभुज के दोनों आधार कोण 50° के हैं। शीर्ष कोण कितना है?", "promptEn": "Both base angles of an isosceles triangle are 50°. What is the vertex angle?",
+              "answer": "80",
+              "hintHi": "तीनों कोणों का योग 180° है।", "hintEn": "The three angles add to 180°.",
+              "explHi": "180 − 50 − 50 = 80°।", "explEn": "180 − 50 − 50 = 80°."
+            },
+            {
+              "slug": "tr-is-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "△ABC में AB = AC, ∠B = (2x + 10)° और ∠C = (3x − 20)° है। x ज्ञात कीजिए।", "promptEn": "In △ABC, AB = AC, ∠B = (2x + 10)° and ∠C = (3x − 20)°. Find x.",
+              "answer": "30",
+              "hintHi": "AB = AC है, तो कौन-से कोण बराबर होंगे?", "hintEn": "If AB = AC, which angles are equal?",
+              "explHi": "बराबर भुजाओं के सामने ∠C और ∠B बराबर हैं: 2x + 10 = 3x − 20 ⇒ x = 30।", "explEn": "∠B and ∠C are opposite equal sides, so 2x + 10 = 3x − 20 ⇒ x = 30."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "slug": "quadrilaterals",
+      "nameHi": "चतुर्भुज",
+      "nameEn": "Quadrilaterals",
+      "summaryHi": "समांतर चतुर्भुज के गुण और मध्य-बिंदु प्रमेय।",
+      "summaryEn": "Properties of parallelograms and the mid-point theorem.",
+      "topics": [
+        {
+          "slug": "parallelogram-properties",
+          "titleHi": "समांतर चतुर्भुज के गुण",
+          "titleEn": "Properties of a parallelogram",
+          "summaryHi": "सम्मुख भुजाएँ, सम्मुख कोण और विकर्ण।",
+          "summaryEn": "Opposite sides, opposite angles and diagonals.",
+          "lesson": {
+            "estMinutes": 9,
+            "blocks": [
+              { "kind": "formula", "hi": "किसी भी चतुर्भुज के कोणों का योग = 360°", "en": "Sum of the angles of any quadrilateral = 360°" },
+              { "kind": "para", "hi": "समांतर चतुर्भुज में सम्मुख भुजाएँ बराबर, सम्मुख कोण बराबर, और विकर्ण एक-दूसरे को समद्विभाजित करते हैं। आसन्न कोणों का योग 180° होता है।", "en": "In a parallelogram, opposite sides are equal, opposite angles are equal, and the diagonals bisect each other. Adjacent angles add to 180°." },
+              { "kind": "example", "hi": "कोण 3 : 5 : 9 : 13 के अनुपात में हैं। कुल भाग 30, एक भाग = 360/30 = 12°। सबसे बड़ा कोण = 13 × 12 = 156°।", "en": "Angles are in the ratio 3 : 5 : 9 : 13. Total parts 30, one part = 360/30 = 12°. Largest angle = 13 × 12 = 156°." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "qd-pp-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "किसी चतुर्भुज के चारों कोणों का योग कितने अंश होता है?", "promptEn": "What is the sum of the four angles of a quadrilateral (in degrees)?",
+              "answer": "360",
+              "hintHi": "एक विकर्ण चतुर्भुज को दो त्रिभुजों में बाँटता है।", "hintEn": "A diagonal splits a quadrilateral into two triangles.",
+              "explHi": "दो त्रिभुज × 180° = 360°।", "explEn": "Two triangles × 180° = 360°."
+            },
+            {
+              "slug": "qd-pp-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "समांतर चतुर्भुज का एक कोण 70° है। उसका आसन्न कोण कितना है?", "promptEn": "One angle of a parallelogram is 70°. What is the adjacent angle?",
+              "answer": "110",
+              "hintHi": "आसन्न कोण संपूरक होते हैं।", "hintEn": "Adjacent angles are supplementary.",
+              "explHi": "180° − 70° = 110°।", "explEn": "180° − 70° = 110°."
+            },
+            {
+              "slug": "qd-pp-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "एक चतुर्भुज के कोण 2 : 3 : 5 : 8 के अनुपात में हैं। सबसे बड़ा कोण कितने अंश का है?", "promptEn": "The angles of a quadrilateral are in the ratio 2 : 3 : 5 : 8. What is the largest angle in degrees?",
+              "answer": "160",
+              "hintHi": "कुल भाग जोड़िए और 360° को उनसे भाग दीजिए।", "hintEn": "Add the parts and divide 360° by the total.",
+              "explHi": "कुल भाग = 18, एक भाग = 20°, सबसे बड़ा = 8 × 20 = 160°।", "explEn": "Total parts = 18, one part = 20°, largest = 8 × 20 = 160°."
+            }
+          ]
+        },
+        {
+          "slug": "mid-point-theorem",
+          "titleHi": "मध्य-बिंदु प्रमेय",
+          "titleEn": "The mid-point theorem",
+          "summaryHi": "दो भुजाओं के मध्य-बिंदुओं को मिलाने वाला रेखाखंड।",
+          "summaryEn": "The segment joining the mid-points of two sides.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "त्रिभुज की दो भुजाओं के मध्य-बिंदुओं को मिलाने वाला रेखाखंड तीसरी भुजा के समांतर और उसका आधा होता है।", "en": "The segment joining the mid-points of two sides of a triangle is parallel to the third side and half its length." },
+              { "kind": "example", "hi": "△ABC में D और E क्रमशः AB और AC के मध्य-बिंदु हैं और BC = 10 सेमी। तब DE = 5 सेमी और DE ∥ BC।", "en": "In △ABC, D and E are the mid-points of AB and AC, and BC = 10 cm. Then DE = 5 cm and DE ∥ BC." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "qd-mp-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "BC = 10 सेमी है। AB और AC के मध्य-बिंदुओं को मिलाने वाले DE की लंबाई (सेमी में)?", "promptEn": "BC = 10 cm. What is the length (cm) of DE joining the mid-points of AB and AC?",
+              "answer": "5",
+              "hintHi": "DE तीसरी भुजा का आधा होता है।", "hintEn": "DE is half the third side.",
+              "explHi": "DE = BC/2 = 5 सेमी।", "explEn": "DE = BC/2 = 5 cm."
+            },
+            {
+              "slug": "qd-mp-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "मध्य-बिंदुओं को मिलाने वाला रेखाखंड 7.5 सेमी है। तीसरी भुजा कितनी है?", "promptEn": "The segment joining the mid-points is 7.5 cm. How long is the third side?",
+              "answer": "15",
+              "hintHi": "तीसरी भुजा इस रेखाखंड की दोगुनी है।", "hintEn": "The third side is twice this segment.",
+              "explHi": "2 × 7.5 = 15 सेमी।", "explEn": "2 × 7.5 = 15 cm."
+            },
+            {
+              "slug": "qd-mp-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "त्रिभुज की भुजाएँ 6, 8 और 10 सेमी हैं। तीनों भुजाओं के मध्य-बिंदुओं को मिलाने से बने त्रिभुज का परिमाप (सेमी में)?", "promptEn": "A triangle has sides 6, 8 and 10 cm. What is the perimeter (cm) of the triangle formed by joining the mid-points of its sides?",
+              "answer": "12",
+              "hintHi": "नए त्रिभुज की हर भुजा, मूल त्रिभुज की किसी भुजा की आधी है।", "hintEn": "Each side of the new triangle is half a side of the original.",
+              "explHi": "नई भुजाएँ 3, 4, 5 सेमी हैं; परिमाप = 12 सेमी।", "explEn": "The new sides are 3, 4, 5 cm; perimeter = 12 cm."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "slug": "circles",
+      "nameHi": "वृत्त",
+      "nameEn": "Circles",
+      "summaryHi": "जीवाएँ, केंद्र से दूरी, और वृत्त में बने कोण।",
+      "summaryEn": "Chords, distance from the centre, and angles in a circle.",
+      "topics": [
+        {
+          "slug": "chords-and-centre",
+          "titleHi": "जीवा और केंद्र",
+          "titleEn": "Chords and the centre",
+          "summaryHi": "केंद्र से जीवा पर लंब और बराबर जीवाएँ।",
+          "summaryEn": "The perpendicular from the centre and equal chords.",
+          "lesson": {
+            "estMinutes": 9,
+            "blocks": [
+              { "kind": "para", "hi": "केंद्र से जीवा पर डाला गया लंब जीवा को समद्विभाजित करता है।", "en": "The perpendicular from the centre to a chord bisects the chord." },
+              { "kind": "para", "hi": "बराबर जीवाएँ केंद्र से बराबर दूरी पर होती हैं और केंद्र पर बराबर कोण बनाती हैं।", "en": "Equal chords are equidistant from the centre and subtend equal angles at the centre." },
+              { "kind": "example", "hi": "त्रिज्या 5 सेमी, केंद्र से जीवा की दूरी 3 सेमी। आधी जीवा = √(5² − 3²) = 4 सेमी, इसलिए जीवा = 8 सेमी।", "en": "Radius 5 cm, distance of chord from centre 3 cm. Half-chord = √(5² − 3²) = 4 cm, so the chord is 8 cm." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "ci-cc-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "12 सेमी की जीवा पर केंद्र से लंब डाला गया। जीवा के प्रत्येक भाग की लंबाई (सेमी)?", "promptEn": "A perpendicular from the centre meets a 12 cm chord. How long (cm) is each part of the chord?",
+              "answer": "6",
+              "hintHi": "लंब जीवा को दो बराबर भागों में बाँटता है।", "hintEn": "The perpendicular cuts the chord into two equal parts.",
+              "explHi": "12/2 = 6 सेमी।", "explEn": "12/2 = 6 cm."
+            },
+            {
+              "slug": "ci-cc-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "त्रिज्या 5 सेमी है और जीवा केंद्र से 3 सेमी दूर है। जीवा की लंबाई (सेमी)?", "promptEn": "The radius is 5 cm and a chord is 3 cm from the centre. How long (cm) is the chord?",
+              "answer": "8",
+              "hintHi": "त्रिज्या, दूरी और आधी जीवा एक समकोण त्रिभुज बनाते हैं।", "hintEn": "The radius, distance and half-chord form a right triangle.",
+              "explHi": "आधी जीवा = √(25 − 9) = 4, जीवा = 8 सेमी।", "explEn": "Half-chord = √(25 − 9) = 4, chord = 8 cm."
+            },
+            {
+              "slug": "ci-cc-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "13 सेमी त्रिज्या वाले वृत्त में 24 सेमी की जीवा केंद्र से कितनी दूर (सेमी) है?", "promptEn": "In a circle of radius 13 cm, how far (cm) from the centre is a 24 cm chord?",
+              "answer": "5",
+              "hintHi": "आधी जीवा 12 सेमी है।", "hintEn": "Half the chord is 12 cm.",
+              "explHi": "दूरी = √(13² − 12²) = √25 = 5 सेमी।", "explEn": "Distance = √(13² − 12²) = √25 = 5 cm."
+            }
+          ]
+        },
+        {
+          "slug": "angles-in-circle",
+          "titleHi": "वृत्त में कोण",
+          "titleEn": "Angles in a circle",
+          "summaryHi": "केंद्र पर कोण, अर्धवृत्त में कोण और चक्रीय चतुर्भुज।",
+          "summaryEn": "Angle at the centre, angle in a semicircle and cyclic quadrilaterals.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "para", "hi": "किसी चाप द्वारा केंद्र पर बना कोण, शेष वृत्त के किसी बिंदु पर बने कोण का दोगुना होता है।", "en": "The angle an arc subtends at the centre is double the angle it subtends at any point on the remaining circle." },
+              { "kind": "formula", "hi": "अर्धवृत्त में कोण = 90°\nचक्रीय चतुर्भुज के सम्मुख कोणों का योग = 180°", "en": "Angle in a semicircle = 90°\nOpposite angles of a cyclic quadrilateral add to 180°" },
+              { "kind": "note", "hi": "एक ही वृत्तखंड के कोण बराबर होते हैं।", "en": "Angles in the same segment are equal." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "ci-ac-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "अर्धवृत्त में बना कोण कितने अंश का होता है?", "promptEn": "How many degrees is the angle in a semicircle?",
+              "answer": "90",
+              "hintHi": "व्यास केंद्र पर 180° बनाता है।", "hintEn": "A diameter makes 180° at the centre.",
+              "explHi": "180°/2 = 90°।", "explEn": "180°/2 = 90°."
+            },
+            {
+              "slug": "ci-ac-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "एक चाप केंद्र पर 100° का कोण बनाता है। वह शेष वृत्त पर कितने अंश का कोण बनाएगा?", "promptEn": "An arc subtends 100° at the centre. What angle does it subtend on the remaining circle?",
+              "answer": "50",
+              "hintHi": "केंद्र का कोण दोगुना होता है।", "hintEn": "The angle at the centre is double.",
+              "explHi": "100°/2 = 50°।", "explEn": "100°/2 = 50°."
+            },
+            {
+              "slug": "ci-ac-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "चक्रीय चतुर्भुज ABCD में ∠A = 75° है। ∠C कितना है?", "promptEn": "In cyclic quadrilateral ABCD, ∠A = 75°. Find ∠C.",
+              "answer": "105",
+              "hintHi": "A और C सम्मुख कोण हैं।", "hintEn": "A and C are opposite angles.",
+              "explHi": "180° − 75° = 105°।", "explEn": "180° − 75° = 105°."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "slug": "herons-formula",
+      "nameHi": "हीरोन का सूत्र",
+      "nameEn": "Heron's Formula",
+      "summaryHi": "तीनों भुजाओं से त्रिभुज का क्षेत्रफल और उसके अनुप्रयोग।",
+      "summaryEn": "Area of a triangle from its three sides, and applications.",
+      "topics": [
+        {
+          "slug": "herons-formula-basics",
+          "titleHi": "हीरोन का सूत्र",
+          "titleEn": "Heron's formula",
+          "summaryHi": "अर्धपरिमाप s और क्षेत्रफल √(s(s−a)(s−b)(s−c))।",
+          "summaryEn": "Semi-perimeter s and area √(s(s−a)(s−b)(s−c)).",
+          "lesson": {
+            "estMinutes": 9,
+            "blocks": [
+              { "kind": "formula", "hi": "s = (a + b + c)/2\nक्षेत्रफल = √(s(s − a)(s − b)(s − c))", "en": "s = (a + b + c)/2\nArea = √(s(s − a)(s − b)(s − c))" },
+              { "kind": "example", "hi": "भुजाएँ 3, 4, 5: s = 6, क्षेत्रफल = √(6 × 3 × 2 × 1) = √36 = 6 वर्ग इकाई।", "en": "Sides 3, 4, 5: s = 6, area = √(6 × 3 × 2 × 1) = √36 = 6 square units." },
+              { "kind": "note", "hi": "यह सूत्र तब काम आता है जब ऊँचाई पता न हो।", "en": "This formula is useful when the height is not known." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "hf-hb-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "भुजाएँ 7, 8 और 9 सेमी हैं। अर्धपरिमाप s कितना है?", "promptEn": "The sides are 7, 8 and 9 cm. What is the semi-perimeter s?",
+              "answer": "12",
+              "hintHi": "तीनों भुजाएँ जोड़कर 2 से भाग दीजिए।", "hintEn": "Add the sides and divide by 2.",
+              "explHi": "(7 + 8 + 9)/2 = 12।", "explEn": "(7 + 8 + 9)/2 = 12."
+            },
+            {
+              "slug": "hf-hb-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "5, 12 और 13 सेमी भुजाओं वाले त्रिभुज का क्षेत्रफल (वर्ग सेमी)?", "promptEn": "Area (cm²) of a triangle with sides 5, 12 and 13 cm?",
+              "answer": "30",
+              "hintHi": "s = 15 है।", "hintEn": "s = 15.",
+              "explHi": "√(15 × 10 × 3 × 2) = √900 = 30 वर्ग सेमी।", "explEn": "√(15 × 10 × 3 × 2) = √900 = 30 cm²."
+            },
+            {
+              "slug": "hf-hb-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "13, 14 और 15 सेमी भुजाओं वाले त्रिभुज का क्षेत्रफल (वर्ग सेमी)?", "promptEn": "Area (cm²) of a triangle with sides 13, 14 and 15 cm?",
+              "answer": "84",
+              "hintHi": "s = 21। अब s − a, s − b, s − c निकालिए।", "hintEn": "s = 21. Now find s − a, s − b, s − c.",
+              "explHi": "√(21 × 8 × 7 × 6) = √7056 = 84 वर्ग सेमी।", "explEn": "√(21 × 8 × 7 × 6) = √7056 = 84 cm²."
+            }
+          ]
+        },
+        {
+          "slug": "herons-applications",
+          "titleHi": "हीरोन सूत्र के अनुप्रयोग",
+          "titleEn": "Applications of Heron's formula",
+          "summaryHi": "खेत, भूखंड और चतुर्भुजों का क्षेत्रफल।",
+          "summaryEn": "Areas of fields, plots and quadrilaterals.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "para", "hi": "किसी चतुर्भुज का क्षेत्रफल निकालने के लिए एक विकर्ण खींचकर उसे दो त्रिभुजों में बाँटिए, और दोनों पर हीरोन का सूत्र लगाइए।", "en": "To find the area of a quadrilateral, draw a diagonal to split it into two triangles and apply Heron's formula to each." },
+              { "kind": "example", "hi": "ABCD में AB = 6, BC = 8, AC = 10, CD = 10, DA = 12। △ABC का क्षेत्रफल 24 और △ACD (s = 16) का √(16 × 6 × 6 × 4) = 48। कुल = 72 वर्ग इकाई।", "en": "In ABCD, AB = 6, BC = 8, AC = 10, CD = 10, DA = 12. △ABC has area 24 and △ACD (s = 16) has √(16 × 6 × 6 × 4) = 48. Total = 72 square units." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "hf-ha-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "6, 8 और 10 मीटर भुजाओं वाले त्रिभुजाकार भूखंड का क्षेत्रफल (वर्ग मीटर)?", "promptEn": "Area (m²) of a triangular plot with sides 6, 8 and 10 m?",
+              "answer": "24",
+              "hintHi": "s = 12।", "hintEn": "s = 12.",
+              "explHi": "√(12 × 6 × 4 × 2) = √576 = 24 वर्ग मीटर।", "explEn": "√(12 × 6 × 4 × 2) = √576 = 24 m²."
+            },
+            {
+              "slug": "hf-ha-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "एक त्रिभुजाकार खेत की भुजाएँ 50 मी, 120 मी और 130 मी हैं। क्षेत्रफल (वर्ग मीटर)?", "promptEn": "A triangular field has sides 50 m, 120 m and 130 m. What is its area (m²)?",
+              "answer": "3000",
+              "hintHi": "s = 150।", "hintEn": "s = 150.",
+              "explHi": "√(150 × 100 × 30 × 20) = √9000000 = 3000 वर्ग मीटर।", "explEn": "√(150 × 100 × 30 × 20) = √9000000 = 3000 m²."
+            },
+            {
+              "slug": "hf-ha-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "चतुर्भुज PQRS में PQ = 9, QR = 12, विकर्ण PR = 15, RS = 15, SP = 18 है (सभी मीटर में)। कुल क्षेत्रफल (वर्ग मीटर)?", "promptEn": "In quadrilateral PQRS, PQ = 9, QR = 12, diagonal PR = 15, RS = 15 and SP = 18 (all in metres). Find the total area (m²).",
+              "answer": "162",
+              "hintHi": "PR से दो त्रिभुज बनते हैं: PQR (9, 12, 15) और PRS (15, 15, 18)।", "hintEn": "PR makes two triangles: PQR (9, 12, 15) and PRS (15, 15, 18).",
+              "explHi": "△PQR: s = 18, √(18 × 9 × 6 × 3) = 54। △PRS: s = 24, √(24 × 9 × 9 × 6) = 108। कुल = 162 वर्ग मीटर।", "explEn": "△PQR: s = 18, √(18 × 9 × 6 × 3) = 54. △PRS: s = 24, √(24 × 9 × 9 × 6) = 108. Total = 162 m²."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "slug": "surface-areas-volumes",
+      "nameHi": "पृष्ठीय क्षेत्रफल और आयतन",
+      "nameEn": "Surface Areas and Volumes",
+      "summaryHi": "शंकु, गोले और अर्धगोले का पृष्ठीय क्षेत्रफल और आयतन।",
+      "summaryEn": "Surface area and volume of cones, spheres and hemispheres.",
+      "topics": [
+        {
+          "slug": "surface-areas",
+          "titleHi": "पृष्ठीय क्षेत्रफल",
+          "titleEn": "Surface areas",
+          "summaryHi": "शंकु का वक्र पृष्ठ और गोले/अर्धगोले का पृष्ठ।",
+          "summaryEn": "Curved surface of a cone, and surfaces of spheres and hemispheres.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "formula", "hi": "शंकु: तिर्यक ऊँचाई l = √(r² + h²), वक्र पृष्ठ = πrl\nगोला: 4πr²\nअर्धगोला: वक्र पृष्ठ 2πr², कुल पृष्ठ 3πr²", "en": "Cone: slant height l = √(r² + h²), curved surface = πrl\nSphere: 4πr²\nHemisphere: curved 2πr², total 3πr²" },
+              { "kind": "note", "hi": "जब तक कहा न जाए, π = 22/7 लीजिए।", "en": "Take π = 22/7 unless told otherwise." },
+              { "kind": "example", "hi": "r = 7 सेमी वाले गोले का पृष्ठीय क्षेत्रफल = 4 × 22/7 × 49 = 616 वर्ग सेमी।", "en": "A sphere with r = 7 cm has surface area 4 × 22/7 × 49 = 616 cm²." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "sv-sa-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "शंकु की त्रिज्या 3 सेमी और ऊँचाई 4 सेमी है। तिर्यक ऊँचाई (सेमी)?", "promptEn": "A cone has radius 3 cm and height 4 cm. What is its slant height (cm)?",
+              "answer": "5",
+              "hintHi": "l = √(r² + h²)।", "hintEn": "l = √(r² + h²).",
+              "explHi": "√(9 + 16) = √25 = 5 सेमी।", "explEn": "√(9 + 16) = √25 = 5 cm."
+            },
+            {
+              "slug": "sv-sa-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "शंकु की त्रिज्या 7 सेमी और तिर्यक ऊँचाई 10 सेमी है। वक्र पृष्ठीय क्षेत्रफल (वर्ग सेमी, π = 22/7)?", "promptEn": "A cone has radius 7 cm and slant height 10 cm. Curved surface area (cm², π = 22/7)?",
+              "answer": "220",
+              "hintHi": "πrl लगाइए।", "hintEn": "Use πrl.",
+              "explHi": "22/7 × 7 × 10 = 220 वर्ग सेमी।", "explEn": "22/7 × 7 × 10 = 220 cm²."
+            },
+            {
+              "slug": "sv-sa-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "7 सेमी त्रिज्या वाले ठोस अर्धगोले का कुल पृष्ठीय क्षेत्रफल (वर्ग सेमी, π = 22/7)?", "promptEn": "Total surface area (cm², π = 22/7) of a solid hemisphere of radius 7 cm?",
+              "answer": "462",
+              "hintHi": "ठोस अर्धगोले में वक्र भाग और समतल वृत्त दोनों हैं: 3πr²।", "hintEn": "A solid hemisphere has a curved part and a flat circle: 3πr².",
+              "explHi": "3 × 22/7 × 49 = 462 वर्ग सेमी।", "explEn": "3 × 22/7 × 49 = 462 cm²."
+            }
+          ]
+        },
+        {
+          "slug": "volumes",
+          "titleHi": "आयतन",
+          "titleEn": "Volumes",
+          "summaryHi": "शंकु, गोले और अर्धगोले का आयतन।",
+          "summaryEn": "Volume of cones, spheres and hemispheres.",
+          "lesson": {
+            "estMinutes": 10,
+            "blocks": [
+              { "kind": "formula", "hi": "शंकु: (1/3)πr²h\nगोला: (4/3)πr³\nअर्धगोला: (2/3)πr³", "en": "Cone: (1/3)πr²h\nSphere: (4/3)πr³\nHemisphere: (2/3)πr³" },
+              { "kind": "example", "hi": "r = 7 सेमी, h = 3 सेमी वाले शंकु का आयतन = 1/3 × 22/7 × 49 × 3 = 154 घन सेमी।", "en": "A cone with r = 7 cm, h = 3 cm has volume 1/3 × 22/7 × 49 × 3 = 154 cm³." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "sv-vo-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "r = 7 सेमी और h = 6 सेमी वाले शंकु का आयतन (घन सेमी, π = 22/7)?", "promptEn": "Volume (cm³, π = 22/7) of a cone with r = 7 cm and h = 6 cm?",
+              "answer": "308",
+              "hintHi": "(1/3)πr²h लगाइए।", "hintEn": "Use (1/3)πr²h.",
+              "explHi": "1/3 × 22/7 × 49 × 6 = 308 घन सेमी।", "explEn": "1/3 × 22/7 × 49 × 6 = 308 cm³."
+            },
+            {
+              "slug": "sv-vo-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "21 सेमी त्रिज्या वाले अर्धगोले का आयतन (घन सेमी, π = 22/7)?", "promptEn": "Volume (cm³, π = 22/7) of a hemisphere of radius 21 cm?",
+              "answer": "19404",
+              "hintHi": "(2/3)πr³; 21³ = 9261।", "hintEn": "(2/3)πr³; 21³ = 9261.",
+              "explHi": "2/3 × 22/7 × 9261 = 19404 घन सेमी।", "explEn": "2/3 × 22/7 × 9261 = 19404 cm³."
+            },
+            {
+              "slug": "sv-vo-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "42 सेमी व्यास वाले गोले का आयतन (घन सेमी, π = 22/7)?", "promptEn": "Volume (cm³, π = 22/7) of a sphere with diameter 42 cm?",
+              "answer": "38808",
+              "hintHi": "पहले त्रिज्या निकालिए: व्यास का आधा।", "hintEn": "First find the radius: half the diameter.",
+              "explHi": "r = 21, आयतन = 4/3 × 22/7 × 9261 = 38808 घन सेमी।", "explEn": "r = 21, volume = 4/3 × 22/7 × 9261 = 38808 cm³."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "slug": "statistics",
+      "nameHi": "सांख्यिकी",
+      "nameEn": "Statistics",
+      "summaryHi": "आँकड़ों को सारणी में रखना और दंड आलेख, आयतचित्र तथा बारंबारता बहुभुज बनाना।",
+      "summaryEn": "Organising data in tables, and drawing bar graphs, histograms and frequency polygons.",
+      "topics": [
+        {
+          "slug": "frequency-tables",
+          "titleHi": "बारंबारता सारणी",
+          "titleEn": "Frequency tables",
+          "summaryHi": "कच्चे आँकड़े, बारंबारता, वर्ग-अंतराल और परिसर।",
+          "summaryEn": "Raw data, frequency, class intervals and range.",
+          "lesson": {
+            "estMinutes": 8,
+            "blocks": [
+              { "kind": "para", "hi": "कोई मान आँकड़ों में जितनी बार आता है, वह उसकी बारंबारता है। बड़े आँकड़ों को 10–20, 20–30 जैसे वर्ग-अंतरालों में बाँटा जाता है।", "en": "The number of times a value appears is its frequency. Large data is grouped into class intervals such as 10–20, 20–30." },
+              { "kind": "formula", "hi": "परिसर = सबसे बड़ा मान − सबसे छोटा मान\nवर्ग-माप = ऊपरी सीमा − निचली सीमा", "en": "Range = largest value − smallest value\nClass width = upper limit − lower limit" },
+              { "kind": "example", "hi": "आँकड़े 2, 3, 3, 5, 3, 2, 5 में 3 की बारंबारता 3 है।", "en": "In the data 2, 3, 3, 5, 3, 2, 5, the frequency of 3 is 3." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "st-ft-1", "type": "NUMERIC", "difficulty": 1,
+              "promptHi": "आँकड़े 4, 7, 4, 9, 4, 7 में 4 की बारंबारता क्या है?", "promptEn": "In the data 4, 7, 4, 9, 4, 7, what is the frequency of 4?",
+              "answer": "3",
+              "hintHi": "गिनिए कि 4 कितनी बार आया है।", "hintEn": "Count how many times 4 appears.",
+              "explHi": "4 तीन बार आया है।", "explEn": "4 appears three times."
+            },
+            {
+              "slug": "st-ft-2", "type": "NUMERIC", "difficulty": 2,
+              "promptHi": "वर्ग-अंतराल 10–20 का वर्ग-माप क्या है?", "promptEn": "What is the class width of the interval 10–20?",
+              "answer": "10",
+              "hintHi": "ऊपरी सीमा − निचली सीमा।", "hintEn": "Upper limit − lower limit.",
+              "explHi": "20 − 10 = 10।", "explEn": "20 − 10 = 10."
+            },
+            {
+              "slug": "st-ft-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "आँकड़े 12, 45, 7, 30, 22 का परिसर क्या है?", "promptEn": "What is the range of the data 12, 45, 7, 30, 22?",
+              "answer": "38",
+              "hintHi": "सबसे बड़ा और सबसे छोटा मान खोजिए।", "hintEn": "Find the largest and smallest values.",
+              "explHi": "45 − 7 = 38।", "explEn": "45 − 7 = 38."
+            }
+          ]
+        },
+        {
+          "slug": "graphical-representation",
+          "titleHi": "आँकड़ों का आलेखीय निरूपण",
+          "titleEn": "Graphical representation of data",
+          "summaryHi": "दंड आलेख, आयतचित्र और बारंबारता बहुभुज।",
+          "summaryEn": "Bar graphs, histograms and frequency polygons.",
+          "lesson": {
+            "estMinutes": 9,
+            "blocks": [
+              { "kind": "para", "hi": "दंड आलेख में बराबर चौड़ाई वाले दंड होते हैं और उनके बीच बराबर खाली जगह होती है।", "en": "A bar graph has bars of equal width with equal gaps between them." },
+              { "kind": "para", "hi": "सतत वर्ग-अंतरालों के लिए आयतचित्र बनाया जाता है — इसमें आयतों के बीच खाली जगह नहीं होती।", "en": "A histogram is used for continuous class intervals — its rectangles have no gaps between them." },
+              { "kind": "para", "hi": "बारंबारता बहुभुज, आयतों के ऊपरी भुजाओं के मध्य-बिंदुओं (वर्ग-चिह्नों) को मिलाकर बनता है। वर्ग-चिह्न = (ऊपरी सीमा + निचली सीमा)/2।", "en": "A frequency polygon joins the mid-points of the tops of the rectangles (class marks). Class mark = (upper limit + lower limit)/2." }
+            ]
+          },
+          "questions": [
+            {
+              "slug": "st-gr-1", "type": "MCQ", "difficulty": 1,
+              "promptHi": "सतत वर्ग-अंतरालों वाले आँकड़ों के लिए कौन-सा आलेख उपयुक्त है?", "promptEn": "Which graph suits data with continuous class intervals?",
+              "options": [
+                { "id": "a", "hi": "दंड आलेख", "en": "Bar graph" },
+                { "id": "b", "hi": "आयतचित्र", "en": "Histogram" },
+                { "id": "c", "hi": "चित्रालेख", "en": "Pictograph" },
+                { "id": "d", "hi": "कोई नहीं", "en": "None" }
+              ],
+              "answer": "b",
+              "hintHi": "किस आलेख में आयत एक-दूसरे से सटे होते हैं?", "hintEn": "In which graph do the rectangles touch each other?",
+              "explHi": "आयतचित्र में आयत बिना खाली जगह के सटे होते हैं, जो सतत अंतरालों को दर्शाता है।", "explEn": "In a histogram the rectangles touch with no gaps, showing continuous intervals."
+            },
+            {
+              "slug": "st-gr-2", "type": "MCQ", "difficulty": 2,
+              "promptHi": "दंड आलेख में दंड कैसे होते हैं?", "promptEn": "In a bar graph, the bars are:",
+              "options": [
+                { "id": "a", "hi": "अलग-अलग चौड़ाई के, सटे हुए", "en": "different widths, touching" },
+                { "id": "b", "hi": "बराबर चौड़ाई के, बीच में बराबर खाली जगह", "en": "equal width, with equal gaps" },
+                { "id": "c", "hi": "बराबर चौड़ाई के, सटे हुए", "en": "equal width, touching" },
+                { "id": "d", "hi": "गोल", "en": "circular" }
+              ],
+              "answer": "b",
+              "hintHi": "दंड आलेख और आयतचित्र का अंतर याद कीजिए।", "hintEn": "Recall how a bar graph differs from a histogram.",
+              "explHi": "दंड आलेख के दंड बराबर चौड़ाई के होते हैं और उनके बीच बराबर खाली जगह होती है।", "explEn": "Bar graph bars have equal width and equal gaps between them."
+            },
+            {
+              "slug": "st-gr-3", "type": "NUMERIC", "difficulty": 3,
+              "promptHi": "वर्ग-अंतराल 30–40 का वर्ग-चिह्न क्या है?", "promptEn": "What is the class mark of the interval 30–40?",
+              "answer": "35",
+              "hintHi": "वर्ग-चिह्न = (ऊपरी सीमा + निचली सीमा)/2।", "hintEn": "Class mark = (upper limit + lower limit)/2.",
+              "explHi": "(30 + 40)/2 = 35।", "explEn": "(30 + 40)/2 = 35."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

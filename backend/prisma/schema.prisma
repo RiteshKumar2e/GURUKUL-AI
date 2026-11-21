@@ -1,0 +1,418 @@
+// GURUKUL AI — data model
+// Educational content (Subject → Chapter → Topic → Lesson/Question) is editable data,
+// seeded from backend/content/*.json. Student data is private and only exposed to the
+// student and to linked parents/teachers.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  PARENT
+  TEACHER
+  ADMIN
+}
+
+enum Language {
+  HI
+  EN
+}
+
+enum TeachingLevel {
+  BASIC
+  STANDARD
+  ADVANCED
+}
+
+enum ContentSource {
+  ORIGINAL_SAMPLE // written for GURUKUL AI, not official material
+  VERIFIED_PUBLIC // checked against a publicly accessible source (see sourceNote)
+}
+
+enum QuestionType {
+  MCQ
+  NUMERIC
+}
+
+enum SessionType {
+  LESSON
+  PRACTICE
+  QUIZ
+  TUTOR
+  VOICE
+  PHOTO
+}
+
+enum AnswerOrigin {
+  ONLINE
+  OFFLINE_SYNC
+}
+
+enum RecommendationKind {
+  REVIEW_LESSON
+  PRACTICE
+  ADVANCE
+}
+
+enum RecommendationStatus {
+  ACTIVE
+  DONE
+  DISMISSED
+}
+
+enum ConversationMode {
+  TEXT
+  VOICE
+  PHOTO
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+enum SyncStatus {
+  APPLIED
+  DUPLICATE
+  REJECTED
+}
+
+model User {
+  id                String         @id @default(cuid())
+  username          String         @unique
+  email             String?        @unique
+  passwordHash      String
+  role              Role
+  displayName       String
+  preferredLanguage Language       @default(HI)
+  lastLoginAt       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  student           StudentProfile?
+  parent            ParentProfile?
+  teacher           TeacherProfile?
+  refreshTokens     RefreshToken[]
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model StudentProfile {
+  id               String                   @id @default(cuid())
+  userId           String                   @unique
+  classLevel       Int                      @default(9)
+  board            String                   @default("JAC")
+  state            String                   @default("Jharkhand")
+  district         String?
+  teachingLevel    TeachingLevel            @default(STANDARD)
+  dailyGoalMinutes Int                      @default(20)
+  onboardingDone   Boolean                  @default(false)
+  linkCode         String                   @unique
+  createdAt        DateTime                 @default(now())
+  user             User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parents          StudentParent[]
+  teachers         StudentTeacher[]
+  answers          StudentAnswer[]
+  progress         LearningProgress[]
+  sessions         LearningSession[]
+  recommendations  AdaptiveRecommendation[]
+  conversations    TutorConversation[]
+  syncRecords      SyncRecord[]
+}
+
+model ParentProfile {
+  id        String          @id @default(cuid())
+  userId    String          @unique
+  createdAt DateTime        @default(now())
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students  StudentParent[]
+}
+
+model TeacherProfile {
+  id         String           @id @default(cuid())
+  userId     String           @unique
+  schoolName String?
+  createdAt  DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students   StudentTeacher[]
+}
+
+model StudentParent {
+  id        String         @id @default(cuid())
+  studentId String
+  parentId  String
+  createdAt DateTime       @default(now())
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parent    ParentProfile  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, parentId])
+  @@index([parentId])
+}
+
+model StudentTeacher {
+  id        String         @id @default(cuid())
+  studentId String
+  teacherId String
+  createdAt DateTime       @default(now())
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, teacherId])
+  @@index([teacherId])
+}
+
+model Subject {
+  id         String    @id @default(cuid())
+  slug       String    @unique
+  nameHi     String
+  nameEn     String
+  classLevel Int
+  board      String
+  sourceNote String?
+  chapters   Chapter[]
+}
+
+model Chapter {
+  id          String          @id @default(cuid())
+  subjectId   String
+  slug        String          @unique
+  number      Int
+  nameHi      String
+  nameEn      String
+  summaryHi   String
+  summaryEn   String
+  source      ContentSource   @default(ORIGINAL_SAMPLE)
+  subject     Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topics      Topic[]
+  assessments Assessment[]
+  sessions    LearningSession[]
+
+  @@unique([subjectId, number])
+}
+
+model Topic {
+  id              String                   @id @default(cuid())
+  chapterId       String
+  slug            String                   @unique
+  order           Int
+  titleHi         String
+  titleEn         String
+  summaryHi       String
+  summaryEn       String
+  chapter         Chapter                  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  lessons         Lesson[]
+  questions       Question[]
+  progress        LearningProgress[]
+  recommendations AdaptiveRecommendation[]
+  sessions        LearningSession[]
+
+  @@index([chapterId, order])
+}
+
+model Lesson {
+  id          String        @id @default(cuid())
+  topicId     String
+  slug        String        @unique
+  titleHi     String
+  titleEn     String
+  /// Array of blocks: { kind: "para" | "example" | "note" | "formula", hi?: string, en?: string }
+  content     Json
+  estMinutes  Int           @default(8)
+  source      ContentSource @default(ORIGINAL_SAMPLE)
+  isPublished Boolean       @default(true)
+  version     Int           @default(1)
+  updatedAt   DateTime      @updatedAt
+  topic       Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([topicId])
+}
+
+model Question {
+  id            String               @id @default(cuid())
+  topicId       String
+  slug          String               @unique
+  type          QuestionType
+  difficulty    Int                  @default(1) // 1 easy, 2 medium, 3 hard
+  promptHi      String
+  promptEn      String
+  /// MCQ only: [{ id: "a", hi: "...", en: "..." }]
+  options       Json?
+  correctAnswer String
+  hintHi        String
+  hintEn        String
+  explanationHi String
+  explanationEn String
+  source        ContentSource        @default(ORIGINAL_SAMPLE)
+  topic         Topic                @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  answers       StudentAnswer[]
+  assessments   AssessmentQuestion[]
+
+  @@index([topicId, difficulty])
+}
+
+model Assessment {
+  id              String               @id @default(cuid())
+  chapterId       String
+  slug            String               @unique
+  titleHi         String
+  titleEn         String
+  durationMinutes Int                  @default(15)
+  chapter         Chapter              @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  questions       AssessmentQuestion[]
+  sessions        LearningSession[]
+
+  @@index([chapterId])
+}
+
+model AssessmentQuestion {
+  assessmentId String
+  questionId   String
+  order        Int
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question     Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([assessmentId, questionId])
+}
+
+model LearningSession {
+  id           String          @id @default(cuid())
+  studentId    String
+  type         SessionType
+  chapterId    String?
+  topicId      String?
+  assessmentId String?
+  score        Int?
+  total        Int?
+  startedAt    DateTime        @default(now())
+  endedAt      DateTime?
+  student      StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  chapter      Chapter?        @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  topic        Topic?          @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  assessment   Assessment?     @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+  answers      StudentAnswer[]
+
+  @@index([studentId, startedAt])
+}
+
+model StudentAnswer {
+  id           String           @id @default(cuid())
+  studentId    String
+  questionId   String
+  sessionId    String?
+  answer       String
+  isCorrect    Boolean
+  difficulty   Int
+  timeTakenSec Int?
+  origin       AnswerOrigin     @default(ONLINE)
+  answeredAt   DateTime         @default(now())
+  student      StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  question     Question         @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  session      LearningSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([studentId, answeredAt])
+  @@index([questionId])
+}
+
+model LearningProgress {
+  id                String         @id @default(cuid())
+  studentId         String
+  topicId           String
+  attempts          Int            @default(0)
+  correct           Int            @default(0)
+  mastery           Float          @default(0) // 0..1, exponentially weighted
+  currentDifficulty Int            @default(1)
+  streak            Int            @default(0) // +n correct in a row, -n wrong in a row
+  lessonCompletedAt DateTime?
+  lastActivityAt    DateTime       @default(now())
+  student           StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topic             Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, topicId])
+  @@index([studentId, mastery])
+}
+
+model AdaptiveRecommendation {
+  id        String               @id @default(cuid())
+  studentId String
+  topicId   String
+  kind      RecommendationKind
+  reasonHi  String
+  reasonEn  String
+  priority  Int                  @default(0)
+  status    RecommendationStatus @default(ACTIVE)
+  createdAt DateTime             @default(now())
+  student   StudentProfile       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topic     Topic                @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, status])
+}
+
+model TutorConversation {
+  id        String           @id @default(cuid())
+  studentId String
+  title     String
+  mode      ConversationMode @default(TEXT)
+  topicId   String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  student   StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  messages  TutorMessage[]
+
+  @@index([studentId, updatedAt])
+}
+
+model TutorMessage {
+  id             String            @id @default(cuid())
+  conversationId String
+  role           MessageRole
+  content        String
+  /// Structured tutor reply (steps, hint, final answer, confidence) when role = ASSISTANT
+  structured     Json?
+  provider       String?
+  model          String?
+  verification   String? // "verified" | "mismatch" | "unchecked"
+  createdAt      DateTime          @default(now())
+  conversation   TutorConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+model SyncRecord {
+  id              String         @id @default(cuid())
+  studentId       String
+  clientId        String
+  kind            String
+  payload         Json
+  status          SyncStatus
+  error           String?
+  clientCreatedAt DateTime
+  processedAt     DateTime       @default(now())
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, clientId])
+}
+
+/// Anonymous, consent-based page-view counts. No user id, IP or device fingerprint is stored.
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  path      String
+  lang      String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
