@@ -29,6 +29,12 @@ export const RECOMMENDATION_STATUSES = ['ACTIVE', 'DONE', 'DISMISSED'] as const;
 export const CONVERSATION_MODES = ['TEXT', 'VOICE', 'PHOTO'] as const;
 export const MESSAGE_ROLES = ['USER', 'ASSISTANT'] as const;
 export const SYNC_STATUSES = ['PENDING', 'APPLIED', 'DUPLICATE', 'REJECTED'] as const;
+/** How far a board's or subject's curriculum has been checked against an official source. */
+export const VERIFICATION_STATUSES = ['VERIFIED', 'PARTIAL', 'UNVERIFIED', 'NOT_AVAILABLE'] as const;
+export const SCHOOL_STAGES = ['PRIMARY', 'MIDDLE', 'SECONDARY', 'SENIOR_SECONDARY'] as const;
+/** Classes 11-12 only. A suggestion for picking subjects, not a rule: students choose subjects freely. */
+export const STREAMS = ['SCIENCE', 'COMMERCE', 'HUMANITIES'] as const;
+export const CONSENT_METHODS = ['STUDENT_DECLARED', 'GUARDIAN_CONFIRMED'] as const;
 
 const id = () => text().primaryKey().$defaultFn(() => randomUUID());
 const createdAt = () => integer({ mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date());
@@ -85,6 +91,10 @@ export const studentProfiles = sqliteTable('student_profiles', {
   dailyGoalMinutes: integer().notNull().default(20),
   onboardingDone: integer({ mode: 'boolean' }).notNull().default(false),
   linkCode: text().notNull().unique(),
+  /** When the student said a parent or guardian agreed to them using the app */
+  guardianConsentDeclaredAt: integer({ mode: 'timestamp_ms' }),
+  /** When a linked parent confirmed consent from their own account */
+  guardianConsentConfirmedAt: integer({ mode: 'timestamp_ms' }),
   createdAt: createdAt(),
 });
 
@@ -139,15 +149,63 @@ export const studentTeachers = sqliteTable(
 
 /* --------------------------------------------------------------- curriculum */
 
-export const subjects = sqliteTable('subjects', {
-  id: id(),
-  slug: text().notNull().unique(),
+/** Boards a student can pick. Reference data, inserted by migration 0001. */
+export const boards = sqliteTable('boards', {
+  id: text().primaryKey(),
+  code: text().notNull().unique(),
   nameHi: text().notNull(),
   nameEn: text().notNull(),
-  classLevel: integer().notNull(),
-  board: text().notNull(),
-  sourceNote: text(),
+  state: text(),
+  /** Textbook basis, e.g. "NCERT" */
+  basis: text(),
+  status: text({ enum: VERIFICATION_STATUSES }).notNull(),
+  noteHi: text(),
+  noteEn: text(),
+  sourceUrl: text(),
+  order: integer().notNull().default(0),
 });
+
+export const academicSessions = sqliteTable('academic_sessions', {
+  id: text().primaryKey(),
+  /** e.g. "2026-27" */
+  code: text().notNull().unique(),
+  isCurrent: integer({ mode: 'boolean' }).notNull().default(false),
+  noteHi: text(),
+  noteEn: text(),
+});
+
+export const classLevels = sqliteTable('class_levels', {
+  /** 1..12 */
+  level: integer().primaryKey(),
+  stage: text({ enum: SCHOOL_STAGES }).notNull(),
+  nameHi: text().notNull(),
+  nameEn: text().notNull(),
+});
+
+export const subjects = sqliteTable(
+  'subjects',
+  {
+    id: id(),
+    slug: text().notNull().unique(),
+    nameHi: text().notNull(),
+    nameEn: text().notNull(),
+    classLevel: integer().notNull(),
+    board: text().notNull(),
+    sourceNote: text(),
+    // Added in migration 0001 (nullable so older rows stay valid)
+    boardId: text().references(() => boards.id),
+    sessionId: text().references(() => academicSessions.id),
+    /** Stable subject key across classes, e.g. "mathematics" */
+    subjectKey: text(),
+    verification: text({ enum: VERIFICATION_STATUSES }),
+    sourceUrl: text(),
+    /** Official textbooks: [{ title, code, medium, chapters }] */
+    books: text({ mode: 'json' }).$type<Array<{ title: string; code: string; medium: string; chapters: number }>>(),
+    chapterCount: integer(),
+    order: integer().notNull().default(0),
+  },
+  (t) => [index('subjects_board_session_class_idx').on(t.boardId, t.sessionId, t.classLevel)],
+);
 
 export const chapters = sqliteTable(
   'chapters',
@@ -351,6 +409,8 @@ export const tutorConversations = sqliteTable(
     title: text().notNull(),
     mode: text({ enum: CONVERSATION_MODES }).notNull().default('TEXT'),
     topicId: text(),
+    /** Subject the question is about (added in migration 0001) */
+    subjectId: text().references(() => subjects.id, { onDelete: 'set null' }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -373,6 +433,51 @@ export const tutorMessages = sqliteTable(
     createdAt: createdAt(),
   },
   (t) => [index('tutor_messages_conversation_created_idx').on(t.conversationId, t.createdAt)],
+);
+
+/* ----------------------------------------------------- student curriculum */
+
+/**
+ * A student's class, board, session, medium and stream. One row is active; older rows are kept
+ * (isActive = false) so changing class never loses history. Progress is stored per topic, and
+ * topics belong to a class's subjects, so earlier progress stays attached to the earlier class.
+ */
+export const studentCurricula = sqliteTable(
+  'student_curricula',
+  {
+    id: id(),
+    studentId: text()
+      .notNull()
+      .references(() => studentProfiles.id, { onDelete: 'cascade' }),
+    boardId: text()
+      .notNull()
+      .references(() => boards.id),
+    sessionId: text()
+      .notNull()
+      .references(() => academicSessions.id),
+    classLevel: integer()
+      .notNull()
+      .references(() => classLevels.level),
+    medium: text({ enum: LANGUAGES }).notNull().default('HI'),
+    stream: text({ enum: STREAMS }),
+    isActive: integer({ mode: 'boolean' }).notNull().default(true),
+    startedAt: createdAt(),
+    endedAt: integer({ mode: 'timestamp_ms' }),
+  },
+  (t) => [index('student_curricula_student_active_idx').on(t.studentId, t.isActive)],
+);
+
+export const studentSubjects = sqliteTable(
+  'student_subjects',
+  {
+    curriculumId: text()
+      .notNull()
+      .references(() => studentCurricula.id, { onDelete: 'cascade' }),
+    subjectId: text()
+      .notNull()
+      .references(() => subjects.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.curriculumId, t.subjectId] }), index('student_subjects_subject_idx').on(t.subjectId)],
 );
 
 /* --------------------------------------------------------------------- sync */
@@ -427,6 +532,7 @@ export const studentProfilesRelations = relations(studentProfiles, ({ one, many 
   recommendations: many(adaptiveRecommendations),
   conversations: many(tutorConversations),
   syncRecords: many(syncRecords),
+  curricula: many(studentCurricula),
 }));
 export const parentProfilesRelations = relations(parentProfiles, ({ one, many }) => ({
   user: one(users, { fields: [parentProfiles.userId], references: [users.id] }),
@@ -445,7 +551,23 @@ export const studentTeachersRelations = relations(studentTeachers, ({ one }) => 
   teacher: one(teacherProfiles, { fields: [studentTeachers.teacherId], references: [teacherProfiles.id] }),
 }));
 
-export const subjectsRelations = relations(subjects, ({ many }) => ({ chapters: many(chapters) }));
+export const boardsRelations = relations(boards, ({ many }) => ({ subjects: many(subjects) }));
+export const academicSessionsRelations = relations(academicSessions, ({ many }) => ({ subjects: many(subjects) }));
+export const subjectsRelations = relations(subjects, ({ one, many }) => ({
+  chapters: many(chapters),
+  boardRef: one(boards, { fields: [subjects.boardId], references: [boards.id] }),
+  session: one(academicSessions, { fields: [subjects.sessionId], references: [academicSessions.id] }),
+}));
+export const studentCurriculaRelations = relations(studentCurricula, ({ one, many }) => ({
+  student: one(studentProfiles, { fields: [studentCurricula.studentId], references: [studentProfiles.id] }),
+  board: one(boards, { fields: [studentCurricula.boardId], references: [boards.id] }),
+  session: one(academicSessions, { fields: [studentCurricula.sessionId], references: [academicSessions.id] }),
+  subjects: many(studentSubjects),
+}));
+export const studentSubjectsRelations = relations(studentSubjects, ({ one }) => ({
+  curriculum: one(studentCurricula, { fields: [studentSubjects.curriculumId], references: [studentCurricula.id] }),
+  subject: one(subjects, { fields: [studentSubjects.subjectId], references: [subjects.id] }),
+}));
 export const chaptersRelations = relations(chapters, ({ one, many }) => ({
   subject: one(subjects, { fields: [chapters.subjectId], references: [subjects.id] }),
   topics: many(topics),
@@ -518,6 +640,9 @@ export type AnswerOrigin = (typeof ANSWER_ORIGINS)[number];
 export type RecommendationKind = (typeof RECOMMENDATION_KINDS)[number];
 export type ConversationMode = (typeof CONVERSATION_MODES)[number];
 export type MessageRole = (typeof MESSAGE_ROLES)[number];
+export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
+export type SchoolStage = (typeof SCHOOL_STAGES)[number];
+export type Stream = (typeof STREAMS)[number];
 export type User = typeof users.$inferSelect;
 export type StudentProfile = typeof studentProfiles.$inferSelect;
 export type Question = typeof questions.$inferSelect;

@@ -25,6 +25,15 @@ const HI: Record<string, string> = {
   'This dashboard is for parent and teacher accounts.': 'यह डैशबोर्ड अभिभावक और शिक्षक खाते के लिए है।',
   'You do not have access to this.': 'आपको इसकी अनुमति नहीं है।',
   'This code did not match any student. Check it and try again.': 'यह कोड किसी विद्यार्थी से मेल नहीं खाया। कोड जाँचकर फिर कोशिश करें।',
+  'A parent or guardian must agree before a student account is made': 'विद्यार्थी का खाता बनाने से पहले माता-पिता या अभिभावक की अनुमति ज़रूरी है',
+  // class, board and subjects
+  'Board or session not found.': 'बोर्ड या सत्र नहीं मिला।',
+  'Board not found.': 'बोर्ड नहीं मिला।',
+  'Academic session not found.': 'शैक्षणिक सत्र नहीं मिला।',
+  "This board's curriculum is not available yet.": 'इस बोर्ड का पाठ्यक्रम अभी उपलब्ध नहीं है।',
+  'Streams apply to Classes 11 and 12 only.': 'संकाय (स्ट्रीम) केवल कक्षा 11 और 12 के लिए है।',
+  'Choose subjects from your class, board and session.': 'अपनी कक्षा, बोर्ड और सत्र के विषय ही चुनें।',
+  'Choose one of your own subjects.': 'अपने चुने हुए विषयों में से ही कोई विषय चुनें।',
   // learning
   'Please type a question.': 'कृपया अपना सवाल लिखें।',
   'Conversation not found.': 'यह बातचीत नहीं मिली।',

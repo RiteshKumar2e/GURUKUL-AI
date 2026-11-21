@@ -22,6 +22,7 @@ export const studentService = {
       dailyGoalMinutes: s.dailyGoalMinutes,
       onboardingDone: s.onboardingDone,
       linkCode: s.linkCode,
+      guardianConsent: { declaredAt: s.guardianConsentDeclaredAt, confirmedAt: s.guardianConsentConfirmedAt },
       user: s.user,
       guardians: [
         ...(guardians?.parents.map((p) => ({ kind: 'PARENT' as const, name: p.parent.user.displayName, since: p.createdAt })) ?? []),

@@ -31,12 +31,16 @@ export const curriculumRepository = {
     return rows.map((s) => ({ ...s, chapters: s.chapters.map(({ topics: t, ...c }) => ({ ...c, _count: { topics: t.length } })) }));
   },
 
-  chapters: async () => {
+  /** Chapters of the given subjects (all subjects when `subjectIds` is undefined). */
+  chapters: async (subjectIds?: string[]) => {
+    if (subjectIds && !subjectIds.length) return [];
     const rows = await db.query.chapters.findMany({
+      where: subjectIds ? inArray(chapters.subjectId, subjectIds) : undefined,
       orderBy: (c, { asc }) => [asc(c.number)],
       with: {
         topics: { orderBy: (t, { asc }) => [asc(t.order)], columns: { id: true, slug: true, titleHi: true, titleEn: true }, with: { questions: { columns: { id: true } } } },
         assessments: { columns: { slug: true } },
+        subject: { columns: { slug: true, nameHi: true, nameEn: true, order: true } },
       },
     });
     return rows.map((c) => ({ ...c, topics: c.topics.map(withCount) }));
@@ -90,11 +94,14 @@ export const curriculumRepository = {
       with: { topics: { orderBy: (t, { asc }) => [asc(t.order)], with: { lessons: published, questions: true } } },
     })) ?? null,
 
-  assessments: async () => {
+  assessments: async (subjectIds?: string[]) => {
     const rows = await db.query.assessments.findMany({
-      with: { chapter: { columns: { slug: true, number: true, nameHi: true, nameEn: true } }, questions: { columns: { questionId: true } } },
+      with: { chapter: { columns: { slug: true, number: true, nameHi: true, nameEn: true, subjectId: true } }, questions: { columns: { questionId: true } } },
     });
-    return rows.map(withCount).sort((a, b) => a.chapter.number - b.chapter.number);
+    return rows
+      .filter((a) => !subjectIds || subjectIds.includes(a.chapter.subjectId))
+      .map(withCount)
+      .sort((a, b) => a.chapter.number - b.chapter.number);
   },
 
   assessmentBySlug: async (slug: string) =>
@@ -110,9 +117,12 @@ export const curriculumRepository = {
     (await db.query.assessments.findFirst({ where: eq(assessments.id, id), with: { questions: { orderBy: (q, { asc }) => [asc(q.order)] } } })) ?? null,
 
   /** Every topic in course order (chapter number, then topic order). */
-  allTopics: async () => {
-    const rows = await db.query.topics.findMany({ with: { chapter: { columns: { number: true, slug: true, nameHi: true, nameEn: true } } } });
-    return rows.sort((a, b) => a.chapter.number - b.chapter.number || a.order - b.order);
+  /** Topics in curriculum order, limited to the given subjects when `subjectIds` is set. */
+  allTopics: async (subjectIds?: string[]) => {
+    const rows = await db.query.topics.findMany({ with: { chapter: { columns: { number: true, slug: true, nameHi: true, nameEn: true, subjectId: true } } } });
+    return rows
+      .filter((t) => !subjectIds || subjectIds.includes(t.chapter.subjectId))
+      .sort((a, b) => a.chapter.number - b.chapter.number || a.order - b.order);
   },
 
   subjectBySlug: async (slug: string) => (await db.query.subjects.findFirst({ where: eq(subjects.slug, slug) })) ?? null,

@@ -1,17 +1,9 @@
-/** Chapter titles for the public landing page (same list as backend/content/class9-maths.json). */
-export const CHAPTERS: Array<{ n: number; hi: string; en: string }> = [
-  { n: 1, hi: 'संख्या पद्धति', en: 'Number Systems' },
-  { n: 2, hi: 'बहुपद', en: 'Polynomials' },
-  { n: 3, hi: 'निर्देशांक ज्यामिति', en: 'Coordinate Geometry' },
-  { n: 4, hi: 'दो चरों वाले रैखिक समीकरण', en: 'Linear Equations in Two Variables' },
-  { n: 5, hi: 'यूक्लिड की ज्यामिति का परिचय', en: "Introduction to Euclid's Geometry" },
-  { n: 6, hi: 'रेखाएँ और कोण', en: 'Lines and Angles' },
-  { n: 7, hi: 'त्रिभुज', en: 'Triangles' },
-  { n: 8, hi: 'चतुर्भुज', en: 'Quadrilaterals' },
-  { n: 9, hi: 'वृत्त', en: 'Circles' },
-  { n: 10, hi: 'हीरोन का सूत्र', en: "Heron's Formula" },
-  { n: 11, hi: 'पृष्ठीय क्षेत्रफल और आयतन', en: 'Surface Areas and Volumes' },
-  { n: 12, hi: 'सांख्यिकी', en: 'Statistics' },
+/** How the tutor teaches at each school stage (landing page). Subjects themselves come from the API. */
+export const STAGES: Array<{ range: string; hi: string; en: string; dhi: string; den: string }> = [
+  { range: '1–5', hi: 'प्राथमिक', en: 'Primary', dhi: 'बहुत आसान शब्द, चित्र जैसे उदाहरण और छोटी गतिविधियाँ।', den: 'Very simple words, picture-like examples and short activities.' },
+  { range: '6–8', hi: 'उच्च प्राथमिक', en: 'Middle', dhi: 'उदाहरण से अवधारणा बनाना और साथ में अभ्यास।', den: 'Building concepts from examples, with guided practice.' },
+  { range: '9–10', hi: 'माध्यमिक', en: 'Secondary', dhi: 'बोर्ड परीक्षा जैसी साफ़ व्याख्या और संरचित अभ्यास।', den: 'Board-style explanations and structured practice.' },
+  { range: '11–12', hi: 'उच्च माध्यमिक', en: 'Senior secondary', dhi: 'गहरी समझ, विषय के अनुसार हल करने के तरीके और परीक्षा तैयारी।', den: 'Deeper concepts, subject-specific problem solving and exam preparation.' },
 ];
 
 export const DISTRICTS = [

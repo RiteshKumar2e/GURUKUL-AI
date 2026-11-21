@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
 import { api } from '@/services/api';
-import type { TeachingLevel } from '@/types/api';
+import type { StudentCurriculum, TeachingLevel } from '@/types/api';
+import { CurriculumPicker, emptyCurriculum, fromStudent, isComplete, type CurriculumValue } from '@/features/curriculum/CurriculumPicker';
 import { DISTRICTS } from '@/lib/constants';
 import { Alert, Button, Select } from '@/components/ui';
 import { Logo } from '@/components/common';
@@ -19,15 +20,24 @@ export default function Onboarding() {
   const [district, setDistrict] = useState(user?.student?.district ?? '');
   const [level, setLevel] = useState<TeachingLevel>(user?.student?.teachingLevel ?? 'STANDARD');
   const [goal, setGoal] = useState(user?.student?.dailyGoalMinutes ?? 20);
+  const [curriculum, setCurriculum] = useState<CurriculumValue>(() => emptyCurriculum(lang === 'en' ? 'EN' : 'HI'));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useDocumentTitle(tx('शुरुआत', 'Get started'));
+
+  // A student who already has a class (e.g. from before Classes 1-12) starts from it
+  useEffect(() => {
+    api<{ curriculum: StudentCurriculum | null }>('/students/me/curriculum')
+      .then((r) => r.curriculum && setCurriculum(fromStudent(r.curriculum)))
+      .catch(() => undefined);
+  }, []);
 
   const finish = async () => {
     setSaving(true);
     setError(null);
     try {
       await api('/users/me', { method: 'PATCH', body: { preferredLanguage: lang === 'hi' ? 'HI' : 'EN' } });
+      await api('/students/me/curriculum', { method: 'PUT', body: curriculum });
       await api('/students/me', { method: 'PATCH', body: { district: district || null, teachingLevel: level, dailyGoalMinutes: goal, onboardingDone: true } });
       await refreshUser();
       toast(tx('सब तैयार है। चलिए शुरू करते हैं!', 'All set. Let’s begin!'));
@@ -40,9 +50,9 @@ export default function Onboarding() {
   };
 
   const levels: Array<{ v: TeachingLevel; hi: string; en: string; dhi: string; den: string }> = [
-    { v: 'BASIC', hi: 'गणित मुश्किल लगता है', en: 'Maths feels hard', dhi: 'बहुत आसान शब्दों और छोटे कदमों में समझाएँ', den: 'Explain in very simple words and small steps' },
-    { v: 'STANDARD', hi: 'ठीक-ठाक है', en: 'I’m okay with it', dhi: 'कक्षा 9 के स्तर पर साफ़ कदमों में', den: 'Clear steps at Class 9 level' },
-    { v: 'ADVANCED', hi: 'मुझे गणित पसंद है', en: 'I enjoy maths', dhi: 'संक्षेप में, और थोड़ा कठिन सवाल भी दें', den: 'Be brief and give me harder follow-ups' },
+    { v: 'BASIC', hi: 'पढ़ाई मुश्किल लगती है', en: 'Studies feel hard', dhi: 'बहुत आसान शब्दों और छोटे कदमों में समझाएँ', den: 'Explain in very simple words and small steps' },
+    { v: 'STANDARD', hi: 'ठीक-ठाक है', en: 'I’m okay with it', dhi: 'अपनी कक्षा के स्तर पर साफ़ कदमों में', den: 'Clear steps at my class level' },
+    { v: 'ADVANCED', hi: 'मुझे पढ़ाई में मज़ा आता है', en: 'I enjoy studying', dhi: 'संक्षेप में, और थोड़ा कठिन सवाल भी दें', den: 'Be brief and give me harder follow-ups' },
   ];
 
   const steps = [
@@ -51,7 +61,7 @@ export default function Onboarding() {
       body: (
         <div className="grid gap-2 sm:grid-cols-2">
           {(['hi', 'en'] as const).map((l) => (
-            <button key={l} type="button" onClick={() => setLang(l)} className={`rounded-md border-2 px-4 py-4 text-left ${lang === l ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`} aria-pressed={lang === l}>
+            <button key={l} type="button" onClick={() => { setLang(l); setCurriculum((c) => ({ ...c, medium: l === 'hi' ? 'HI' : 'EN' })); }} className={`rounded-md border-2 px-4 py-4 text-left ${lang === l ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`} aria-pressed={lang === l}>
               <span className="block text-lg font-semibold">{l === 'hi' ? 'हिंदी' : 'English'}</span>
               <span className="block text-sm text-ink-600">{l === 'hi' ? 'पाठ, संकेत और ट्यूटर हिंदी में' : 'Lessons, hints and tutor in English'}</span>
             </button>
@@ -60,7 +70,12 @@ export default function Onboarding() {
       ),
     },
     {
-      title: tx('आपको गणित कैसा लगता है?', 'How do you feel about maths?'),
+      title: tx('आप किस कक्षा में पढ़ते हैं?', 'Which class are you in?'),
+      body: <CurriculumPicker value={curriculum} onChange={setCurriculum} />,
+      ready: isComplete(curriculum),
+    },
+    {
+      title: tx('आपको पढ़ाई कैसी लगती है?', 'How do you find your studies?'),
       body: (
         <div className="grid gap-2">
           {levels.map((l) => (
@@ -126,7 +141,9 @@ export default function Onboarding() {
             {tx('पीछे', 'Back')}
           </Button>
           {step < steps.length - 1 ? (
-            <Button onClick={() => setStep((s) => s + 1)}>{tx('आगे', 'Next')}</Button>
+            <Button onClick={() => setStep((s) => s + 1)} disabled={(steps[step] as { ready?: boolean }).ready === false}>
+              {tx('आगे', 'Next')}
+            </Button>
           ) : (
             <Button onClick={finish} loading={saving}>
               {tx('पढ़ाई शुरू करें', 'Start learning')}

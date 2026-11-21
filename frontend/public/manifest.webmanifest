@@ -1,7 +1,7 @@
 {
-  "name": "GURUKUL AI — कक्षा 9 गणित",
+  "name": "GURUKUL AI — कक्षा 1–12",
   "short_name": "GURUKUL AI",
-  "description": "हिंदी में कक्षा 9 गणित सीखने का साथी — ऑफ़लाइन भी।",
+  "description": "हिंदी में कक्षा 1 से 12 की पढ़ाई का साथी — ऑफ़लाइन भी।",
   "lang": "hi",
   "start_url": "/app",
   "scope": "/",

@@ -164,7 +164,7 @@ describe('tutor reply structure', () => {
   });
 
   it('system prompt protects its instructions and uses the student\'s weak topics', () => {
-    const p = systemPrompt({ language: 'HI', level: 'BASIC', weakTopics: ['Polynomials (25% correct)'] });
+    const p = systemPrompt({ language: 'HI', level: 'BASIC', learner: { classLevel: 9, stage: 'SECONDARY', board: 'JAC' }, weakTopics: ['Polynomials (25% correct)'] });
     expect(p).toMatch(/never reveal/i);
     expect(p).toMatch(/outOfSyllabus/);
     expect(p).toContain('Polynomials (25% correct)');
@@ -263,8 +263,13 @@ describe('account isolation on a shared phone', () => {
   async function register(role: 'STUDENT' | 'PARENT' | 'TEACHER', name: string) {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ role, username: `${prefix}_${name}`, displayName: `Test ${name}`, password: pw, email: role === 'STUDENT' ? undefined : `${prefix}_${name}@example.com`, preferredLanguage: 'HI', acceptTerms: true });
+      .send({ role, username: `${prefix}_${name}`, displayName: `Test ${name}`, password: pw, email: role === 'STUDENT' ? undefined : `${prefix}_${name}@example.com`, preferredLanguage: 'HI', acceptTerms: true, guardianConsent: true });
     expect(res.status).toBe(201);
+    if (role === 'STUDENT') {
+      // Class 9 compatibility: the original JAC Class 9 maths content (session 2025-26)
+      const cur = await request(app).put('/api/students/me/curriculum').set('Authorization', `Bearer ${res.body.accessToken}`).send({ board: 'JAC', session: '2025-26', classLevel: 9, medium: 'HI', subjects: ['class-9-maths'] });
+      expect(cur.status).toBe(200);
+    }
     return { token: res.body.accessToken as string, user: res.body.user };
   }
   const auth = (t: string) => ({ Authorization: `Bearer ${t}` });

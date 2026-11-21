@@ -38,8 +38,12 @@ export default function Register() {
       schoolName: z.string().trim().max(80).optional(),
       website: z.string().optional(),
       acceptTerms: z.boolean().refine((v) => v, tx('आगे बढ़ने के लिए शर्तें स्वीकार करें', 'Please accept the terms to continue')),
+      guardianConsent: z.boolean().optional(),
     })
     .superRefine((v, ctx) => {
+      if (v.role === 'STUDENT' && !v.guardianConsent) {
+        ctx.addIssue({ code: 'custom', path: ['guardianConsent'], message: tx('माता-पिता या अभिभावक की अनुमति ज़रूरी है', 'A parent or guardian must agree first') });
+      }
       if (v.role !== 'STUDENT') {
         if (!v.email) ctx.addIssue({ code: 'custom', path: ['email'], message: tx('अभिभावक/शिक्षक के लिए ईमेल ज़रूरी है', 'Email is required for parents and teachers') });
         else if (!z.string().email().safeParse(v.email).success) ctx.addIssue({ code: 'custom', path: ['email'], message: tx('सही ईमेल लिखें', 'Enter a valid email') });
@@ -49,7 +53,7 @@ export default function Register() {
 
   const { register, handleSubmit, watch, setValue, setError, clearErrors, trigger, getValues, formState } = useForm<Form>({
     resolver: zodResolver(schema),
-    defaultValues: { role: 'STUDENT', acceptTerms: false },
+    defaultValues: { role: 'STUDENT', acceptTerms: false, guardianConsent: false },
   });
   const role = watch('role');
 
@@ -90,6 +94,7 @@ export default function Register() {
         ...data,
         email: data.role === 'STUDENT' ? undefined : data.email,
         schoolName: data.role === 'TEACHER' ? data.schoolName : undefined,
+        guardianConsent: data.role === 'STUDENT' ? data.guardianConsent : undefined,
         preferredLanguage: lang === 'hi' ? 'HI' : 'EN',
       });
       toast(tx('खाता बन गया!', 'Your account is ready!'));
@@ -220,7 +225,6 @@ export default function Register() {
                     {tx(' और ', ' and ')}
                     <Link to="/privacy" target="_blank">{tx('गोपनीयता नीति', 'privacy policy')}</Link>
                     {tx(' पढ़ ली है।', '.')}
-                    {role === 'STUDENT' && tx(' 18 वर्ष से कम हूँ तो अभिभावक की अनुमति से खाता बना रहा/रही हूँ।', ' If I am under 18, I am signing up with a parent’s or guardian’s permission.')}
                   </span>
                 </label>
                 {formState.errors.acceptTerms && (
@@ -229,6 +233,27 @@ export default function Register() {
                   </p>
                 )}
               </div>
+              {role === 'STUDENT' && (
+                <div>
+                  <label className="flex items-start gap-3">
+                    <input type="checkbox" className="mt-1.5 h-5 w-5 shrink-0 accent-ink-950" {...register('guardianConsent')} />
+                    <span className="text-[0.97rem] text-ink-800">
+                      {tx(
+                        'मेरे माता-पिता या अभिभावक को पता है कि मैं यह ऐप इस्तेमाल कर रहा/रही हूँ, और उन्होंने अनुमति दी है।',
+                        'My parent or guardian knows I am using this app and has agreed.',
+                      )}
+                    </span>
+                  </label>
+                  <p className="mt-1 text-sm text-ink-600">
+                    {tx('बाद में वे अपने खाते से आपका कोड जोड़कर अनुमति की पुष्टि कर सकते हैं।', 'Later they can confirm it by linking your code from their own account.')}
+                  </p>
+                  {formState.errors.guardianConsent && (
+                    <p className="mt-1 text-sm text-bad-700" role="alert">
+                      {formState.errors.guardianConsent.message}
+                    </p>
+                  )}
+                </div>
+              )}
             </>
           )}
 

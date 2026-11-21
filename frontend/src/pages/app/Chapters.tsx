@@ -31,7 +31,7 @@ export default function Chapters() {
 
   return (
     <>
-      <PageHeader title={tx('कक्षा 9 गणित — अध्याय', 'Class 9 Mathematics — chapters')} subtitle={tx('किसी अध्याय या विषय का नाम खोजें।', 'Search by chapter or topic name.')} />
+      <PageHeader title={q.data?.selection ? tx(`कक्षा ${q.data.selection.classLevel} — सभी अध्याय`, `Class ${q.data.selection.classLevel} — all chapters`) : tx('सभी अध्याय', 'All chapters')} subtitle={tx('किसी अध्याय या विषय का नाम खोजें।', 'Search by chapter or topic name.')} />
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
         <label className="relative flex-1">
           <span className="sr-only">{tx('खोजें', 'Search')}</span>

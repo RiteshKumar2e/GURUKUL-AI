@@ -18,6 +18,8 @@ export interface RegisterInput {
   preferredLanguage: Language;
   schoolName?: string;
   website?: string; // honeypot
+  /** Student declares that a parent or guardian agreed */
+  guardianConsent?: boolean;
 }
 
 async function issueTokens(user: { id: string; role: Role; studentId?: string | null }) {
@@ -46,6 +48,7 @@ export const authService = {
           preferredLanguage: input.preferredLanguage,
           linkCode: input.role === 'STUDENT' ? generateLinkCode() : undefined,
           schoolName: input.schoolName,
+          guardianConsentDeclaredAt: input.role === 'STUDENT' && input.guardianConsent ? new Date() : null,
         });
         const tokens = await issueTokens({ id: user.id, role: user.role, studentId: user.student?.id });
         return { user, ...tokens };

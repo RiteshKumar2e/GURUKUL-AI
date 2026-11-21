@@ -8,10 +8,10 @@ export type Intent = 'hint' | 'solution' | 'explain' | 'check';
 export function useAskTutor() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (vars: { conversationId?: string; content: string; intent: Intent; mode?: 'TEXT' | 'VOICE' | 'PHOTO'; topicSlug?: string; language: 'HI' | 'EN' | 'TE' }) => {
+    mutationFn: async (vars: { conversationId?: string; content: string; intent: Intent; mode?: 'TEXT' | 'VOICE' | 'PHOTO'; topicSlug?: string; subjectSlug?: string; language: 'HI' | 'EN' | 'TE' }) => {
       let id = vars.conversationId;
       if (!id) {
-        const conv = await api<Conversation>('/tutor/conversations', { body: { mode: vars.mode ?? 'TEXT', topicSlug: vars.topicSlug, title: vars.content.slice(0, 70) } });
+        const conv = await api<Conversation>('/tutor/conversations', { body: { mode: vars.mode ?? 'TEXT', topicSlug: vars.topicSlug, subjectSlug: vars.subjectSlug || undefined, title: vars.content.slice(0, 70) } });
         id = conv.id;
       }
       const res = await api<{ userMessage: TutorMessage; assistantMessage: TutorMessage }>(`/tutor/conversations/${id}/messages`, {

@@ -80,7 +80,7 @@ export function TutorReply({ message, onFollowUp, player: external }: { message:
     <div className="panel overflow-hidden">
       <div className="space-y-3 px-4 py-3">
         {s.demo && <Badge tone="saffron">{tx('डेमो मोड — AI उत्तर नहीं', 'Demo mode — not an AI answer')}</Badge>}
-        {s.outOfSyllabus && <Badge tone="saffron">{tx('कक्षा 9 के पाठ्यक्रम से बाहर', 'Beyond the Class 9 syllabus')}</Badge>}
+        {s.outOfSyllabus && <Badge tone="saffron">{tx('आपकी कक्षा के पाठ्यक्रम से बाहर', 'Beyond your class syllabus')}</Badge>}
         {s.reply && <p className="text-ink-900">{s.reply}</p>}
 
         {s.understanding && (

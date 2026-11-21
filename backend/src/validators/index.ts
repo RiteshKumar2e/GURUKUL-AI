@@ -22,14 +22,32 @@ export const registerSchema = z
     schoolName: z.string().trim().max(80).optional(),
     website: z.string().max(200).optional(), // honeypot: real users never see this field
     acceptTerms: z.literal(true, { errorMap: () => ({ message: 'Please accept the terms to continue' }) }),
+    /** Students are minors: a parent or guardian must have agreed (declared by the student) */
+    guardianConsent: z.boolean().optional(),
   })
-  .refine((v) => v.role === 'STUDENT' || !!v.email, { path: ['email'], message: 'Email is required for parent and teacher accounts' });
+  .refine((v) => v.role === 'STUDENT' || !!v.email, { path: ['email'], message: 'Email is required for parent and teacher accounts' })
+  .refine((v) => v.role !== 'STUDENT' || v.guardianConsent === true, { path: ['guardianConsent'], message: 'A parent or guardian must agree before a student account is made' });
 
 export const loginSchema = z.object({ username: z.string().trim().min(1, 'Enter your username').max(24), password: z.string().min(1, 'Enter your password').max(72) });
 
 export const updateUserSchema = z.object({ displayName: displayName.optional(), preferredLanguage: language.optional() });
 export const changePasswordSchema = z.object({ currentPassword: z.string().min(1), newPassword: password });
 export const deleteAccountSchema = z.object({ password: z.string().min(1) });
+
+export const curriculumSchema = z.object({
+  board: z.string().trim().min(2).max(20),
+  session: z.string().trim().regex(/^\d{4}-\d{2}$/, 'Session looks like 2026-27'),
+  classLevel: z.coerce.number().int().min(1).max(12),
+  medium: z.enum(['HI', 'EN']),
+  stream: z.enum(['SCIENCE', 'COMMERCE', 'HUMANITIES']).nullable().optional(),
+  subjects: z.array(z.string().trim().min(1).max(80)).min(1, 'Choose at least one subject').max(15),
+});
+
+export const catalogSubjectsQuery = z.object({
+  board: z.string().trim().min(2).max(20),
+  session: z.string().trim().regex(/^\d{4}-\d{2}$/),
+  class: z.coerce.number().int().min(1).max(12),
+});
 
 export const updateStudentSchema = z.object({
   district: z.string().trim().max(40).nullable().optional(),
@@ -38,7 +56,11 @@ export const updateStudentSchema = z.object({
   onboardingDone: z.boolean().optional(),
 });
 
-export const linkSchema = z.object({ code: z.string().trim().min(6).max(6) });
+export const linkSchema = z.object({
+  code: z.string().trim().min(6).max(6),
+  /** A parent confirms, from their own account, that they agree to the child using the app */
+  guardianConsent: z.boolean().optional(),
+});
 export const idParam = z.object({ id: z.string().min(1).max(40) });
 export const studentIdParam = z.object({ studentId: z.string().min(1).max(40) });
 export const slugParam = z.object({ slug: z.string().min(1).max(80).regex(/^[a-z0-9-]+$/) });
@@ -60,6 +82,7 @@ export const createConversationSchema = z.object({
   title: z.string().trim().max(80).optional(),
   mode: z.enum(['TEXT', 'VOICE', 'PHOTO']).optional(),
   topicSlug: z.string().max(80).optional(),
+  subjectSlug: z.string().max(80).optional(),
 });
 
 export const askSchema = z.object({

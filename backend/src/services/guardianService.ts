@@ -14,11 +14,15 @@ async function profileId(userId: string, role: Role) {
 }
 
 export const guardianService = {
-  async link(userId: string, role: Role, code: string) {
+  async link(userId: string, role: Role, code: string, guardianConsent = false) {
     const pid = await profileId(userId, role);
     const student = await guardianRepository.studentByLinkCode(code.trim().toUpperCase());
     if (!student) throw badRequest('This code did not match any student. Check it and try again.');
     await guardianRepository.link(role, pid, student.id);
+    // Only a parent can confirm consent; a teacher link never counts as guardian consent
+    if (role === 'PARENT' && guardianConsent) {
+      await db.update(studentProfiles).set({ guardianConsentConfirmedAt: new Date() }).where(eq(studentProfiles.id, student.id));
+    }
     return { studentId: student.id, displayName: student.user.displayName };
   },
 

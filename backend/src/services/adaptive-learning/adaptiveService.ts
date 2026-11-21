@@ -3,6 +3,7 @@ import { db, type Executor } from '../../db/client';
 import { learningRepository } from '../../repositories/learningRepository';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
 import { gradeAnswer } from '../../utils/grading';
+import { studentCurriculumService } from '../curriculum/studentCurriculum';
 
 /** Weight of a correct answer by difficulty: harder questions move mastery further. */
 const SCORE_BY_DIFFICULTY: Record<number, number> = { 1: 0.6, 2: 0.8, 3: 1 };
@@ -139,7 +140,9 @@ export const adaptiveService = {
 
   /** Topics the student is struggling with, weakest first. */
   async weakTopics(studentId: string) {
-    const all = await learningRepository.allProgress(studentId);
+    const subjectIds = await studentCurriculumService.subjectIds(studentId);
+    const inScope = new Set((await curriculumRepository.allTopics(subjectIds)).map((t) => t.id));
+    const all = (await learningRepository.allProgress(studentId)).filter((p) => inScope.has(p.topicId));
     return all
       .filter((p) => p.attempts >= 2 && (p.mastery < 0.45 || p.correct / p.attempts < 0.5))
       .sort((a, b) => a.mastery - b.mastery)
@@ -153,7 +156,11 @@ export const adaptiveService = {
 
   /** Rebuilds the student's active recommendations from their current progress. */
   async recompute(studentId: string) {
-    const [progress, topics] = await Promise.all([learningRepository.allProgress(studentId), curriculumRepository.allTopics()]);
+    const subjectIds = await studentCurriculumService.subjectIds(studentId);
+    const [allProgress, topics] = await Promise.all([learningRepository.allProgress(studentId), curriculumRepository.allTopics(subjectIds)]);
+    // Only the current class's subjects: progress from an earlier class stays stored but is not recommended
+    const inScope = new Set(topics.map((t) => t.id));
+    const progress = allProgress.filter((p) => inScope.has(p.topicId));
     const byTopic = new Map(progress.map((p) => [p.topicId, p]));
     const recs: Array<{ topicId: string; kind: RecommendationKind; reasonHi: string; reasonEn: string; priority: number }> = [];
 
@@ -233,7 +240,7 @@ export const adaptiveService = {
       else {
         const recs = await learningRepository.activeRecommendations(studentId);
         const rec = recs.find((r) => r.kind !== 'REVIEW_LESSON') ?? recs[0];
-        topicId = rec?.topicId ?? (await curriculumRepository.allTopics())[0]?.id;
+        topicId = rec?.topicId ?? (await curriculumRepository.allTopics(await studentCurriculumService.subjectIds(studentId)))[0]?.id;
       }
     }
     if (!topicId) return null;

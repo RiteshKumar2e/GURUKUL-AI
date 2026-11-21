@@ -86,7 +86,12 @@ export default function ChapterDetail() {
           )}
 
           {q.data.topics.length === 0 ? (
-            <EmptyState title={tx('इस अध्याय में अभी विषय नहीं जोड़े गए', 'No topics have been added to this chapter yet')} />
+            <EmptyState
+              title={tx('इस अध्याय के पाठ अभी ऐप में नहीं हैं', 'This chapter has no lessons in the app yet')}
+              action={<ButtonLink to={`/app/tutor?q=${encodeURIComponent(`${q.data.nameEn}: `)}`}>{tx('इस अध्याय का सवाल ट्यूटर से पूछें', 'Ask the tutor about this chapter')}</ButtonLink>}
+            >
+              {tx('अध्याय का नाम NCERT की आधिकारिक पुस्तक से है। आप ट्यूटर से इस अध्याय का कोई भी सवाल पूछ सकते हैं।', 'The chapter title comes from the official NCERT book. You can ask the tutor any question about it.')}
+            </EmptyState>
           ) : (
             <ol className="space-y-3">
               {q.data.topics.map((t, i) => (

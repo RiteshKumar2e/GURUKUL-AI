@@ -17,8 +17,13 @@ const pw = 'Test@12345';
 async function register(role: 'STUDENT' | 'PARENT' | 'TEACHER', name: string) {
   const res = await request(app)
     .post('/api/auth/register')
-    .send({ role, username: `${prefix}_${name}`, displayName: `Test ${name}`, password: pw, email: role === 'STUDENT' ? undefined : `${prefix}_${name}@example.com`, preferredLanguage: 'HI', acceptTerms: true });
+    .send({ role, username: `${prefix}_${name}`, displayName: `Test ${name}`, password: pw, email: role === 'STUDENT' ? undefined : `${prefix}_${name}@example.com`, preferredLanguage: 'HI', acceptTerms: true, guardianConsent: true });
   expect(res.status).toBe(201);
+  if (role === 'STUDENT') {
+    // Class 9 compatibility: the original JAC Class 9 maths content (session 2025-26)
+    const cur = await request(app).put('/api/students/me/curriculum').set('Authorization', `Bearer ${res.body.accessToken}`).send({ board: 'JAC', session: '2025-26', classLevel: 9, medium: 'HI', subjects: ['class-9-maths'] });
+    expect(cur.status).toBe(200);
+  }
   return { token: res.body.accessToken as string, user: res.body.user, cookie: res.headers['set-cookie'] as unknown as string[] };
 }
 
@@ -47,11 +52,11 @@ describe('health', () => {
 
 describe('auth', () => {
   it('rejects duplicate usernames', async () => {
-    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_stu`, displayName: 'Dup', password: pw, acceptTerms: true });
+    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_stu`, displayName: 'Dup', password: pw, acceptTerms: true, guardianConsent: true });
     expect(res.status).toBe(409);
   });
   it('rejects the honeypot field', async () => {
-    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_bot`, displayName: 'Bot', password: pw, acceptTerms: true, website: 'http://spam' });
+    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_bot`, displayName: 'Bot', password: pw, acceptTerms: true, guardianConsent: true, website: 'http://spam' });
     expect(res.status).toBe(400);
   });
   it('validates input', async () => {
@@ -79,9 +84,11 @@ describe('auth', () => {
 
 describe('learning flow', () => {
   it('lists the curriculum publicly', async () => {
-    const res = await request(app).get('/api/curriculum');
+    const res = await request(app).get('/api/curriculum?board=JAC&session=2025-26&class=9');
     expect(res.status).toBe(200);
     expect(res.body.chapters.length).toBe(12);
+    // No class is assumed when none is asked for
+    expect((await request(app).get('/api/curriculum')).body.chapters).toHaveLength(0);
     expect(res.body.meta.curriculumVerification.status).toBeTruthy();
   });
 

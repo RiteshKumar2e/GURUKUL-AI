@@ -35,6 +35,11 @@ export default function Dashboard() {
       <header className="mb-7">
         <p className="text-ink-600">{greeting(tx)},</p>
         <h1 className="mt-0.5 text-[1.9rem] leading-tight sm:text-[2.3rem]">{user?.displayName}</h1>
+        {user?.student && (
+          <Link to="/app/class" className="mt-1 inline-flex min-h-[44px] items-center text-sm font-semibold text-ink-700">
+            {tx('कक्षा', 'Class')} {user.student.classLevel} · {user.student.board}
+          </Link>
+        )}
         <span className="mt-2 block h-1.5 w-14 rounded-full bg-saffron-400" aria-hidden />
       </header>
 

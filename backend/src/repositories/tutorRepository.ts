@@ -33,7 +33,7 @@ export const tutorRepository = {
     return rows.map((r) => ({ ...r, _count: { messages: byId.get(r.id) ?? 0 } }));
   },
 
-  create: async (studentId: string, data: { title: string; mode: ConversationMode; topicId?: string | null }) =>
+  create: async (studentId: string, data: { title: string; mode: ConversationMode; topicId?: string | null; subjectId?: string | null }) =>
     (await db.insert(tutorConversations).values({ studentId, ...data }).returning())[0],
 
   findOwned: async (studentId: string, id: string) =>

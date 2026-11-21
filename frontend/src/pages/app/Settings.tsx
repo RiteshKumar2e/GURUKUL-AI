@@ -106,6 +106,19 @@ export default function Settings() {
     <>
       <PageHeader title={tx('सेटिंग्स', 'Settings')} />
 
+      {user?.role === 'STUDENT' && (
+        <Section title={tx('कक्षा और विषय', 'Class and subjects')}>
+          <div className="panel flex flex-wrap items-center justify-between gap-3 p-4">
+            <p>
+              {user.student ? `${tx('कक्षा', 'Class')} ${user.student.classLevel} · ${user.student.board}` : tx('अभी नहीं चुना', 'Not chosen yet')}
+            </p>
+            <Link to="/app/class" className="inline-flex min-h-[44px] items-center font-semibold">
+              {tx('कक्षा, बोर्ड या विषय बदलें', 'Change class, board or subjects')}
+            </Link>
+          </div>
+        </Section>
+      )}
+
       <Section title={tx('प्रोफ़ाइल', 'Profile')}>
         <form
           className="panel space-y-4 p-4"

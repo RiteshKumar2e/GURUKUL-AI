@@ -20,7 +20,7 @@ export const healthController = {
 };
 
 export const guardianController = {
-  link: async (req: Request, res: Response) => res.status(201).json(await guardianService.link(req.user!.id, req.user!.role, req.body.code)),
+  link: async (req: Request, res: Response) => res.status(201).json(await guardianService.link(req.user!.id, req.user!.role, req.body.code, req.body.guardianConsent === true)),
   students: async (req: Request, res: Response) => res.json(await guardianService.students(req.user!.id, req.user!.role)),
   report: async (req: Request, res: Response) => res.json(await guardianService.report(req.user!.id, req.user!.role, req.params.studentId)),
   unlink: async (req: Request, res: Response) => {

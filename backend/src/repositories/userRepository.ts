@@ -51,6 +51,7 @@ export const userRepository = {
     preferredLanguage: Language;
     linkCode?: string;
     schoolName?: string | null;
+    guardianConsentDeclaredAt?: Date | null;
   }): Promise<PublicUser> {
     const id = await db.transaction(async (tx) => {
       const [u] = await tx
@@ -64,7 +65,7 @@ export const userRepository = {
           preferredLanguage: data.preferredLanguage,
         })
         .returning({ id: users.id });
-      if (data.role === 'STUDENT') await tx.insert(studentProfiles).values({ userId: u.id, linkCode: data.linkCode! });
+      if (data.role === 'STUDENT') await tx.insert(studentProfiles).values({ userId: u.id, linkCode: data.linkCode!, guardianConsentDeclaredAt: data.guardianConsentDeclaredAt ?? null });
       if (data.role === 'PARENT') await tx.insert(parentProfiles).values({ userId: u.id });
       if (data.role === 'TEACHER') await tx.insert(teacherProfiles).values({ userId: u.id, schoolName: data.schoolName ?? null });
       return u.id;

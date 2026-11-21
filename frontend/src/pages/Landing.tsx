@@ -6,7 +6,7 @@ import { useLang } from '@/context/LanguageContext';
 import { homePathFor, useAuth } from '@/context/AuthContext';
 import { useDocumentTitle } from '@/hooks';
 import { ButtonLink } from '@/components/ui';
-import { CHAPTERS } from '@/lib/constants';
+import { STAGES } from '@/lib/constants';
 
 const CONTACT = (import.meta.env.VITE_CONTACT_EMAIL as string | undefined)?.trim();
 
@@ -116,10 +116,10 @@ export default function Landing() {
   const { tx, lang } = useLang();
   const { user } = useAuth();
   useDocumentTitle(
-    tx('कक्षा 9 गणित, हिंदी में', 'Class 9 maths, in Hindi'),
+    tx('कक्षा 1–12, अपनी भाषा में', 'Classes 1–12, in your language'),
     tx(
-      'GURUKUL AI झारखंड (JAC) के कक्षा 9 के विद्यार्थियों के लिए हिंदी में गणित सीखने का साथी है। पहले संकेत, फिर हल। बोलकर, लिखकर या फ़ोटो से पूछिए।',
-      'GURUKUL AI is a Hindi-first maths companion for JAC Class 9 students in Jharkhand. Hints before answers. Ask by voice, typing or photo.',
+      'GURUKUL AI कक्षा 1 से 12 के विद्यार्थियों के लिए हिंदी-प्रथम AI ट्यूटर है। पहले संकेत, फिर हल। बोलकर, लिखकर या फ़ोटो से पूछिए।',
+      'GURUKUL AI is a Hindi-first AI tutor for students in Classes 1 to 12. Hints before answers. Ask by voice, typing or photo.',
     ),
   );
   const cta = user ? homePathFor(user) : '/register';
@@ -177,23 +177,23 @@ export default function Landing() {
         <div className="container-page grid gap-10 py-10 md:grid-cols-[1.1fr_1fr] md:gap-12 md:py-16">
           <div className="flex flex-col">
             <p className="eyebrow">
-              <span className="inline-block rounded-full border-2 border-ink-950 bg-white px-3 py-1 text-ink-950">{tx('JAC · कक्षा 9 · गणित', 'JAC · Class 9 · Maths')}</span>
+              <span className="inline-block rounded-full border-2 border-ink-950 bg-white px-3 py-1 text-ink-950">{tx('कक्षा 1–12 · JAC · CBSE', 'Classes 1–12 · JAC · CBSE')}</span>
             </p>
             <h1 className={`mt-6 ${hi ? 'text-[2.1rem] leading-[1.35] sm:text-[2.75rem]' : 'text-[2.1rem] leading-[1.15] sm:text-[2.85rem]'}`}>
               {hi ? (
                 <>
-                  गणित का हर सवाल, <span className="mark">अपनी भाषा</span> में समझिए।
+                  पढ़ाई का हर सवाल, <span className="mark">अपनी भाषा</span> में समझिए।
                 </>
               ) : (
                 <>
-                  Understand every maths question in <span className="mark">your own language.</span>
+                  Understand every study question in <span className="mark">your own language.</span>
                 </>
               )}
             </h1>
             <p className="mt-5 max-w-lg text-[1.08rem] text-ink-800">
               {tx(
-                'कक्षा 9 के विद्यार्थियों के लिए हिंदी में गणित का ट्यूटर। उत्तर बताने से पहले संकेत देता है, कदम-दर-कदम समझाता है, और कमज़ोर नेटवर्क पर भी पढ़ाई रुकने नहीं देता।',
-                'A Hindi maths tutor for Class 9. It gives hints before answers, explains step by step, and keeps working on a weak network.',
+                'कक्षा 1 से 12 के लिए हिंदी-प्रथम ट्यूटर, जो आपकी कक्षा और विषय के हिसाब से समझाता है। उत्तर से पहले संकेत देता है, कदम-दर-कदम सिखाता है, और कमज़ोर नेटवर्क पर भी पढ़ाई रुकने नहीं देता।',
+                'A Hindi-first tutor for Classes 1 to 12 that teaches at your class and subject level. It gives hints before answers, explains step by step, and keeps working on a weak network.',
               )}
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -270,11 +270,11 @@ export default function Landing() {
       <section className="dots">
         <div className="container-page py-14 md:py-20">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
-            <SectionHead label={tx('पाठ्यक्रम', 'Curriculum')} title={tx('कक्षा 9 गणित के 12 अध्याय', 'All 12 chapters of Class 9 maths')}>
+            <SectionHead label={tx('पाठ्यक्रम', 'Curriculum')} title={tx('कक्षा 1 से 12 तक', 'Classes 1 to 12')}>
               <p>
                 {tx(
-                  'हर अध्याय में छोटे पाठ, हल किए उदाहरण, तीन स्तर के अभ्यास प्रश्न और अध्याय परीक्षा। सामग्री इस परियोजना के लिए नए सिरे से लिखी गई है; अध्यायों का क्रम NCERT कक्षा 9 (संशोधित) पुस्तक पर आधारित है, जिसे JAC अपनाता है।',
-                  'Each chapter has short lessons, worked examples, practice at three levels and a chapter quiz. Content is written fresh for this project; the chapter order follows the rationalised NCERT Class 9 book that JAC uses.',
+                  'अपनी कक्षा, बोर्ड और विषय चुनिए। विषय और पुस्तकें NCERT की आधिकारिक सूची (2026-27) से हैं। पूरे पाठ, अभ्यास और क्विज़ अभी कक्षा 9 गणित (नमूना सामग्री) में हैं; बाकी कक्षाओं में आधिकारिक अध्याय/पुस्तक जानकारी और AI ट्यूटर उपलब्ध है।',
+                  'Pick your class, board and subjects. Subjects and books come from NCERT’s official list (2026-27). Full lessons, practice and quizzes exist today for Class 9 maths (sample content); other classes get the official chapter or book details and the AI tutor.',
                 )}
               </p>
             </SectionHead>
@@ -282,11 +282,12 @@ export default function Landing() {
               {tx('स्रोत और सत्यापन देखें', 'See sources and verification')}
             </Link>
           </div>
-          <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {CHAPTERS.map((c) => (
-              <li key={c.n} className="flex min-h-[60px] items-center gap-3 rounded-md border-2 border-ink-950 bg-white px-3 py-2.5">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-ink-900 text-sm font-bold tabular-nums text-white">{c.n}</span>
-                <span className="font-semibold text-ink-950">{tx(c.hi, c.en)}</span>
+          <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {STAGES.map((s) => (
+              <li key={s.range} className="flex flex-col gap-2 rounded-md border-2 border-ink-950 bg-white px-4 py-4">
+                <span className="font-display text-2xl font-extrabold tabular-nums text-ink-950">{s.range}</span>
+                <span className="font-semibold text-ink-950">{tx(s.hi, s.en)}</span>
+                <span className="text-sm text-ink-700">{tx(s.dhi, s.den)}</span>
               </li>
             ))}
           </ol>

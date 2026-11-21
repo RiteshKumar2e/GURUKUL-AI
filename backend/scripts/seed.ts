@@ -1,9 +1,14 @@
 /**
- * Seeds editable curriculum content from backend/content/class9-maths.json.
+ * Seeds curriculum data:
+ *  - backend/content/curriculum-catalog.json: subjects, official NCERT books and (where read from
+ *    the book) chapter titles for Classes 1-12, for each available board, session 2026-27;
+ *  - backend/content/class9-maths.json: the original Class 9 maths lessons and questions
+ *    (JAC, session 2025-26).
  *
  *   npm run db:seed
  *
- * Safe to re-run: content is upserted by slug. It creates no user accounts and never touches
+ * Run `npm run db:migrate` first (it creates the boards, sessions and classes).
+ * Safe to re-run: everything is upserted by slug. It creates no user accounts and never touches
  * users' data.
  */
 import 'dotenv/config';
@@ -12,8 +17,10 @@ import path from 'path';
 import { eq, sql } from 'drizzle-orm';
 import { db, closeDatabase, checkDatabase } from '../src/db/client';
 import {
+  academicSessions,
   assessmentQuestions,
   assessments,
+  boards,
   chapters,
   lessons,
   questions,
@@ -58,18 +65,25 @@ interface ContentFile {
   }>;
 }
 
-const excluded = (cols: string[]) => Object.fromEntries(cols.map((c) => [c, sql.raw(`excluded.${c.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase())}`)]));
+const excluded = (cols: string[]) => Object.fromEntries(cols.map((c) => [c, sql.raw(`excluded."${c.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase())}"`)]));
 
 async function seedContent() {
   const file = path.resolve(__dirname, '../content/class9-maths.json');
   const content = JSON.parse(fs.readFileSync(file, 'utf8')) as ContentFile;
   const sourceNote = content.meta.curriculumVerification.note;
 
-  const [subject] = await db
-    .insert(subjects)
-    .values({ ...content.subject, sourceNote })
-    .onConflictDoUpdate({ target: subjects.slug, set: { ...content.subject, sourceNote } })
-    .returning();
+  // Earlier NCERT book (12 chapters), so it belongs to session 2025-26; JAC was the original target
+  const legacy = {
+    ...content.subject,
+    sourceNote,
+    boardId: 'board_jac',
+    sessionId: 'session_2025_26',
+    subjectKey: 'mathematics',
+    verification: 'PARTIAL' as const,
+    sourceUrl: 'http://jcert.jharkhand.gov.in/public/assets/Guideline/20220808163146_62f0ed1aa7bbf.pdf',
+    chapterCount: content.chapters.length,
+  };
+  const [subject] = await db.insert(subjects).values(legacy).onConflictDoUpdate({ target: subjects.slug, set: legacy }).returning();
 
   let lessonCount = 0;
   let questionCount = 0;
@@ -139,10 +153,93 @@ async function seedContent() {
   console.log(`Content: ${content.chapters.length} chapters, ${lessonCount} lessons, ${questionCount} questions`);
 }
 
+interface Catalog {
+  meta: { session: string; sources: Record<string, string> };
+  classes: Record<
+    string,
+    Array<{
+      key: string;
+      nameEn: string;
+      nameHi: string;
+      order: number;
+      books: Array<{ title: string; code: string; medium: string; chapters: number }>;
+      chapters: Array<{ number: number; titleEn: string }> | null;
+      chapterSource?: string[];
+    }>
+  >;
+}
+
+/** Subjects (and maths chapter titles) for Classes 1-12 from the official NCERT textbook list. */
+async function seedCatalog() {
+  const catalog = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../content/curriculum-catalog.json'), 'utf8')) as Catalog;
+  const session = await db.query.academicSessions.findFirst({ where: eq(academicSessions.code, catalog.meta.session) });
+  if (!session) throw new Error(`Session ${catalog.meta.session} is missing. Run \`npm run db:migrate\` first.`);
+  const available = (await db.select().from(boards)).filter((b) => b.status !== 'NOT_AVAILABLE');
+
+  let subjectCount = 0;
+  let chapterCount = 0;
+  for (const board of available) {
+    for (const [cls, list] of Object.entries(catalog.classes)) {
+      const classLevel = Number(cls);
+      const rows = list.map((sub) => ({
+        slug: `${board.code.toLowerCase()}-${session.code}-c${classLevel}-${sub.key}`,
+        nameHi: sub.nameHi,
+        nameEn: sub.nameEn,
+        classLevel,
+        board: board.code,
+        boardId: board.id,
+        sessionId: session.id,
+        subjectKey: sub.key,
+        // Subjects come from NCERT's official list; how far that matches the board is the board's status
+        verification: board.status,
+        sourceUrl: 'https://ncert.nic.in/textbook.php',
+        sourceNote: catalog.meta.sources.subjectsAndBooks,
+        books: sub.books,
+        chapterCount: sub.chapters?.length ?? sub.books.find((b) => b.medium === 'EN')?.chapters ?? sub.books[0]?.chapters ?? null,
+        order: sub.order,
+      }));
+      if (!rows.length) continue;
+      const saved = await db
+        .insert(subjects)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: subjects.slug,
+          set: excluded(['nameHi', 'nameEn', 'classLevel', 'board', 'boardId', 'sessionId', 'subjectKey', 'verification', 'sourceUrl', 'sourceNote', 'books', 'chapterCount', 'order']),
+        })
+        .returning({ id: subjects.id, slug: subjects.slug });
+      subjectCount += saved.length;
+      const idBySlug = new Map(saved.map((r) => [r.slug, r.id]));
+
+      for (const sub of list) {
+        if (!sub.chapters?.length) continue;
+        const subjectSlug = `${board.code.toLowerCase()}-${session.code}-c${classLevel}-${sub.key}`;
+        const chapterRows = sub.chapters.map((c) => ({
+          subjectId: idBySlug.get(subjectSlug)!,
+          slug: `${subjectSlug}-ch${c.number}`,
+          number: c.number,
+          // Official English title from the NCERT book; no Hindi title was read, so it is not invented
+          nameEn: c.titleEn,
+          nameHi: c.titleEn,
+          summaryHi: '',
+          summaryEn: '',
+          source: 'VERIFIED_PUBLIC' as const,
+        }));
+        await db
+          .insert(chapters)
+          .values(chapterRows)
+          .onConflictDoUpdate({ target: chapters.slug, set: excluded(['number', 'nameEn', 'nameHi', 'source']) });
+        chapterCount += chapterRows.length;
+      }
+    }
+  }
+  console.log(`Catalog: ${subjectCount} subjects and ${chapterCount} chapter titles for ${available.map((b) => b.code).join(', ')} (${session.code})`);
+}
+
 async function main() {
   const health = await checkDatabase();
   if (!health.ok) throw new Error(`Database not reachable (${health.location}): ${health.error}`);
   if (!health.migrated) throw new Error('Tables are missing. Run `npm run db:migrate` first.');
+  await seedCatalog();
   await seedContent();
 }
 

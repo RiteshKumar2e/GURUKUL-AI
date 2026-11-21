@@ -45,6 +45,12 @@ export default function About() {
                 'The chapter list follows the rationalised NCERT Class 9 Mathematics book (12 chapters). The official JCERT Jharkhand reduced syllabus for 2021-22 lists Class 9 maths by the NCERT book’s chapter numbers, which indicates JAC follows that book. We could not read the official syllabus for the current session, so we do not claim full alignment with the current JAC syllabus.',
               )}
             </p>
+            <p className="mt-2 text-ink-800">
+              {tx(
+                'कक्षा 1 से 12 के विषय और पुस्तकें NCERT की आधिकारिक पुस्तक सूची (ncert.nic.in, सत्र 2026-27, 21 नवंबर 2026 को पढ़ी गई) से हैं। गणित के अध्यायों के नाम वहीं से लिए गए हैं जहाँ वे पुस्तक की विषय-सूची में पढ़े जा सके। हर बोर्ड के साथ उसकी जाँच की स्थिति दिखाई जाती है; ICSE का पाठ्यक्रम अभी उपलब्ध नहीं है।',
+                'Subjects and books for Classes 1 to 12 come from NCERT’s official textbook list (ncert.nic.in, session 2026-27, read on 21 November 2026). Maths chapter titles are included only where they could be read from the book’s contents page. Each board shows how far it has been verified; the ICSE curriculum is not available yet.',
+              )}
+            </p>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
               {meta.data.curriculumVerification.sources.map((s) => (
                 <li key={s} className="break-all">

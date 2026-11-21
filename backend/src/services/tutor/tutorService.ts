@@ -11,6 +11,8 @@ import { getLlmProvider } from '../voice/registry';
 import { systemPrompt, userTurn, type TutorIntent, type TutorLanguage } from './prompts';
 import { calculatorFromText, verifyCheck, type CheckSpec } from './verifier';
 import { adaptiveService } from '../adaptive-learning/adaptiveService';
+import { stageOf, studentCurriculumService } from '../curriculum/studentCurriculum';
+import { subjects as subjectsTable } from '../../db/schema';
 
 const nullableText = z.string().nullable().optional().catch(null);
 
@@ -190,14 +192,22 @@ function demoReply(content: string, language: TutorLanguage, intent: TutorIntent
 export const tutorService = {
   list: (studentId: string) => tutorRepository.list(studentId),
 
-  async create(studentId: string, input: { title?: string; mode?: ConversationMode; topicSlug?: string }) {
+  async create(studentId: string, input: { title?: string; mode?: ConversationMode; topicSlug?: string; subjectSlug?: string }) {
     let topicId: string | null = null;
+    let subjectId: string | null = null;
     if (input.topicSlug) {
       const topic = await curriculumRepository.topicBySlug(input.topicSlug);
       if (!topic) throw notFound('Topic not found.');
       topicId = topic.id;
     }
-    return tutorRepository.create(studentId, { title: input.title?.slice(0, 80) || 'नया सवाल', mode: input.mode ?? 'TEXT', topicId });
+    if (input.subjectSlug) {
+      // Only a subject the student actually studies, so class, board and subject stay consistent
+      const mine = await studentCurriculumService.subjectIds(studentId);
+      const subject = await db.query.subjects.findFirst({ where: eq(subjectsTable.slug, input.subjectSlug), columns: { id: true } });
+      if (!subject || !mine.includes(subject.id)) throw badRequest('Choose one of your own subjects.');
+      subjectId = subject.id;
+    }
+    return tutorRepository.create(studentId, { title: input.title?.slice(0, 80) || 'नया सवाल', mode: input.mode ?? 'TEXT', topicId, subjectId });
   },
 
   async get(studentId: string, id: string) {
@@ -218,7 +228,17 @@ export const tutorService = {
     if (!content) throw badRequest('Please type a question.');
 
     const student = await db.query.studentProfiles.findFirst({ where: eq(studentProfiles.id, studentId), with: { user: { columns: { preferredLanguage: true } } } });
-    const language: TutorLanguage = input.language ?? student?.user.preferredLanguage ?? 'HI';
+    const curriculum = await studentCurriculumService.active(studentId);
+    const language: TutorLanguage = input.language ?? curriculum?.medium ?? student?.user.preferredLanguage ?? 'HI';
+    const classLevel = curriculum?.classLevel ?? student?.classLevel ?? 9;
+    const conversationSubject = conversation.subjectId ? curriculum?.subjects.find((s) => s.id === conversation.subjectId) : undefined;
+    const learner = {
+      classLevel,
+      stage: stageOf(classLevel),
+      board: curriculum?.board.code ?? student?.board ?? null,
+      subjects: curriculum?.subjects.map((s) => s.nameEn),
+      subject: conversationSubject?.nameEn ?? null,
+    };
     const topic = conversation.topicId ? await curriculumRepository.topicById(conversation.topicId) : null;
 
     const userMsg = await tutorRepository.addMessage({ conversationId, role: 'USER', content });
@@ -243,6 +263,7 @@ export const tutorService = {
           role: 'system',
           content: systemPrompt({
             language,
+            learner,
             level: student?.teachingLevel ?? 'STANDARD',
             voice: conversation.mode === 'VOICE',
             topicContext: topic ? lessonContext(topic.lessons[0], topic.titleEn) : undefined,

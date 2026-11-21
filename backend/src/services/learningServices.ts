@@ -4,6 +4,7 @@ import { learningRepository } from '../repositories/learningRepository';
 import { adaptiveService } from './adaptive-learning/adaptiveService';
 import { badRequest, forbidden, notFound } from '../utils/errors';
 import { contentMeta } from '../utils/contentMeta';
+import { catalogService, studentCurriculumService } from './curriculum/studentCurriculum';
 
 type Option = { id: string; hi: string; en: string };
 
@@ -29,15 +30,39 @@ function feedback(q: Question, isCorrect: boolean) {
 /* ---------------------------------- curriculum ---------------------------------- */
 
 export const curriculumService = {
-  async overview(studentId?: string) {
-    const [subjects, progress] = await Promise.all([
-      curriculumRepository.subjects(),
+  /**
+   * The student's own subjects and their chapters. Without a signed-in student, a class can be
+   * asked for with ?board=&session=&class=; with neither, the lists are empty (no class is assumed).
+   */
+  async overview(studentId?: string, query: { board?: string; session?: string; classLevel?: number } = {}) {
+    let selection: Awaited<ReturnType<typeof studentCurriculumService.active>> = null;
+    let subjectList: Array<{ id: string; slug: string; nameHi: string; nameEn: string; classLevel: number; subjectKey: string | null; verification: string | null; chapterCount: number | null; books: unknown }> = [];
+    if (studentId) {
+      selection = await studentCurriculumService.active(studentId);
+      subjectList = selection?.subjects ?? [];
+    } else if (query.board && query.session && query.classLevel) {
+      subjectList = (await catalogService.subjects(query.board, query.session, query.classLevel)).subjects;
+    }
+    const subjectIds = subjectList.map((s) => s.id);
+    const [chapters, progress] = await Promise.all([
+      curriculumRepository.chapters(subjectIds),
       studentId ? learningRepository.allProgress(studentId) : Promise.resolve([]),
     ]);
-    const chapters = await curriculumRepository.chapters();
     const progressByTopic = new Map(progress.map((p) => [p.topicId, p]));
     return {
-      subjects: subjects.map((s) => ({ id: s.id, slug: s.slug, nameHi: s.nameHi, nameEn: s.nameEn, classLevel: s.classLevel, board: s.board })),
+      selection: selection && { board: selection.board, session: selection.session, classLevel: selection.classLevel, stage: selection.stage, medium: selection.medium, stream: selection.stream },
+      subjects: subjectList.map((s) => ({
+        id: s.id,
+        slug: s.slug,
+        nameHi: s.nameHi,
+        nameEn: s.nameEn,
+        classLevel: s.classLevel,
+        board: selection?.board.code ?? query.board ?? null,
+        subjectKey: s.subjectKey,
+        verification: s.verification,
+        chapterCount: s.chapterCount,
+        books: s.books,
+      })),
       chapters: chapters.map((c) => {
         const tp = c.topics.map((t) => progressByTopic.get(t.id));
         const started = tp.filter(Boolean);
@@ -50,6 +75,7 @@ export const curriculumService = {
           summaryHi: c.summaryHi,
           summaryEn: c.summaryEn,
           source: c.source,
+          subjectSlug: c.subject.slug,
           topicCount: c.topics.length,
           questionCount: c.topics.reduce((n, t) => n + t._count.questions, 0),
           hasAssessment: c.assessments.length > 0,
@@ -207,8 +233,10 @@ export const practiceService = {
 /* ---------------------------------- assessments --------------------------------- */
 
 export const assessmentService = {
-  async list() {
-    const rows = await curriculumRepository.assessments();
+  /** Quizzes for the student's subjects (all quizzes when no student is given). */
+  async list(studentId?: string) {
+    const ids = studentId ? await studentCurriculumService.subjectIds(studentId) : undefined;
+    const rows = await curriculumRepository.assessments(ids);
     return rows.map((a) => ({ slug: a.slug, titleHi: a.titleHi, titleEn: a.titleEn, durationMinutes: a.durationMinutes, questionCount: a._count.questions, chapter: a.chapter }));
   },
 

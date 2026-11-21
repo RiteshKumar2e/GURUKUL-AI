@@ -6,6 +6,13 @@ import { progressService } from '../services/progressService';
 import { studentService } from '../services/studentService';
 import { learningRepository } from '../repositories/learningRepository';
 import { syncService } from '../services/sync/syncService';
+import { catalogService, studentCurriculumService } from '../services/curriculum/studentCurriculum';
+
+const classQuery = (req: Request) => ({
+  board: typeof req.query.board === 'string' ? req.query.board : undefined,
+  session: typeof req.query.session === 'string' ? req.query.session : undefined,
+  classLevel: req.query.class ? Number(req.query.class) || undefined : undefined,
+});
 
 const optionalStudent = (req: Request) => (req.user?.role === 'STUDENT' ? req.user.studentId : undefined);
 
@@ -14,11 +21,24 @@ export const studentController = {
   update: async (req: Request, res: Response) => res.json(await studentService.update(studentId(req), req.body)),
   dashboard: async (req: Request, res: Response) => res.json(await studentService.dashboard(studentId(req))),
   rotateCode: async (req: Request, res: Response) => res.json(await studentService.rotateLinkCode(studentId(req))),
+  curriculum: async (req: Request, res: Response) => res.json({ curriculum: await studentCurriculumService.active(studentId(req)) }),
+  curriculumHistory: async (req: Request, res: Response) => res.json(await studentCurriculumService.history(studentId(req))),
+  setCurriculum: async (req: Request, res: Response) => {
+    const sid = studentId(req);
+    const curriculum = await studentCurriculumService.set(sid, req.body);
+    await adaptiveService.recompute(sid);
+    res.json({ curriculum });
+  },
+};
+
+export const catalogController = {
+  options: async (_req: Request, res: Response) => res.json(await catalogService.options()),
+  subjects: async (req: Request, res: Response) => res.json(await catalogService.subjects(String(req.query.board), String(req.query.session), Number(req.query.class))),
 };
 
 export const curriculumController = {
-  overview: async (req: Request, res: Response) => res.json(await curriculumService.overview(optionalStudent(req))),
-  chapters: async (req: Request, res: Response) => res.json((await curriculumService.overview(optionalStudent(req))).chapters),
+  overview: async (req: Request, res: Response) => res.json(await curriculumService.overview(optionalStudent(req), classQuery(req))),
+  chapters: async (req: Request, res: Response) => res.json((await curriculumService.overview(optionalStudent(req), classQuery(req))).chapters),
   chapter: async (req: Request, res: Response) => res.json(await curriculumService.chapter(req.params.slug, optionalStudent(req))),
   offlinePack: async (req: Request, res: Response) => res.json(await curriculumService.offlinePack(req.params.slug)),
   topic: async (req: Request, res: Response) => res.json(await curriculumService.topic(req.params.slug, optionalStudent(req))),
@@ -33,7 +53,7 @@ export const practiceController = {
 };
 
 export const assessmentController = {
-  list: async (_req: Request, res: Response) => res.json(await assessmentService.list()),
+  list: async (req: Request, res: Response) => res.json(await assessmentService.list(optionalStudent(req))),
   get: async (req: Request, res: Response) => res.json(await assessmentService.get(req.params.slug)),
   start: async (req: Request, res: Response) => res.status(201).json(await assessmentService.start(studentId(req), req.params.slug)),
   submit: async (req: Request, res: Response) => res.json(await assessmentService.submit(studentId(req), req.params.id, req.body.answers)),

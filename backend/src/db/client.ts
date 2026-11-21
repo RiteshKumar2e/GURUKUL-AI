@@ -105,6 +105,8 @@ export interface DbHealth {
   latencyMs?: number;
   migrated?: boolean;
   foreignKeys?: boolean;
+  /** Subjects in the Classes 1-12 catalogue; 0 means `npm run db:seed` has not been run */
+  catalogSubjects?: number;
   error?: string;
 }
 
@@ -117,7 +119,14 @@ export async function checkDatabase(): Promise<DbHealth> {
     const latencyMs = Date.now() - started;
     const migratedRow = await db.get<{ n: number }>(sql`select count(*) as n from sqlite_master where type = 'table' and name = 'users'`);
     const fk = await db.get<{ foreign_keys: number }>(sql`pragma foreign_keys`);
-    return { ...base, ok: true, latencyMs, migrated: Number(migratedRow?.n ?? 0) > 0, foreignKeys: Number(fk?.foreign_keys ?? 0) === 1 };
+    let catalogSubjects: number | undefined;
+    try {
+      const c = await db.get<{ n: number }>(sql`select count(*) as n from subjects where board_id is not null`);
+      catalogSubjects = Number(c?.n ?? 0);
+    } catch {
+      /* before migration 0001 */
+    }
+    return { ...base, ok: true, latencyMs, migrated: Number(migratedRow?.n ?? 0) > 0, foreignKeys: Number(fk?.foreign_keys ?? 0) === 1, catalogSubjects };
   } catch (err) {
     const info = dbErrorInfo(err);
     // Message only: driver errors can echo the URL, but never the auth token
@@ -139,6 +148,7 @@ export async function initDatabase(): Promise<DbHealth> {
   const health = await checkDatabase();
   if (!health.ok) console.error(`[db] cannot reach the database (${health.location}): ${health.error}`);
   else if (!health.migrated) console.error('[db] connected, but tables are missing. Run `npm run db:migrate`.');
+  else if (!health.catalogSubjects || health.catalogSubjects < 10) console.error('[db] the Classes 1-12 catalogue is empty. Run `npm run db:seed` so students can choose their subjects.');
   else console.log(`[db] connected (${health.location}, ${health.latencyMs} ms, foreign keys ${health.foreignKeys ? 'on' : 'OFF'})`);
   return health;
 }

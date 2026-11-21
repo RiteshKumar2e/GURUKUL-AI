@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { api } from '@/services/api';
 import { syncManager, type SyncState } from '@/lib/sync';
-import type { Health } from '@/types/api';
+import type { CurriculumOverview, Health } from '@/types/api';
 
 const APP = (import.meta.env.VITE_APP_NAME as string) || 'GURUKUL AI';
 
@@ -38,6 +38,11 @@ export function useSyncState() {
     };
   }, []);
   return state;
+}
+
+/** The student's class, board, subjects and chapters. */
+export function useCurriculum() {
+  return useQuery({ queryKey: ['curriculum'], queryFn: () => api<CurriculumOverview>('/curriculum') });
 }
 
 /** Whether the server has a live AI provider or is in demo mode. */

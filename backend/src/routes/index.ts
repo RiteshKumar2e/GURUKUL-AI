@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authRouter, usersRouter } from './auth.routes';
 import { parentsRouter, studentsRouter } from './people.routes';
-import { chaptersRouter, curriculumRouter, topicsRouter } from './curriculum.routes';
+import { catalogRouter, chaptersRouter, curriculumRouter, topicsRouter } from './curriculum.routes';
 import { adaptiveRouter, assessmentsRouter, practiceRouter, progressRouter, syncRouter } from './learning.routes';
 import { tutorRouter, visionRouter, voiceRouter } from './ai.routes';
 import { analyticsController, healthController } from '../controllers/miscController';
@@ -16,6 +16,7 @@ api.use('/users', usersRouter);
 api.use('/students', studentsRouter);
 api.use('/parents', parentsRouter);
 api.use('/curriculum', curriculumRouter);
+api.use('/catalog', catalogRouter);
 api.use('/chapters', chaptersRouter);
 api.use('/topics', topicsRouter);
 api.use('/tutor', tutorRouter);

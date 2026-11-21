@@ -39,6 +39,8 @@ export interface ChapterSummary {
   summaryHi: string;
   summaryEn: string;
   source: 'ORIGINAL_SAMPLE' | 'VERIFIED_PUBLIC';
+  /** Subject this chapter belongs to */
+  subjectSlug?: string;
   topicCount: number;
   questionCount: number;
   hasAssessment: boolean;
@@ -54,8 +56,53 @@ export interface ContentMeta {
   contentLicence: string;
 }
 
+export type Verification = 'VERIFIED' | 'PARTIAL' | 'UNVERIFIED' | 'NOT_AVAILABLE';
+export type SchoolStage = 'PRIMARY' | 'MIDDLE' | 'SECONDARY' | 'SENIOR_SECONDARY';
+export type Stream = 'SCIENCE' | 'COMMERCE' | 'HUMANITIES';
+export interface Book {
+  title: string;
+  code: string;
+  medium: string;
+  chapters: number;
+}
+
+export interface CatalogOptions {
+  boards: Array<{ code: string; nameHi: string; nameEn: string; state: string | null; basis: string | null; status: Verification; noteHi: string | null; noteEn: string | null; sourceUrl: string | null; available: boolean }>;
+  sessions: Array<{ code: string; isCurrent: boolean; noteHi: string | null; noteEn: string | null }>;
+  classes: Array<{ level: number; stage: SchoolStage; nameHi: string; nameEn: string }>;
+  streams: Record<Stream, string[]>;
+}
+
+export interface CatalogSubject {
+  id: string;
+  slug: string;
+  nameHi: string;
+  nameEn: string;
+  classLevel: number;
+  subjectKey: string | null;
+  verification: Verification | null;
+  sourceUrl: string | null;
+  books: Book[] | null;
+  chapterCount: number | null;
+  chaptersListed: number;
+  hasLessons: boolean;
+}
+
+export interface StudentCurriculum {
+  id: string;
+  board: { code: string; nameHi: string; nameEn: string; status: Verification };
+  session: { code: string; isCurrent: boolean };
+  classLevel: number;
+  stage: SchoolStage;
+  medium: Lang;
+  stream: Stream | null;
+  startedAt: string;
+  subjects: Array<Omit<CatalogSubject, 'chaptersListed' | 'hasLessons'>>;
+}
+
 export interface CurriculumOverview {
-  subjects: Array<{ id: string; slug: string; nameHi: string; nameEn: string; classLevel: number; board: string }>;
+  selection: { board: StudentCurriculum['board']; session: StudentCurriculum['session']; classLevel: number; stage: SchoolStage; medium: Lang; stream: Stream | null } | null;
+  subjects: Array<{ id: string; slug: string; nameHi: string; nameEn: string; classLevel: number; board: string | null; subjectKey: string | null; verification: Verification | null; chapterCount: number | null; books: Book[] | null }>;
   chapters: ChapterSummary[];
   meta: ContentMeta;
 }
@@ -242,7 +289,7 @@ export interface TutorStructured {
   understanding?: string | null;
   /** आसान व्याख्या */
   explanation?: string | null;
-  /** The question is maths but beyond Class 9 */
+  /** The question is beyond the student's class */
   outOfSyllabus?: boolean;
   steps: Array<{ title: string; detail: string }>;
   hint: string | null;

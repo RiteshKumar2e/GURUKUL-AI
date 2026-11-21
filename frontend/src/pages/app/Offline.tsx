@@ -190,7 +190,8 @@ export default function Offline() {
         <Section title={tx('और अध्याय सहेजें', 'Save more chapters')}>
           <ul className="divide-y-2 divide-line overflow-hidden rounded-lg border-2 border-ink-950 bg-white">
             {curriculum.data.chapters
-              .filter((c) => !savedSlugs.has(c.slug))
+              // Only chapters with lessons can be studied offline
+              .filter((c) => c.topicCount > 0 && !savedSlugs.has(c.slug))
               .map((c) => (
                 <DownloadRow key={c.slug} slug={c.slug} label={`${c.number}. ${pick(c, 'name')}`} />
               ))}

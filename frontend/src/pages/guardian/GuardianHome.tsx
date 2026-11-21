@@ -17,6 +17,7 @@ export default function GuardianHome() {
   const toast = useToast();
   const qc = useQueryClient();
   const [code, setCode] = useState('');
+  const [consent, setConsent] = useState(false);
   const [linking, setLinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isTeacher = user?.role === 'TEACHER';
@@ -33,7 +34,7 @@ export default function GuardianHome() {
     setLinking(true);
     setError(null);
     try {
-      const res = await api<{ displayName: string }>('/parents/link', { body: { code: c } });
+      const res = await api<{ displayName: string }>('/parents/link', { body: { code: c, guardianConsent: !isTeacher && consent } });
       setCode('');
       toast(tx(`${res.displayName} जुड़ गए`, `${res.displayName} is now linked`));
       void qc.invalidateQueries({ queryKey: ['guardian-students'] });
@@ -62,6 +63,12 @@ export default function GuardianHome() {
             <p id="code-help" className="mt-1 text-sm text-ink-600">
               {tx('विद्यार्थी को यह कोड अपने ऐप में सेटिंग्स → अभिभावक और शिक्षक में मिलेगा।', 'The student finds it in their app under Settings → Parents and teachers.')}
             </p>
+            {!isTeacher && (
+              <label className="mt-3 flex items-start gap-3 text-sm">
+                <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-ink-950" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+                <span>{tx('मैं इस बच्चे का माता-पिता/अभिभावक हूँ और उसके GURUKUL AI इस्तेमाल करने की अनुमति देता/देती हूँ।', 'I am this child’s parent or guardian and I agree to them using GURUKUL AI.')}</span>
+              </label>
+            )}
           </div>
           <Button type="submit" loading={linking} icon={<UserPlus className="h-4 w-4" />}>
             {tx('जोड़ें', 'Link')}

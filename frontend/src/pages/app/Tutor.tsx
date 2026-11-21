@@ -4,10 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Camera, History, Mic, Plus, Send, Trash2 } from 'lucide-react';
 import { useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
-import { useDocumentTitle, useHealth, useOnline } from '@/hooks';
+import { useCurriculum, useDocumentTitle, useHealth, useOnline } from '@/hooks';
 import { api, ApiError } from '@/services/api';
 import type { Conversation } from '@/types/api';
-import { Alert, Button, EmptyState, Segmented, Skeleton } from '@/components/ui';
+import { Alert, Button, EmptyState, Segmented, Select, Skeleton } from '@/components/ui';
 import { DemoModeNotice, QueryError } from '@/components/common';
 import { TutorReply } from '@/features/tutor/TutorReply';
 import { useAskTutor, type Intent } from '@/features/tutor/useTutor';
@@ -27,6 +27,9 @@ export default function Tutor() {
   const [showHistory, setShowHistory] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const topicSlug = params.get('topic') ?? undefined;
+  const curriculum = useCurriculum();
+  const mySubjects = curriculum.data?.subjects ?? [];
+  const [subjectSlug, setSubjectSlug] = useState(() => params.get('subject') ?? '');
   useDocumentTitle(tx('AI ट्यूटर', 'AI tutor'));
 
   const list = useQuery({ queryKey: ['conversations'], queryFn: () => api<Conversation[]>('/tutor/conversations') });
@@ -60,7 +63,7 @@ export default function Tutor() {
     setPending(c);
     setText('');
     try {
-      const res = await ask.mutateAsync({ conversationId: id, content: c, intent, topicSlug, language: lang === 'hi' ? 'HI' : 'EN' });
+      const res = await ask.mutateAsync({ conversationId: id, content: c, intent, topicSlug, subjectSlug, language: lang === 'hi' ? 'HI' : 'EN' });
       if (!id) navigate(`/app/tutor/${res.conversationId}`, { replace: true });
     } catch (e) {
       setText(c);
@@ -173,6 +176,16 @@ export default function Tutor() {
           }}
         >
           <div className="mb-2 overflow-x-auto">
+            {!id && mySubjects.length > 1 && (
+              <Select id="tutor-subject" label={tx('विषय', 'Subject')} value={subjectSlug} onChange={(e) => setSubjectSlug(e.target.value)}>
+                <option value="">{tx('कोई भी विषय', 'Any subject')}</option>
+                {mySubjects.map((s) => (
+                  <option key={s.slug} value={s.slug}>
+                    {lang === 'hi' ? s.nameHi : s.nameEn}
+                  </option>
+                ))}
+              </Select>
+            )}
             <Segmented label={tx('मुझे चाहिए', 'I want')} value={intent} onChange={setIntent} options={intents} />
           </div>
           <label htmlFor="tutor-input" className="sr-only">

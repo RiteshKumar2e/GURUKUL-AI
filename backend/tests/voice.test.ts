@@ -163,7 +163,7 @@ describe('voice API (no keys configured)', () => {
   beforeAll(async () => {
     Object.assign(env, { SARVAM_API_KEY: '', sarvamEnabled: false, AI_API_KEY: '', aiEnabled: false, GEMINI_API_KEY: '', geminiEnabled: false });
     resetVoiceProvidersForTests();
-    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_s`, displayName: 'Voice Test', password: 'Test@12345', acceptTerms: true });
+    const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_s`, displayName: 'Voice Test', password: 'Test@12345', acceptTerms: true, guardianConsent: true });
     token = res.body.accessToken;
   });
   afterAll(async () => {

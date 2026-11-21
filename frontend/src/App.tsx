@@ -20,6 +20,7 @@ const Privacy = lazy(() => import('./pages/legal/Privacy'));
 const Terms = lazy(() => import('./pages/legal/Terms'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Onboarding = lazy(() => import('./pages/app/Onboarding'));
+const ClassSettings = lazy(() => import('./pages/app/ClassSettings'));
 const Dashboard = lazy(() => import('./pages/app/Dashboard'));
 const Learn = lazy(() => import('./pages/app/Learn'));
 const Chapters = lazy(() => import('./pages/app/Chapters'));
@@ -107,6 +108,7 @@ export default function App() {
                     <Route path="app" element={student(<AppLayout kind="student" />)}>
                       <Route index element={<Dashboard />} />
                       <Route path="learn" element={<Learn />} />
+                      <Route path="class" element={<ClassSettings />} />
                       <Route path="learn/chapters" element={<Chapters />} />
                       <Route path="learn/chapters/:slug" element={<ChapterDetail />} />
                       <Route path="learn/topics/:slug" element={<Topic />} />

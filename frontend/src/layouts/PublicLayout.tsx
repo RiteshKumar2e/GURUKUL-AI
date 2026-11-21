@@ -118,7 +118,7 @@ export function PublicLayout() {
               <span className="inline-block bg-paper px-2 py-1">
                 <Logo />
               </span>
-              <p className="mt-3 max-w-sm">{tx('झारखंड के कक्षा 9 के विद्यार्थियों के लिए हिंदी में गणित सीखने का साथी।', 'A Hindi-first maths companion for Class 9 students in Jharkhand.')}</p>
+              <p className="mt-3 max-w-sm">{tx('कक्षा 1 से 12 के विद्यार्थियों के लिए हिंदी-प्रथम पढ़ाई का साथी।', 'A Hindi-first learning companion for students in Classes 1 to 12.')}</p>
               <p className="mt-2 text-xs text-ink-200">
                 {tx(
                   'ACE Builders Global Hackathon 2026 के लिए बनाया गया प्रोटोटाइप। JAC या NCERT से संबद्ध नहीं।',
