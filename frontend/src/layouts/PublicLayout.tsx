@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Github, Linkedin, Mail, Menu, X } from 'lucide-react';
 import { useLang } from '@/context/LanguageContext';
 import { homePathFor, useAuth } from '@/context/AuthContext';
 import { LanguageToggle, Logo } from '@/components/common';
 import { ButtonLink } from '@/components/ui';
 
 const CONTACT = (import.meta.env.VITE_CONTACT_EMAIL as string | undefined)?.trim();
+
+const AUTHOR_LINKS = [
+  { href: 'https://www.linkedin.com/in/riteshkumar-tech', label: 'LinkedIn', Icon: Linkedin },
+  { href: 'mailto:riteshkumar90359@gmail.com', label: 'Email: riteshkumar90359@gmail.com', Icon: Mail },
+  { href: 'https://github.com/RiteshKumar2e', label: 'GitHub', Icon: Github },
+];
 
 export function PublicLayout() {
   const { tx } = useLang();
@@ -148,6 +154,29 @@ export function PublicLayout() {
                     <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
                   </li>
                 )}
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-ink-700">
+            <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-sm sm:flex-row">
+              <p>
+                {tx('निर्माता', 'Built by')} <span className="font-display font-bold text-white">Ritesh Kumar</span>
+              </p>
+              <ul className="flex items-center gap-2">
+                {AUTHOR_LINKS.map(({ href, label, Icon }) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target={href.startsWith('mailto:') ? undefined : '_blank'}
+                      rel={href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+                      aria-label={label}
+                      title={label}
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-ink-100 text-white transition-colors hover:border-saffron-400 hover:bg-saffron-400 hover:!text-ink-950"
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
