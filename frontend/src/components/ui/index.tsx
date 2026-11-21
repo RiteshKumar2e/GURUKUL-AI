@@ -49,13 +49,15 @@ interface FieldWrapProps {
   label: string;
   error?: string;
   hint?: string;
+  icon?: ReactNode;
   children: ReactNode;
 }
 
-export function FieldWrap({ id, label, error, hint, children }: FieldWrapProps) {
+export function FieldWrap({ id, label, error, hint, icon, children }: FieldWrapProps) {
   return (
     <div>
-      <label htmlFor={id} className="label">
+      <label htmlFor={id} className={`label ${icon ? 'flex items-center gap-2' : ''}`}>
+        {icon && <span className="text-ink-600 [&>svg]:h-4 [&>svg]:w-4" aria-hidden>{icon}</span>}
         {label}
       </label>
       {children}
@@ -74,10 +76,10 @@ export function FieldWrap({ id, label, error, hint, children }: FieldWrapProps) 
   );
 }
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & { label: string; error?: string; hint?: string; id: string };
-export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ label, error, hint, id, className = '', ...rest }, ref) {
+type InputProps = InputHTMLAttributes<HTMLInputElement> & { label: string; error?: string; hint?: string; id: string; icon?: ReactNode };
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ label, error, hint, icon, id, className = '', ...rest }, ref) {
   return (
-    <FieldWrap id={id} label={label} error={error} hint={hint}>
+    <FieldWrap id={id} label={label} error={error} hint={hint} icon={icon}>
       <input ref={ref} id={id} className={`field ${error ? 'field-error' : ''} ${className}`} aria-invalid={!!error} aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined} {...rest} />
     </FieldWrap>
   );
@@ -85,11 +87,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ l
 
 /** Password field with a show/hide (eye) button. The button sits inside the input box, so a hint
  *  or error below the field never shifts it. */
-export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type'>>(function PasswordInput({ label, error, hint, id, className = '', ...rest }, ref) {
+export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type'>>(function PasswordInput({ label, error, hint, icon, id, className = '', ...rest }, ref) {
   const { tx } = useLang();
   const [show, setShow] = useState(false);
   return (
-    <FieldWrap id={id} label={label} error={error} hint={hint}>
+    <FieldWrap id={id} label={label} error={error} hint={hint} icon={icon}>
       <div className="relative">
         <input
           ref={ref}
