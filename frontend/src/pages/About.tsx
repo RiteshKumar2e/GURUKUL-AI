@@ -83,13 +83,6 @@ export default function About() {
           </p>
         )}
       </section>
-
-      <section className="mt-8">
-        <h2 className="text-xl">{tx('डेमो डेटा', 'Demo data')}</h2>
-        <p className="mt-2 text-ink-800">
-          {tx('डेमो खाते (demo.student, demo.parent, demo.teacher) और उनका इतिहास कंप्यूटर से बनाया गया नकली डेटा है। इसमें किसी असली विद्यार्थी की जानकारी नहीं है।', 'The demo accounts (demo.student, demo.parent, demo.teacher) and their history are computer-generated synthetic data. They contain no real student information.')}
-        </p>
-      </section>
     </article>
   );
 }

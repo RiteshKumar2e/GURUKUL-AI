@@ -351,11 +351,11 @@ export default function Landing() {
             </ul>
           </div>
 
-          {/* Shape of the real guardian view, filled with a demo student */}
+          {/* Shape of the real guardian view, filled with made-up example numbers */}
           <div className="overflow-hidden rounded-lg border-2 border-ink-950 bg-white text-ink-950 shadow-brut-saffron">
             <div className="flex items-center justify-between border-b-2 border-ink-950 px-4 py-3">
               <p className="font-extrabold">{tx('अनु · कक्षा 9', 'Anu · Class 9')}</p>
-              <span className="rounded-full border-[1.5px] border-ink-950 bg-lemon-300 px-2.5 py-0.5 text-xs font-bold">{tx('डेमो डेटा', 'Demo data')}</span>
+              <span className="rounded-full border-[1.5px] border-ink-950 bg-lemon-300 px-2.5 py-0.5 text-xs font-bold">{tx('उदाहरण', 'Example')}</span>
             </div>
             <ul className="space-y-3 px-4 py-4 text-sm">
               {[

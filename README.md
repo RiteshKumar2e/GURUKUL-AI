@@ -6,7 +6,7 @@
 
 **A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), built for low-cost Android phones and unreliable internet.**
 
-[![Live demo](https://img.shields.io/badge/demo-gurukul--ai.vercel.app-111111?style=flat-square)](https://gurukul-ai.vercel.app)
+[![Live app](https://img.shields.io/badge/app-gurukul--ai.vercel.app-111111?style=flat-square)](https://gurukul-ai.vercel.app)
 [![API health](https://img.shields.io/badge/API-health-2ea44f?style=flat-square)](https://gurukul-ai-o0nq.onrender.com/api/health)
 ![Status](https://img.shields.io/badge/status-prototype-f5c400?style=flat-square)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5a0fc8?style=flat-square)
@@ -20,7 +20,7 @@
 ![Turso](https://img.shields.io/badge/Turso-libSQL-4FF8D2?style=flat-square&logo=turso&logoColor=black)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat-square&logo=drizzle&logoColor=black)
 
-[**Live demo**](https://gurukul-ai.vercel.app) · [Quick start](#quick-start) · [Architecture](#architecture) · [API](#api-reference) · [Limitations](#known-limitations)
+[**Live app**](https://gurukul-ai.vercel.app) · [Quick start](#quick-start) · [Architecture](#architecture) · [API](#api-reference) · [Limitations](#known-limitations)
 
 </div>
 
@@ -35,7 +35,6 @@
 |---|---|
 | **Web app** | https://gurukul-ai.vercel.app |
 | **API health** | https://gurukul-ai-o0nq.onrender.com/api/health |
-| **Demo login** | `demo.student` / `Demo@1234` (synthetic data) |
 
 > [!TIP]
 > The API runs on Render's free tier, so the first request after a quiet period can take up to a minute while the server wakes up.
@@ -164,7 +163,7 @@ cp .env.example .env                 # Windows: copy .env.example .env
 npm install
 npm run db:check                     # read-only: is the database reachable?
 npm run db:migrate                   # create tables (first time)
-npm run db:seed                      # curriculum + synthetic demo accounts
+npm run db:seed                      # curriculum content (no user accounts)
 npm run dev                          # http://localhost:5000/api
 ```
 
@@ -177,17 +176,7 @@ npm install
 npm run dev                          # http://localhost:5173
 ```
 
-### Demo accounts
-
-All three hold **synthetic data only**. Password: `Demo@1234`.
-
-| Username | Role |
-|---|---|
-| `demo.student` | Student with a generated practice history |
-| `demo.parent` | Parent linked to the demo student |
-| `demo.teacher` | Teacher linked to the demo student |
-
-Run `SEED_DEMO=false npm run db:seed` to load content without demo accounts.
+There are no built-in accounts. Open http://localhost:5173/register to create a student, parent or teacher account.
 
 ### Scripts
 
@@ -201,7 +190,7 @@ Run `SEED_DEMO=false npm run db:seed` to load content without demo accounts.
 | `npm run preview` | — | Serve the production build (service worker active) |
 | `npm run db:check` | Read-only connection and table check | — |
 | `npm run db:migrate` | Apply pending migrations (non-destructive) | — |
-| `npm run db:seed` | Upsert curriculum and replace the 3 demo accounts | — |
+| `npm run db:seed` | Upsert curriculum content (creates no accounts) | — |
 | `npm run db:generate` | Create a migration from `src/db/schema.ts` | — |
 | `npm run db:studio` | Browse data in Drizzle Studio | — |
 

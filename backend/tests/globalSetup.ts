@@ -16,7 +16,7 @@ const files = () => ['', '-journal', '-wal', '-shm'].map((s) => TEST_DB_FILE + s
 export default function setup() {
   const root = path.resolve(__dirname, '..');
   for (const f of files()) fs.rmSync(f, { force: true });
-  const env = { ...process.env, NODE_ENV: 'test', TURSO_DATABASE_URL: TEST_DB, TURSO_AUTH_TOKEN: '', SEED_DEMO: 'false' };
+  const env = { ...process.env, NODE_ENV: 'test', TURSO_DATABASE_URL: TEST_DB, TURSO_AUTH_TOKEN: '' };
   const tsx = path.join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs');
   execFileSync(process.execPath, [tsx, 'scripts/migrate.ts'], { cwd: root, env, stdio: 'inherit' });
   execFileSync(process.execPath, [tsx, 'scripts/seed.ts'], { cwd: root, env, stdio: 'inherit' });
