@@ -1,17 +1,50 @@
+<div align="center">
+
+<img src="frontend/public/og-image.png" alt="GURUKUL AI: गणित का हर सवाल, अपनी भाषा में समझिए" width="720">
+
 # GURUKUL AI
 
-**A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), designed for low-cost Android phones and unreliable internet.**
+**A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), built for low-cost Android phones and unreliable internet.**
 
-Built for the ACE Builders Global Hackathon 2026, Problem Statement 3: *The Last-Mile Tutor*.
+[![Live demo](https://img.shields.io/badge/demo-gurukul--ai.vercel.app-111111?style=flat-square)](https://gurukul-ai.vercel.app)
+[![API health](https://img.shields.io/badge/API-health-2ea44f?style=flat-square)](https://gurukul-ai-o0nq.onrender.com/api/health)
+![Status](https://img.shields.io/badge/status-prototype-f5c400?style=flat-square)
+![PWA](https://img.shields.io/badge/PWA-offline--ready-5a0fc8?style=flat-square)
 
-> **Status: working prototype.** Lessons and questions are original sample content written for this project, not official JAC material. Read [Verification status](#verification-status) and [Known limitations](#known-limitations) before relying on it.
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js_20+-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white)
+![Turso](https://img.shields.io/badge/Turso-libSQL-4FF8D2?style=flat-square&logo=turso&logoColor=black)
+![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat-square&logo=drizzle&logoColor=black)
+
+[**Live demo**](https://gurukul-ai.vercel.app) · [Quick start](#quick-start) · [Architecture](#architecture) · [API](#api-reference) · [Limitations](#known-limitations)
+
+</div>
 
 ---
 
+> [!NOTE]
+> **Working prototype**, built for the **ACE Builders Global Hackathon 2026**, Problem Statement 3: *The Last-Mile Tutor*. Lessons and questions are original sample content written for this project, not official JAC material. Read [Verification status](#verification-status) and [Known limitations](#known-limitations) before relying on it.
+
+## Try it
+
+| | |
+|---|---|
+| **Web app** | https://gurukul-ai.vercel.app |
+| **API health** | https://gurukul-ai-o0nq.onrender.com/api/health |
+| **Demo login** | `demo.student` / `Demo@1234` (synthetic data) |
+
+> [!TIP]
+> The API runs on Render's free tier, so the first request after a quiet period can take up to a minute while the server wakes up.
+
 ## Contents
 
-- [Why GURUKUL AI](#why-gurukul-ai)
+- [The problem](#the-problem)
 - [Features](#features)
+- [How a question is answered](#how-a-question-is-answered)
 - [Architecture](#architecture)
 - [Quick start](#quick-start)
 - [Configuration](#configuration)
@@ -19,38 +52,67 @@ Built for the ACE Builders Global Hackathon 2026, Problem Statement 3: *The Last
 - [AI, voice and photo](#ai-voice-and-photo)
 - [Offline learning and sync](#offline-learning-and-sync)
 - [Security and privacy](#security-and-privacy)
+- [Design and accessibility](#design-and-accessibility)
+- [Performance](#performance)
 - [API reference](#api-reference)
 - [Testing](#testing)
 - [Deployment](#deployment)
+- [Troubleshooting](#troubleshooting)
 - [Verification status](#verification-status)
 - [Known limitations](#known-limitations)
+- [Roadmap](#roadmap)
 - [Project structure](#project-structure)
+- [Contributing](#contributing)
+- [Credits and licences](#credits-and-licences)
 
 ---
 
-## Why GURUKUL AI
+## The problem
 
-Many Class 9 students in Jharkhand study on a shared, low-cost phone, with patchy mobile data and nobody at home to ask when they get stuck. GURUKUL AI is built around those conditions:
+Many Class 9 students in Jharkhand study on a shared, low-cost phone, with patchy mobile data and nobody at home to ask when they get stuck. GURUKUL AI is designed around those conditions:
 
-- **Hindi first**, with English one tap away. The tutor can also reply in Telugu.
-- **Hints before answers.** It teaches, step by step, instead of handing out solutions.
-- **Works on a weak network.** Lessons and practice keep working offline and sync later.
-- **Honest about AI.** Numeric answers are re-checked by a calculator, and uncertain or unverified answers are labelled.
+| Principle | What it means in the app |
+|---|---|
+| **Hindi first** | Hindi by default, English one tap away. The tutor can also reply in Telugu |
+| **Hints before answers** | The tutor teaches step by step instead of handing out solutions |
+| **Works on a weak network** | Lessons and practice keep working offline and sync later |
+| **Honest about AI** | Numeric answers are re-checked by a calculator, and uncertain or unverified answers are labelled |
+| **Safe for minors** | Students give only a name and username. Guardians see progress, never tutor conversations |
 
 ## Features
 
-| Feature | What the student gets | Works offline |
-|---|---|---|
-| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question. Hindi, English or Telugu. | No |
-| **Answer checking** | A deterministic calculator re-checks the tutor's final number and shows whether it matched. | No |
-| **Voice tutor** | Speak the question, check and edit the transcript, then listen to the reply with play, pause, replay and stop. Typing always works as a fallback. | No |
-| **Photo questions** | Photograph a question from a book or notebook. The image is compressed on the phone; the student can correct the extracted text before asking. | No |
-| **Lessons** | 12 chapters, 24 short lessons with worked examples, in Hindi and English. | Yes, after download |
-| **Adaptive practice** | 72 questions at three levels. Difficulty moves up or down with each answer; weak topics come first, with an explanation for every mistake. | Yes, after download |
-| **Chapter quizzes** | A timed quiz per chapter, graded on the server. | No |
-| **Progress** | Topic mastery, accuracy, daily streak and recommended next steps. | Read only |
-| **Parent and teacher view** | A guardian links with a 6-character code the student shares, and sees progress, weak topics and activity, but never the tutor conversations. | No |
-| **Installable app** | A PWA that installs to the home screen and caches the app shell. | Yes |
+| Feature | What the student gets | Offline |
+|---|---|:---:|
+| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question. Hindi, English or Telugu | ✗ |
+| **Answer checking** | A deterministic calculator re-checks the tutor's final number and shows whether it matched | ✗ |
+| **Voice tutor** | Speak the question, check and edit the transcript, then listen to the reply with play, pause, replay and stop. Typing always works as a fallback | ✗ |
+| **Photo questions** | Photograph a question from a book or notebook. The image is compressed on the phone; the student can correct the extracted text before asking | ✗ |
+| **Lessons** | 12 chapters, 24 short lessons with worked examples, in Hindi and English | ✓ after download |
+| **Adaptive practice** | 72 questions at three levels. Difficulty moves up or down with each answer; weak topics come first, with an explanation for every mistake | ✓ after download |
+| **Chapter quizzes** | A timed quiz per chapter, graded on the server | ✗ |
+| **Progress** | Topic mastery, accuracy, daily streak and recommended next steps | Read only |
+| **Parent and teacher view** | A guardian links with a 6-character code the student shares, and sees progress, weak topics and activity, but never the tutor conversations | ✗ |
+| **Installable app** | A PWA that installs to the home screen and caches the app shell | ✓ |
+
+## How a question is answered
+
+```mermaid
+flowchart LR
+    A["Student asks<br/>(text, voice or photo)"] --> B{"Voice or photo?"}
+    B -- voice --> C["Speech to text<br/>student edits transcript"]
+    B -- photo --> D["Vision model extracts text<br/>student corrects it"]
+    B -- text --> E
+    C --> E["LLM tutor<br/>hint → steps → follow-up"]
+    D --> E
+    E --> F["Calculator re-checks<br/>the final number"]
+    F --> G["Reply labelled<br/>verified / mismatch / unchecked"]
+    G --> H["Optional read-aloud"]
+```
+
+1. The student types, speaks or photographs a question. Voice and photo input are always shown as editable text before anything is sent to the tutor.
+2. The tutor (Groq, or Gemini as a fallback) replies in a fixed structure: a hint, numbered steps, a final answer, a follow-up question and its own confidence level.
+3. For arithmetic and one-variable linear answers, a deterministic calculator recomputes the result. A mismatch is shown to the student with a warning not to rely on the answer.
+4. With no AI key configured, the tutor runs in a clearly labelled **demo mode** that shows only the calculator result and the linked lesson summary.
 
 ## Architecture
 
@@ -76,7 +138,7 @@ Many Class 9 students in Jharkhand study on a shared, low-cost phone, with patch
 | Backend | Node.js 20+, Express 4, TypeScript, Zod, JSON Web Tokens, bcrypt, Multer, Helmet, express-rate-limit |
 | Database | Turso (libSQL) with Drizzle ORM and SQL migrations |
 | AI | Groq (default LLM, vision, Whisper), Google Gemini (optional fallback), Sarvam AI (optional speech) |
-| Hosting | Vercel for the frontend; any Node.js host for the backend |
+| Hosting | Vercel (frontend), Render (backend API), Turso (database) |
 
 ## Quick start
 
@@ -273,6 +335,33 @@ AI features (tutor, voice, photo) always need internet, and the app says so.
 - **Analytics.** Anonymous page counts, sent only after the visitor opts in through the cookie banner.
 - **Shared phones.** Logging out clears personal data cached on the device.
 
+## Design and accessibility
+
+The interface uses a print-style neo-brutalist look: white paper, 2 px black outlines with hard offset shadows on the main components, red for actions and yellow for highlights. Every page shares one set of tokens (`frontend/tailwind.config.js`, `frontend/src/styles/index.css`) and one component kit (`frontend/src/components/ui`).
+
+| Area | What is in place |
+|---|---|
+| Language | Hindi by default, English one tap away. Archivo for Latin text, Mukta for Devanagari, Noto Sans Telugu for Telugu |
+| Contrast | Text colours meet WCAG AA (4.5:1 or higher). The one lighter grey is used only for icons and separators |
+| Touch targets | Buttons, links and form controls are at least 44 px tall |
+| Small screens | Checked at 360 px width on every route with no horizontal scrolling |
+| Keyboard and screen readers | Skip link, visible focus ring, labelled controls, `aria-live` status for recording and loading, show/hide password button |
+| Motion | No decorative animation; transitions are disabled for users who prefer reduced motion |
+| Forms | Inline errors in plain Hindi or English, a 3-step registration, success and error toasts |
+| Launch basics | Page titles and descriptions, favicon and app icons, social preview image, sitemap and robots.txt, custom 404 page, cookie banner |
+
+## Performance
+
+Measured on the production build of the Hindi landing page, with the network throttled to 400 kbps and 400 ms latency:
+
+| Metric | Result |
+|---|---|
+| First visit, total download | about 340 KB (15 requests) |
+| Largest contentful paint | about 2.9 s |
+| Repeat visit | served from the service worker cache |
+
+Fonts are subset and loaded only for the scripts on screen, routes are split into separate chunks, photos are compressed on the phone before upload, and chapter packs are downloaded once for offline use.
+
 ## API reference
 
 All routes are under `/api`. Protected routes need `Authorization: Bearer <access token>`.
@@ -313,6 +402,37 @@ Backend tests never touch the Turso database in `.env`. [`tests/globalSetup.ts`]
 
 ## Deployment
 
+| Part | Host | URL |
+|---|---|---|
+| Frontend | Vercel | https://gurukul-ai.vercel.app |
+| Backend API | Render | https://gurukul-ai-o0nq.onrender.com |
+| Database | Turso (aws-ap-south-1) | private |
+
+### Backend on Render
+
+| Setting | Value |
+|---|---|
+| Root Directory | `backend` |
+| Build Command | `npm ci --include=dev && npm run build` |
+| Start Command | `npm run db:migrate && npm start` |
+| Health Check Path | `/api/health` |
+
+`--include=dev` is required: with `NODE_ENV=production`, npm would otherwise skip TypeScript and the build would fail. The start command applies any pending migrations before the server starts; it never drops or resets data.
+
+**Environment** (Render → Environment). Set everything from `backend/.env.example` with real values, plus the production settings below. Do not set `PORT`; Render provides it.
+
+```
+NODE_ENV=production
+NODE_VERSION=22.12.0
+TRUST_PROXY=true
+ENFORCE_HTTPS=true
+COOKIE_SECURE=true
+COOKIE_SAMESITE=none          # frontend and API are on different sites
+FRONTEND_URL=https://gurukul-ai.vercel.app
+```
+
+Use JWT secrets in production that are different from your local ones.
+
 ### Frontend on Vercel
 
 1. Import the repository and set **Root Directory** to `frontend`.
@@ -321,31 +441,29 @@ Backend tests never touch the Turso database in `.env`. [`tests/globalSetup.ts`]
    - the SPA fallback to `index.html`;
    - long caching for hashed assets, and no caching for `sw.js` and `index.html`;
    - security headers.
-3. Add these environment variables, then redeploy. Vite fixes them at build time.
+3. In **Settings → Environment Variables**, add the values below, then redeploy. Vite fixes them into the bundle at build time.
 
 | Variable | Value |
 |---|---|
-| `VITE_API_URL` | Your **deployed** backend, e.g. `https://<backend-host>/api` (not `localhost`) |
+| `VITE_API_URL` | `https://gurukul-ai-o0nq.onrender.com/api` |
 | `VITE_SITE_URL` | `https://gurukul-ai.vercel.app` |
 | `VITE_APP_NAME` | `GURUKUL AI` |
 
-### Backend on any Node.js host (Render, Railway, Fly.io…)
-
-- **Root directory:** `backend`
-- **Build:** `npm ci && npm run build`
-- **Start:** `npm run db:migrate && npm start`
-- **Environment:** everything from `backend/.env.example`, plus:
-
-```
-NODE_ENV=production
-TRUST_PROXY=true
-ENFORCE_HTTPS=true
-COOKIE_SECURE=true
-COOKIE_SAMESITE=none          # frontend and API are on different sites
-FRONTEND_URL=https://gurukul-ai.vercel.app
-```
-
 Serve everything over HTTPS. Browsers allow service workers, the microphone and the camera only on secure origins.
+
+## Troubleshooting
+
+| Symptom | Cause and fix |
+|---|---|
+| Browser console: *blocked by CORS policy* calling `localhost:5000` from the Vercel site | `VITE_API_URL` is not set on Vercel, so the build still points at localhost. Set it to the Render URL and redeploy |
+| Login works but the user is logged out on refresh, in production | Refresh cookie not sent cross-site. Set `COOKIE_SAMESITE=none` and `COOKIE_SECURE=true` on the backend |
+| Render build fails with `tsc: not found` | Use the build command `npm ci --include=dev && npm run build` |
+| First request takes up to a minute | Render free tier wakes the server on demand. Later requests are fast |
+| Backend exits with `TURSO_DATABASE_URL is required` or `TURSO_AUTH_TOKEN is required` | Fill both in `backend/.env` (or the host's environment). Local database files are not supported outside tests |
+| `/api/health` shows `"db":"down"` or `"migrated":false` | Check the Turso URL and token with `npm run db:check`, then run `npm run db:migrate` |
+| Tutor reply says *Demo mode* | No `AI_API_KEY` or `GEMINI_API_KEY` on the backend |
+| Groq error `model_not_found` | The model was retired. List available models with `GET https://api.groq.com/openai/v1/models` and update `AI_MODEL` / `AI_VISION_MODEL` |
+| Microphone or camera does not work | They need HTTPS (or `localhost`) and the user's permission |
 
 ## Verification status
 
@@ -356,6 +474,8 @@ What has and has not been checked, as observed during development:
 | Backend: lint, 59/59 tests, production build | Passing (2026-11-21) |
 | Frontend: lint, 5/5 tests, production build | Passing (2026-11-21) |
 | Turso database: migration, seed, health check, login and curriculum API | Verified against a live Turso database (2026-11-21) |
+| Render deployment | `/api/health` returns `db: up` with migrations applied and AI live; CORS allows the Vercel origin (2026-11-21) |
+| Vercel frontend talking to the Render API | Depends on `VITE_API_URL` being set on Vercel; not yet confirmed end to end |
 | Groq tutor | Live Hindi and Telugu replies observed during development (2026-11-21) |
 | Browser journeys (register, practice, quiz, offline and reconnect, every route on mobile and desktop) | Checked with a headless-browser script during development; the script is not in the repository |
 | Sarvam and Gemini | Request formats follow their public docs and are covered by mocked tests only. **Not tested against the live APIs** |
@@ -372,6 +492,19 @@ What has and has not been checked, as observed during development:
 - **Background sync.** Sync runs while the app is open. iOS Safari has no Background Sync API, so syncing happens on reconnect or app open.
 - **Legal review.** The privacy policy and terms need legal review (for example against India's DPDP Act 2023) before public use.
 - **Licence.** Not chosen yet; it will follow a review of the organisers' ownership terms.
+
+## Roadmap
+
+Planned next steps, taken from the gaps above:
+
+- [ ] Align lessons with the official JAC notified syllabus and expand content beyond sample chapters
+- [ ] Telugu lessons and practice questions, and native-speaker review of server-written Telugu strings
+- [ ] Field testing on real low-end Android devices and slow networks
+- [ ] End-to-end check of the Vercel frontend against the Render API
+- [ ] Live testing of Sarvam speech and the Gemini fallback
+- [ ] A guardian- or teacher-assisted password reset that does not require a student email
+- [ ] Commit the browser journey tests to the repository
+- [ ] Legal review of the privacy policy and terms (DPDP Act 2023) and a project licence
 
 ## Project structure
 
@@ -395,3 +528,36 @@ backend/                  Express API
 ```
 
 There is no root `package.json`. Install and run each app from its own folder.
+
+## Contributing
+
+Issues and pull requests are welcome.
+
+1. Fork the repository and create a branch from `main`.
+2. Follow the [Quick start](#quick-start) to run both apps locally against your own Turso database.
+3. For schema changes, edit `backend/src/db/schema.ts` and generate a migration with `npm run db:generate`. Never edit an applied migration.
+4. Before opening a pull request, run lint, tests and build in both apps (see [Testing](#testing)).
+5. Keep student data minimal, keep secrets out of the frontend, and write any new user-facing text in both Hindi and English.
+
+## Credits and licences
+
+GURUKUL AI is built on open-source software. Main dependencies and their licences:
+
+| Package | Licence |
+|---|---|
+| React, React Router, TanStack Query, React Hook Form, Zod, Tailwind CSS | MIT |
+| Express, Helmet, Multer, express-rate-limit, jsonwebtoken, @libsql/client | MIT |
+| Drizzle ORM | Apache-2.0 |
+| bcryptjs | BSD-3-Clause |
+| lucide-react (icons), idb | ISC |
+| Archivo, Mukta, Noto Sans Telugu (fonts, via Fontsource) | SIL Open Font License 1.1 |
+
+All lessons, questions and explanations in `backend/content/` were written for this project. GURUKUL AI is not affiliated with JAC, NCERT or the Government of Jharkhand. The project's own licence has not been chosen yet (see [Known limitations](#known-limitations)).
+
+---
+
+<div align="center">
+
+Made for students in Jharkhand · <a href="https://gurukul-ai.vercel.app">gurukul-ai.vercel.app</a>
+
+</div>
