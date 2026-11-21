@@ -32,9 +32,10 @@ export default function Dashboard() {
 
   return (
     <>
-      <header className="mb-6">
+      <header className="mb-7">
         <p className="text-ink-600">{greeting(tx)},</p>
-        <h1 className="text-[1.9rem] sm:text-[2.4rem]"><span className="mark">{user?.displayName}</span></h1>
+        <h1 className="mt-0.5 text-[1.9rem] leading-tight sm:text-[2.3rem]">{user?.displayName}</h1>
+        <span className="mt-2 block h-1.5 w-14 rounded-full bg-saffron-400" aria-hidden />
       </header>
 
       {q.isLoading && (
