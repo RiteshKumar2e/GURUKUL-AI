@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { api } from '@/services/api';
-import { syncManager } from '@/lib/sync';
+import { syncManager, type SyncState } from '@/lib/sync';
 import type { Health } from '@/types/api';
 
 const APP = (import.meta.env.VITE_APP_NAME as string) || 'GURUKUL AI';
@@ -30,7 +30,7 @@ export function useOnline() {
 }
 
 export function useSyncState() {
-  const [state, setState] = useState<{ pending: number; syncing: boolean; lastResult?: { applied: number; rejected: number } }>({ pending: 0, syncing: false });
+  const [state, setState] = useState<SyncState>({ pending: 0, syncing: false, failed: false });
   useEffect(() => {
     const unsub = syncManager.subscribe(setState);
     return () => {

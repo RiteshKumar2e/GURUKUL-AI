@@ -15,7 +15,11 @@ interface AuthCtx {
   offlineSession: boolean;
   login: (username: string, password: string) => Promise<User>;
   register: (data: Record<string, unknown>) => Promise<User>;
-  logout: () => Promise<void>;
+  /**
+   * Signs out and clears this student's data from the device. Unsynced offline work is sent first;
+   * if some cannot be sent, the user is asked before it is discarded. Resolves false if they cancel.
+   */
+  logout: (opts?: { force?: boolean }) => Promise<boolean>;
   setUser: (u: User) => void;
   refreshUser: () => Promise<void>;
 }
@@ -46,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<User | null>(null);
   const [status, setStatus] = useState<Status>('loading');
   const qc = useQueryClient();
-  const { setLang } = useLang();
+  const { setLang, tx } = useLang();
 
   const setUser = useCallback(
     (u: User) => {
@@ -60,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (u: User, token: string, adoptLanguage = true) => {
       tokenStore.set(token);
       hint.set(true);
+      syncManager.setOwner(u.id);
       setUser(u);
       setStatus('authenticated');
       if (adoptLanguage) setLang(u.preferredLanguage === 'EN' ? 'en' : 'hi');
@@ -86,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (result === 'offline') {
         const cached = await offlineDb.getKv<User>(CACHED_USER);
         if (cached) {
+          syncManager.setOwner(cached.id);
           setUserState(cached);
           setStatus('offline');
           return;
@@ -136,7 +142,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(async (opts?: { force?: boolean }) => {
+    if (navigator.onLine) await syncManager.flush().catch(() => null);
+    if (!opts?.force) {
+      const left = await syncManager.pendingCount();
+      if (
+        left > 0 &&
+        !window.confirm(
+          tx(
+            `${left} ऑफ़लाइन उत्तर अभी सर्वर पर नहीं पहुँचे हैं। लॉग आउट करने पर वे इस फ़ोन से मिट जाएँगे। फिर भी लॉग आउट करें?`,
+            `${left} offline answer(s) have not reached the server yet. Logging out will remove them from this phone. Log out anyway?`,
+          ),
+        )
+      ) {
+        return false;
+      }
+    }
     try {
       await api('/auth/logout', { method: 'POST' });
     } catch {
@@ -144,11 +165,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     tokenStore.set(null);
     hint.set(false);
-    await offlineDb.clearPersonal();
+    await offlineDb.clearPersonal(user?.id ?? null);
+    syncManager.setOwner(null);
     qc.clear();
     setUserState(null);
     setStatus('anonymous');
-  }, [qc]);
+    return true;
+  }, [qc, tx, user]);
 
   const refreshUser = useCallback(async () => {
     const res = await api<{ user: User }>('/users/me');

@@ -12,6 +12,17 @@ describe('offline answer checking', () => {
     expect(parseNumber('abc')).toBeNull();
     expect(parseNumber('1/0')).toBeNull();
   });
+  it('reads mixed numbers, units and Indian digit grouping like the server', () => {
+    expect(parseNumber('2 1/2')).toBe(2.5);
+    expect(parseNumber('-2 1/2')).toBe(-2.5);
+    expect(parseNumber('12 cm')).toBe(12);
+    expect(parseNumber('5 sq units')).toBe(5);
+    expect(parseNumber('20 वर्ग सेमी')).toBe(20);
+    expect(parseNumber('₹1,00,000')).toBe(100000);
+    // ambiguous: never guessed as 23
+    expect(parseNumber('2 3')).toBeNull();
+    expect(checkAnswer('NUMERIC', '5/2', '2 1/2')).toBe(true);
+  });
   it('matches the server rules', () => {
     expect(checkAnswer('NUMERIC', '-5/2', '-2.5')).toBe(true);
     expect(checkAnswer('NUMERIC', '35', '36')).toBe(false);

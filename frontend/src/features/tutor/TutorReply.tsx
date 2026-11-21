@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui';
 export function speakableText(m: TutorMessage) {
   const s = m.structured;
   if (!s) return m.content;
-  return [s.reply, ...s.steps.map((st) => `${st.title}. ${st.detail}`), s.hint, s.finalAnswer, s.followUp].filter(Boolean).join('. ');
+  // Same order as on screen
+  return [s.reply, s.understanding, s.hint, s.explanation, ...s.steps.map((st) => `${st.title}. ${st.detail}`), s.finalAnswer, s.followUp].filter(Boolean).join('. ');
 }
 
 /** Play / pause / replay / stop for one reply. Shared by the tutor and voice pages. */
@@ -51,6 +52,10 @@ export function ReplyAudioControls({ text, lang, player }: { text: string; lang:
   );
 }
 
+function SectionTitle({ children }: { children: string }) {
+  return <h3 className="mb-0.5 font-display text-sm font-bold text-ink-700">{children}</h3>;
+}
+
 const toVoiceLang = (l?: string): VoiceLang | null => (l === 'TE' ? 'te' : l === 'EN' ? 'en' : l === 'HI' ? 'hi' : null);
 
 export function TutorReply({ message, onFollowUp, player: external }: { message: TutorMessage; onFollowUp?: (text: string) => void; player?: ReturnType<typeof useVoicePlayback> }) {
@@ -75,16 +80,33 @@ export function TutorReply({ message, onFollowUp, player: external }: { message:
     <div className="panel overflow-hidden">
       <div className="space-y-3 px-4 py-3">
         {s.demo && <Badge tone="saffron">{tx('डेमो मोड — AI उत्तर नहीं', 'Demo mode — not an AI answer')}</Badge>}
+        {s.outOfSyllabus && <Badge tone="saffron">{tx('कक्षा 9 के पाठ्यक्रम से बाहर', 'Beyond the Class 9 syllabus')}</Badge>}
         {s.reply && <p className="text-ink-900">{s.reply}</p>}
 
+        {s.understanding && (
+          <section>
+            <SectionTitle>{tx('प्रश्न की समझ', 'Understanding the question')}</SectionTitle>
+            <p className="text-ink-900">{s.understanding}</p>
+          </section>
+        )}
+
         {s.hint && (
-          <div className="rounded bg-saffron-50 px-3 py-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-saffron-700">{tx('संकेत', 'Hint')}</p>
+          <section className="rounded border-2 border-saffron-400 bg-saffron-50 px-3 py-2">
+            <SectionTitle>{tx('पहला संकेत', 'First hint')}</SectionTitle>
             <p className="text-ink-900">{s.hint}</p>
-          </div>
+          </section>
+        )}
+
+        {s.explanation && (
+          <section>
+            <SectionTitle>{tx('आसान व्याख्या', 'Simple explanation')}</SectionTitle>
+            <p className="text-ink-900">{s.explanation}</p>
+          </section>
         )}
 
         {s.steps.length > 0 && (
+          <section>
+          {!s.demo && <SectionTitle>{tx('चरण-दर-चरण हल', 'Step-by-step solution')}</SectionTitle>}
           <ol className="space-y-2">
             {s.steps.map((st, i) => (
               <li key={i} className="flex gap-3">
@@ -97,13 +119,14 @@ export function TutorReply({ message, onFollowUp, player: external }: { message:
               </li>
             ))}
           </ol>
+          </section>
         )}
 
         {s.finalAnswer && (
-          <p className="rounded-md border-2 border-ink-950 px-3 py-2">
-            <span className="text-sm text-ink-600">{tx('उत्तर: ', 'Answer: ')}</span>
-            <span className="font-semibold">{s.finalAnswer}</span>
-          </p>
+          <section className="rounded-md border-2 border-ink-950 px-3 py-2">
+            <SectionTitle>{tx('अंतिम उत्तर', 'Final answer')}</SectionTitle>
+            <p className="font-semibold">{s.finalAnswer}</p>
+          </section>
         )}
 
         {s.caveat && (
@@ -117,6 +140,7 @@ export function TutorReply({ message, onFollowUp, player: external }: { message:
           <div className="flex items-start gap-2 border-t border-line pt-3">
             <CircleHelp className="mt-1 h-4 w-4 shrink-0 text-ink-600" aria-hidden />
             <div>
+              <SectionTitle>{tx('अब आप कोशिश करें', 'Now you try')}</SectionTitle>
               <p className="text-ink-900">{s.followUp}</p>
               {onFollowUp && (
                 <button className="mt-1 text-sm font-semibold underline decoration-saffron-400 underline-offset-4" onClick={() => onFollowUp(s.followUp!)}>

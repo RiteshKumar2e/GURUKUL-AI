@@ -1,6 +1,6 @@
 import { Component, useEffect, useState, type ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { CloudOff, RefreshCw, WifiOff } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, CloudOff, RefreshCw, WifiOff } from 'lucide-react';
 import { useLang } from '@/context/LanguageContext';
 import { homePathFor, useAuth } from '@/context/AuthContext';
 import { readConsent, useOnline, useSyncState, writeConsent } from '@/hooks';
@@ -10,8 +10,9 @@ import type { Role } from '@/types/api';
 import { Alert, Button, Spinner } from './ui';
 
 export function Logo({ to = '/', compact = false }: { to?: string; compact?: boolean }) {
+  const { tx } = useLang();
   return (
-    <Link to={to} className="flex items-center gap-2 text-ink-900 no-underline" aria-label="GURUKUL AI — home">
+    <Link to={to} className="flex items-center gap-2 text-ink-900 no-underline" aria-label={tx('GURUKUL AI — मुख्य पेज', 'GURUKUL AI — home')}>
       <img src="/favicon.svg" alt="" width={32} height={32} className="h-8 w-8" />
       {!compact && (
         <span className="text-[1.2rem] font-extrabold tracking-tight text-ink-950">
@@ -41,30 +42,76 @@ export function LanguageToggle({ className = '' }: { className?: string }) {
   );
 }
 
-/** Shows connectivity and the offline sync queue. Hidden when online with nothing pending. */
+/**
+ * Connection and sync status for the student app, in five plain states:
+ * ऑफ़लाइन · सिंक बाकी है · सिंक हो रहा है · सिंक पूरा हुआ · दोबारा कोशिश करें.
+ * Hidden when online with nothing pending, apart from a short "sync complete" confirmation.
+ */
 export function OfflineBanner() {
   const online = useOnline();
-  const { pending, syncing } = useSyncState();
+  const { pending, syncing, failed, lastResult } = useSyncState();
   const { tx } = useLang();
-  if (online && pending === 0) return null;
+  const [showDone, setShowDone] = useState(false);
+  const doneAt = lastResult && lastResult.applied > 0 && !failed ? lastResult.at : 0;
+  useEffect(() => {
+    if (!doneAt) return;
+    setShowDone(true);
+    const t = window.setTimeout(() => setShowDone(false), 5000);
+    return () => window.clearTimeout(t);
+  }, [doneAt]);
+
+  const state: 'offline' | 'syncing' | 'retry' | 'pending' | 'done' | null = !online
+    ? 'offline'
+    : syncing
+      ? 'syncing'
+      : pending > 0 && failed
+        ? 'retry'
+        : pending > 0
+          ? 'pending'
+          : showDone
+            ? 'done'
+            : null;
+  if (!state) return null;
+
+  const tone = {
+    offline: 'border-ink-700 bg-ink-800 text-white',
+    syncing: 'border-saffron-200 bg-saffron-50 text-ink-950',
+    pending: 'border-saffron-200 bg-saffron-50 text-ink-950',
+    retry: 'border-bad-600 bg-bad-50 text-ink-950',
+    done: 'border-good-600 bg-good-50 text-ink-950',
+  }[state];
+  const Icon = { offline: WifiOff, syncing: RefreshCw, pending: CloudOff, retry: AlertTriangle, done: CheckCircle2 }[state];
+  const label = {
+    offline: tx('ऑफ़लाइन', 'Offline'),
+    syncing: tx('सिंक हो रहा है…', 'Syncing…'),
+    pending: tx('सिंक बाकी है', 'Sync pending'),
+    retry: tx('सिंक नहीं हो पाया', 'Sync failed'),
+    done: tx('सिंक पूरा हुआ', 'Sync complete'),
+  }[state];
+  const detail = {
+    offline:
+      tx('डाउनलोड किए अध्याय और अभ्यास चलते रहेंगे। AI ट्यूटर, आवाज़ और फ़ोटो के लिए इंटरनेट चाहिए।', 'Downloaded chapters and practice still work. The AI tutor, voice and photo need internet.') +
+      (pending > 0 ? tx(` ${pending} उत्तर फ़ोन पर सुरक्षित हैं।`, ` ${pending} answer(s) saved on this phone.`) : ''),
+    syncing: tx(`${pending} उत्तर सर्वर पर भेजे जा रहे हैं।`, `Sending ${pending} answer(s) to the server.`),
+    pending: tx(`${pending} उत्तर सर्वर पर भेजने बाकी हैं।`, `${pending} answer(s) waiting to be sent.`),
+    retry: tx(`${pending} उत्तर फ़ोन पर सुरक्षित हैं, पर अभी भेजे नहीं जा सके।`, `${pending} answer(s) are safe on this phone but could not be sent yet.`),
+    done: tx(`${lastResult?.applied ?? 0} उत्तर सर्वर पर पहुँच गए। प्रगति अपडेट हो गई।`, `${lastResult?.applied ?? 0} answer(s) reached the server. Progress updated.`),
+  }[state];
+
   return (
-    <div className={`border-b px-4 py-2 text-sm ${online ? 'border-saffron-200 bg-saffron-50' : 'border-ink-700 bg-ink-800 text-white'}`} role="status">
+    <div className={`border-b-2 px-4 py-2 text-sm ${tone}`} role="status" aria-live="polite">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-1">
-        {online ? <CloudOff className="h-4 w-4" aria-hidden /> : <WifiOff className="h-4 w-4" aria-hidden />}
-        <span className="flex-1">
-          {online
-            ? tx(`${pending} उत्तर/पाठ सर्वर पर भेजने बाकी हैं।`, `${pending} offline answer(s) or lesson(s) waiting to sync.`)
-            : tx('आप ऑफ़लाइन हैं। डाउनलोड किए अध्याय और अभ्यास चलते रहेंगे।', 'You are offline. Downloaded chapters and practice still work.')}
-          {!online && pending > 0 && tx(` (${pending} सहेजे गए)`, ` (${pending} saved)`)}
-        </span>
-        {online && pending > 0 && (
-          <button onClick={() => void syncManager.flush()} className="inline-flex items-center gap-1 font-semibold text-ink-900 underline" disabled={syncing}>
-            <RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} aria-hidden />
-            {syncing ? tx('भेज रहे हैं…', 'Syncing…') : tx('अभी भेजें', 'Sync now')}
+        <Icon className={`h-4 w-4 shrink-0 ${state === 'syncing' ? 'motion-safe:animate-spin' : ''}`} aria-hidden />
+        <span className="font-display font-bold">{label}</span>
+        <span className="min-w-0 flex-1">{detail}</span>
+        {(state === 'pending' || state === 'retry') && (
+          <button onClick={() => void syncManager.flush()} className="inline-flex min-h-[44px] items-center gap-1 font-semibold text-ink-950 underline">
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+            {state === 'retry' ? tx('दोबारा कोशिश करें', 'Try again') : tx('अभी भेजें', 'Sync now')}
           </button>
         )}
-        {!online && (
-          <Link to="/app/offline" className="font-semibold text-white underline decoration-saffron-400">
+        {state === 'offline' && (
+          <Link to="/app/offline" className="inline-flex min-h-[44px] items-center font-semibold text-white underline decoration-saffron-400">
             {tx('ऑफ़लाइन पढ़ाई', 'Offline learning')}
           </Link>
         )}

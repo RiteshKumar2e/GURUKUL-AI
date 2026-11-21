@@ -97,7 +97,7 @@ export default function Register() {
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 409) {
-          const field = err.message.toLowerCase().includes('email') ? 'email' : 'username';
+          const field = err.raw.toLowerCase().includes('email') ? 'email' : 'username';
           setError(field, { message: field === 'email' ? tx('यह ईमेल पहले से दर्ज है', 'This email is already registered') : tx('यह यूज़रनेम कोई और ले चुका है', 'This username is taken') });
           setStep(field === 'email' ? 0 : 1);
           return;

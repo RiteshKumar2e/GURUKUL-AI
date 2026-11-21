@@ -5,10 +5,14 @@
  */
 
 const SUPERSCRIPTS: Record<string, string> = { '²': '^2', '³': '^3' };
+const VULGAR: Record<string, string> = { '½': '(1/2)', '⅓': '(1/3)', '⅔': '(2/3)', '¼': '(1/4)', '¾': '(3/4)' };
 
 export function normaliseExpression(input: string): string {
   let s = input.trim().toLowerCase();
   s = s.replace(/[²³]/g, (c) => SUPERSCRIPTS[c] ?? c);
+  s = s.replace(/[½⅓⅔¼¾]/g, (c) => VULGAR[c] ?? c);
+  // "2 3" is ambiguous (23? 2×3?). Mark it so the tokenizer rejects it instead of guessing.
+  s = s.replace(/(\d)\s+(?=\d)/g, '$1#');
   s = s
     .replace(/[−–—]/g, '-')
     .replace(/[×·]/g, '*')
@@ -154,9 +158,24 @@ export function evaluate(expression: string, variable?: string, value = 0): numb
   }
 }
 
-/** Parses a student's numeric answer: "5", "-2.5", "−5/2", "x = 4", "55°". */
+/** Trailing unit words a student may add: "12 cm", "5 sq units", "20 वर्ग सेमी", "9 cm²". */
+const UNIT_TAIL = /\s*(?:sq\.?|square|वर्ग)?\s*(?:cm|mm|km|m|units?|सेमी|मिमी|किमी|मीटर|मी|इकाई)\.?\s*(?:²|³|\^\s*[23])?\s*$/i;
+const SQ_TAIL = /\s*(?:sq\.?|square|वर्ग)\s*$/i;
+
+/**
+ * Parses a student's numeric answer: "5", "-2.5", "−5/2", "x = 4", "55°", "2 1/2" (mixed number),
+ * "12 cm", "sqrt(2)". Returns null when the answer is not a number it can read safely.
+ */
 export function parseNumericAnswer(raw: string): number | null {
-  const cleaned = raw.replace(/^[a-z]\s*=\s*/i, '').replace(/[₹,]/g, '').replace(/(cm|m|sq|units?|सेमी|मी|वर्ग|इकाई)\.?/gi, '');
+  let cleaned = raw.trim().replace(/^[a-z]\s*=\s*/i, '').replace(/₹/g, '').replace(/(\d),(?=\d{2,3}\b)/g, '$1');
+  cleaned = cleaned.replace(UNIT_TAIL, '').replace(SQ_TAIL, '').trim();
+  const mixed = cleaned.match(/^([+\-−]?)(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if (mixed) {
+    const [, sign, whole, num, den] = mixed;
+    if (Number(den) === 0) return null;
+    const v = Number(whole) + Number(num) / Number(den);
+    return sign === '-' || sign === '−' ? -v : v;
+  }
   return evaluate(cleaned);
 }
 

@@ -1,5 +1,5 @@
 import { and, count, desc, eq, gte } from 'drizzle-orm';
-import { db } from '../db/client';
+import { db, type Executor } from '../db/client';
 import {
   adaptiveRecommendations,
   learningProgress,
@@ -16,13 +16,13 @@ type ProgressFields = Partial<Omit<typeof learningProgress.$inferInsert, 'id' | 
 const recTopic = { columns: { slug: true, titleHi: true, titleEn: true }, with: { chapter: { columns: { slug: true, number: true, nameHi: true, nameEn: true } } } } as const;
 
 export const learningRepository = {
-  progressFor: async (studentId: string, topicId: string) =>
-    (await db.query.learningProgress.findFirst({ where: and(eq(learningProgress.studentId, studentId), eq(learningProgress.topicId, topicId)) })) ?? null,
+  progressFor: async (studentId: string, topicId: string, ex: Executor = db) =>
+    (await ex.query.learningProgress.findFirst({ where: and(eq(learningProgress.studentId, studentId), eq(learningProgress.topicId, topicId)) })) ?? null,
 
   /** Atomic insert-or-update on the (student, topic) unique index. */
-  upsertProgress: async (studentId: string, topicId: string, data: ProgressFields) =>
+  upsertProgress: async (studentId: string, topicId: string, data: ProgressFields, ex: Executor = db) =>
     (
-      await db
+      await ex
         .insert(learningProgress)
         .values({ studentId, topicId, ...data })
         .onConflictDoUpdate({ target: [learningProgress.studentId, learningProgress.topicId], set: data })
@@ -35,7 +35,8 @@ export const learningRepository = {
       with: { topic: { columns: { id: true, slug: true, titleHi: true, titleEn: true }, with: { chapter: { columns: { slug: true, number: true, nameHi: true, nameEn: true } } } } },
     }),
 
-  createAnswer: async (data: {
+  createAnswer: async (
+    data: {
     studentId: string;
     questionId: string;
     sessionId?: string | null;
@@ -45,7 +46,9 @@ export const learningRepository = {
     timeTakenSec?: number | null;
     origin?: AnswerOrigin;
     answeredAt?: Date;
-  }) => (await db.insert(studentAnswers).values(data).returning())[0],
+    },
+    ex: Executor = db,
+  ) => (await ex.insert(studentAnswers).values(data).returning())[0],
 
   recentAnswers: (studentId: string, take = 20) =>
     db.query.studentAnswers.findMany({
@@ -62,6 +65,19 @@ export const learningRepository = {
       .innerJoin(questions, eq(questions.id, studentAnswers.questionId))
       .where(and(eq(studentAnswers.studentId, studentId), eq(studentAnswers.isCorrect, true), gte(studentAnswers.answeredAt, since), eq(questions.topicId, topicId)));
     return new Set(rows.map((r) => r.questionId));
+  },
+
+  /** Last attempt per question in a topic: when it was answered and whether that attempt was correct. */
+  lastAttemptsInTopic: async (studentId: string, topicId: string) => {
+    const rows = await db
+      .select({ questionId: studentAnswers.questionId, at: studentAnswers.answeredAt, isCorrect: studentAnswers.isCorrect })
+      .from(studentAnswers)
+      .innerJoin(questions, eq(questions.id, studentAnswers.questionId))
+      .where(and(eq(studentAnswers.studentId, studentId), eq(questions.topicId, topicId)))
+      .orderBy(studentAnswers.answeredAt);
+    const out = new Map<string, { at: Date; correct: boolean }>();
+    for (const r of rows) out.set(r.questionId, { at: r.at, correct: r.isCorrect }); // later rows win
+    return out;
   },
 
   answersSince: (studentId: string, since: Date) =>

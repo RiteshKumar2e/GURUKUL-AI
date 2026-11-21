@@ -238,6 +238,12 @@ export interface GuardianReport extends ProgressOverview {
 
 export interface TutorStructured {
   reply: string;
+  /** प्रश्न की समझ (older messages may not have it) */
+  understanding?: string | null;
+  /** आसान व्याख्या */
+  explanation?: string | null;
+  /** The question is maths but beyond Class 9 */
+  outOfSyllabus?: boolean;
   steps: Array<{ title: string; detail: string }>;
   hint: string | null;
   finalAnswer: string | null;

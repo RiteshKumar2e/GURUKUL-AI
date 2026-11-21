@@ -2,14 +2,14 @@
   "meta": {
     "description": "Class 9 Mathematics content for GURUKUL AI. Chapter titles follow the 12-chapter list of the rationalised NCERT Class 9 Mathematics textbook, which JAC is reported to follow. All lesson text, examples and questions below are ORIGINAL SAMPLE material written for this project. They are not copied from, and are not, official JAC or NCERT material.",
     "curriculumVerification": {
-      "status": "secondary-sources-only",
+      "status": "partially-verified",
       "verifiedOn": "2026-11-21",
-      "note": "Chapter list checked against secondary sources only. The official JAC notified syllabus PDF (jac.jharkhand.gov.in) could not be accessed during development. Check against it before any claim of syllabus alignment.",
+      "note": "An official JCERT Jharkhand document (reduced syllabus for Classes 9-12, session 2021-22) lists Class 9 Mathematics using the NCERT textbook's chapter and section numbering, which supports that JAC follows the NCERT book. The app's 12 chapters follow the later rationalised NCERT book, which drops 3 of the 15 chapters in that 2021-22 list. No official syllabus for the current session (2025-26 or 2026-27) could be read: JCERT links a 2026-27 Class 9 split-up syllabus only through a Google Drive folder whose files could not be opened. Treat alignment with the current JAC syllabus as unverified. See docs/JAC_CURRICULUM_AUDIT.md.",
       "sources": [
-        "https://school.careers360.com/boards/jac/jac-9th-syllabus",
-        "https://www.pw.live/state-boards/jac/exams/jac-class-9-maths-syllabus",
-        "https://byjus.com/jac/class-9-maths-syllabus",
-        "https://jac.jharkhand.gov.in (official, not accessed)"
+        "http://jcert.jharkhand.gov.in/public/assets/Guideline/20220808163146_62f0ed1aa7bbf.pdf (official JCERT, Reduced Syllabus Classes 9-12, 2021-22: read)",
+        "http://jcert.jharkhand.gov.in/home/syllabus (official JCERT syllabus page: read)",
+        "https://drive.google.com/drive/folders/1FljzGq9aZNH5ZvytmUoisOmEcxLqZs33 (Split-up syllabus 2026-27, linked from the JCERT home page: folder listed, Class 9 file not opened)",
+        "https://jac.jharkhand.gov.in (official JAC site: no syllabus document found)"
       ]
     },
     "contentLicence": "Original sample content created for GURUKUL AI. Licence to be decided after reviewing hackathon ownership terms."

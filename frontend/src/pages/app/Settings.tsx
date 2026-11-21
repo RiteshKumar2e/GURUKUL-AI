@@ -70,7 +70,8 @@ export default function Settings() {
       await api('/users/me/password', { body: { currentPassword: v.currentPassword, newPassword: v.newPassword } });
       pwForm.reset();
       toast(tx('पासवर्ड बदल गया। कृपया फिर से लॉग इन करें।', 'Password changed. Please log in again.'));
-      await logout();
+      // The server has revoked every session; the student must sign in again either way
+      await logout({ force: true });
       navigate('/login');
     } catch (e) {
       pwForm.setError('currentPassword', { message: e instanceof ApiError ? tx('मौजूदा पासवर्ड गलत है', 'Current password is incorrect') : tx('बदला नहीं जा सका', 'Could not change it') });
@@ -84,7 +85,7 @@ export default function Settings() {
     setDeleteError(null);
     try {
       await api('/users/me', { method: 'DELETE', body: { password: deletePw } });
-      await logout();
+      await logout({ force: true });
       toast(tx('आपका खाता मिटा दिया गया', 'Your account has been deleted'), 'info');
       navigate('/', { replace: true });
     } catch (e) {
@@ -233,7 +234,7 @@ export default function Settings() {
 
       <Section title={tx('खाता', 'Account')}>
         <div className="panel space-y-3 p-4">
-          <Button variant="secondary" onClick={async () => { await logout(); navigate('/login'); }}>
+          <Button variant="secondary" onClick={async () => { if (await logout()) navigate('/login'); }}>
             {tx('लॉग आउट', 'Log out')}
           </Button>
           <div className="border-t border-line pt-4">

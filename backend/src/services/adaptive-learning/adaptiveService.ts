@@ -1,4 +1,5 @@
 import type { AnswerOrigin, Question, RecommendationKind } from '../../db/schema';
+import { db, type Executor } from '../../db/client';
 import { learningRepository } from '../../repositories/learningRepository';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
 import { gradeAnswer } from '../../utils/grading';
@@ -37,6 +38,57 @@ export function nextProgress(prev: ProgressState, isCorrect: boolean, difficulty
   };
 }
 
+export interface Attempt {
+  at: Date;
+  correct: boolean;
+}
+
+/** A correct answer this recent keeps a question out of practice for a while. */
+const SOLVED_COOLDOWN_MS = 6 * 3600_000;
+
+/**
+ * Pure, deterministic choice of the next practice question. Exported for tests.
+ *  1. Skip questions answered correctly in the last 6 hours.
+ *  2. Never repeat the question answered last (if any other question is available), so a student
+ *     who got it wrong sees a different question first and comes back to it later.
+ *  3. Prefer the student's current level, then the nearest level (easier before harder),
+ *     then questions never tried, then the one tried longest ago, then by id for stability.
+ * If every question was solved recently, the least recently answered one is offered again.
+ */
+export function pickQuestion<Q extends { id: string; difficulty: number }>(
+  pool: Q[],
+  level: number,
+  attempts: Map<string, Attempt>,
+  now = new Date(),
+): { question: Q; allRecentlySolved: boolean } | null {
+  if (pool.length === 0) return null;
+  let lastId: string | undefined;
+  let lastAt = -Infinity;
+  for (const [id, a] of attempts) if (a.at.getTime() > lastAt) [lastId, lastAt] = [id, a.at.getTime()];
+
+  const order = (a: Q, b: Q) => {
+    const da = Math.abs(a.difficulty - level) * 2 + (a.difficulty > level ? 1 : 0);
+    const db_ = Math.abs(b.difficulty - level) * 2 + (b.difficulty > level ? 1 : 0);
+    if (da !== db_) return da - db_;
+    const ta = attempts.get(a.id)?.at.getTime() ?? -Infinity;
+    const tb = attempts.get(b.id)?.at.getTime() ?? -Infinity;
+    if (ta !== tb) return ta - tb;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  };
+
+  const notSolved = pool.filter((q) => {
+    const a = attempts.get(q.id);
+    return !(a?.correct && now.getTime() - a.at.getTime() < SOLVED_COOLDOWN_MS);
+  });
+  const fresh = notSolved.filter((q) => q.id !== lastId);
+  const candidates = fresh.length ? fresh : notSolved;
+  if (candidates.length) return { question: [...candidates].sort(order)[0], allRecentlySolved: false };
+
+  const oldestFirst = [...pool].sort((a, b) => (attempts.get(a.id)?.at.getTime() ?? 0) - (attempts.get(b.id)?.at.getTime() ?? 0));
+  const notLast = oldestFirst.filter((q) => q.id !== lastId);
+  return { question: (notLast[0] ?? oldestFirst[0])!, allRecentlySolved: true };
+}
+
 const EMPTY: ProgressState = { attempts: 0, correct: 0, mastery: 0, currentDifficulty: 1, streak: 0 };
 
 export const adaptiveService = {
@@ -48,8 +100,11 @@ export const adaptiveService = {
     timeTakenSec?: number | null;
     origin?: AnswerOrigin;
     answeredAt?: Date;
+    /** Run inside a caller's transaction (offline sync applies each record atomically). */
+    ex?: Executor;
   }) {
     const { studentId, question } = params;
+    const ex = params.ex ?? db;
     const isCorrect = gradeAnswer(question.type, question.correctAnswer, params.answer);
     await learningRepository.createAnswer({
       studentId,
@@ -61,20 +116,25 @@ export const adaptiveService = {
       timeTakenSec: params.timeTakenSec ?? null,
       origin: params.origin ?? 'ONLINE',
       answeredAt: params.answeredAt,
-    });
-    const prev = await learningRepository.progressFor(studentId, question.topicId);
+    }, ex);
+    const prev = await learningRepository.progressFor(studentId, question.topicId, ex);
     const next = nextProgress(prev ?? EMPTY, isCorrect, question.difficulty);
-    const progress = await learningRepository.upsertProgress(studentId, question.topicId, { ...next, lastActivityAt: new Date() });
+    const progress = await learningRepository.upsertProgress(studentId, question.topicId, { ...next, lastActivityAt: new Date() }, ex);
     return { isCorrect, progress };
   },
 
-  async markLessonComplete(studentId: string, topicId: string, at = new Date()) {
-    const prev = await learningRepository.progressFor(studentId, topicId);
-    return learningRepository.upsertProgress(studentId, topicId, {
-      ...(prev ? {} : EMPTY),
-      lessonCompletedAt: prev?.lessonCompletedAt ?? at,
-      lastActivityAt: at,
-    });
+  async markLessonComplete(studentId: string, topicId: string, at = new Date(), ex: Executor = db) {
+    const prev = await learningRepository.progressFor(studentId, topicId, ex);
+    return learningRepository.upsertProgress(
+      studentId,
+      topicId,
+      {
+        ...(prev ? {} : EMPTY),
+        lessonCompletedAt: prev?.lessonCompletedAt ?? at,
+        lastActivityAt: at,
+      },
+      ex,
+    );
   },
 
   /** Topics the student is struggling with, weakest first. */
@@ -180,16 +240,10 @@ export const adaptiveService = {
 
     const progress = await learningRepository.progressFor(studentId, topicId);
     const difficulty = progress?.currentDifficulty ?? 1;
-    const recentCorrect = await learningRepository.recentCorrectQuestionIds(studentId, topicId, new Date(Date.now() - 6 * 3600_000));
-
-    const atLevel = (await curriculumRepository.questionsForTopic(topicId, difficulty)).filter((q) => !recentCorrect.has(q.id));
-    let pool = atLevel;
-    if (pool.length === 0) pool = (await curriculumRepository.questionsForTopic(topicId)).filter((q) => !recentCorrect.has(q.id));
-    const exhausted = pool.length === 0;
-    if (exhausted) pool = await curriculumRepository.questionsForTopic(topicId);
-    if (pool.length === 0) return null;
-
-    const question = pool[Math.floor(Math.random() * pool.length)];
+    const [pool, attempts] = await Promise.all([curriculumRepository.questionsForTopic(topicId), learningRepository.lastAttemptsInTopic(studentId, topicId)]);
+    const picked = pickQuestion(pool, difficulty, attempts);
+    if (!picked) return null;
+    const { question, allRecentlySolved: exhausted } = picked;
     const topic = await curriculumRepository.topicById(topicId);
     return {
       question,

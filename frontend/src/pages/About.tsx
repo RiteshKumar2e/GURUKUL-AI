@@ -34,15 +34,15 @@ export default function About() {
         {meta.data && (
           <div className="panel mt-3 p-4">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge tone="saffron">{tx('केवल द्वितीयक स्रोत', 'Secondary sources only')}</Badge>
+              <Badge tone="saffron">{tx('आंशिक रूप से जाँचा गया', 'Partly verified')}</Badge>
               <span className="text-sm text-ink-600">
                 {tx('जाँच की तारीख:', 'Checked on:')} {formatDate(meta.data.curriculumVerification.verifiedOn, { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
             <p className="mt-2 text-ink-800">
               {tx(
-                'अध्यायों की सूची संशोधित NCERT कक्षा 9 गणित (12 अध्याय) पर आधारित है। कई स्रोत बताते हैं कि JAC इसे अपनाता है, पर विकास के दौरान JAC की आधिकारिक अधिसूचित पाठ्यक्रम फ़ाइल नहीं खुल सकी। इसलिए हम आधिकारिक मिलान का दावा नहीं करते।',
-                'The chapter list follows the rationalised NCERT Class 9 Mathematics book (12 chapters). Several sources report that JAC follows it, but the official JAC notified syllabus file could not be opened during development, so we do not claim official alignment.',
+                'अध्यायों की सूची संशोधित NCERT कक्षा 9 गणित (12 अध्याय) पर आधारित है। झारखंड JCERT के आधिकारिक संक्षिप्त पाठ्यक्रम (सत्र 2021-22) में कक्षा 9 गणित NCERT पुस्तक की अध्याय-संख्या के अनुसार है, जिससे पता चलता है कि JAC यही पुस्तक अपनाता है। लेकिन चालू सत्र का आधिकारिक पाठ्यक्रम हम नहीं पढ़ सके, इसलिए चालू JAC पाठ्यक्रम से पूरे मिलान का दावा नहीं करते।',
+                'The chapter list follows the rationalised NCERT Class 9 Mathematics book (12 chapters). The official JCERT Jharkhand reduced syllabus for 2021-22 lists Class 9 maths by the NCERT book’s chapter numbers, which indicates JAC follows that book. We could not read the official syllabus for the current session, so we do not claim full alignment with the current JAC syllabus.',
               )}
             </p>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">

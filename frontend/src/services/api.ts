@@ -1,13 +1,18 @@
+import { localiseError } from '@/lib/errorText';
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || 'http://localhost:5000/api';
 
 export class ApiError extends Error {
+  /** The server's original (English) message, for code that inspects it */
+  public readonly raw: string;
   constructor(
     public status: number,
     public code: string,
     message: string,
     public details?: Array<{ field: string; message: string }>,
   ) {
-    super(message);
+    // Shown to students: in Hindi when the interface is in Hindi
+    super(localiseError(message, status));
+    this.raw = message;
   }
   get isNetwork() {
     return this.status === 0;

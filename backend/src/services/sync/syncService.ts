@@ -53,20 +53,30 @@ export const syncService = {
       }
 
       try {
+        // Look-ups happen before the transaction; the writes (answer, progress, APPLIED mark) are
+        // one transaction, so a failure part-way can never leave an answer stored without its
+        // record settled, which a retry would then store a second time.
         let isCorrect: boolean | undefined;
+        const claimId = claimed.id;
         if (rec.kind === 'answer') {
           const q = await curriculumRepository.questionById(rec.payload.questionId);
           if (!q) throw new RejectError('Unknown question');
-          const r = await adaptiveService.recordAnswer({ studentId, question: q, answer: rec.payload.answer, timeTakenSec: rec.payload.timeTakenSec, origin: 'OFFLINE_SYNC', answeredAt: when });
-          isCorrect = r.isCorrect;
+          const payload = rec.payload;
+          await db.transaction(async (tx) => {
+            const r = await adaptiveService.recordAnswer({ studentId, question: q, answer: payload.answer, timeTakenSec: payload.timeTakenSec, origin: 'OFFLINE_SYNC', answeredAt: when, ex: tx });
+            isCorrect = r.isCorrect;
+            await tx.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId));
+          });
         } else if (rec.kind === 'lesson-complete') {
           const t = await curriculumRepository.topicBySlug(rec.payload.topicSlug);
           if (!t) throw new RejectError('Unknown topic');
-          await adaptiveService.markLessonComplete(studentId, t.id, when);
+          await db.transaction(async (tx) => {
+            await adaptiveService.markLessonComplete(studentId, t.id, when, tx);
+            await tx.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId));
+          });
         } else {
           throw new RejectError('Unknown record kind');
         }
-        await db.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimed.id));
         changed = true;
         results.push({ clientId: rec.clientId, status: 'APPLIED', isCorrect });
       } catch (e) {

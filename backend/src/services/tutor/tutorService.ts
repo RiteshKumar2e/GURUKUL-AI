@@ -10,9 +10,15 @@ import { AIProviderError, type ChatMessage } from '../ai';
 import { getLlmProvider } from '../voice/registry';
 import { systemPrompt, userTurn, type TutorIntent, type TutorLanguage } from './prompts';
 import { calculatorFromText, verifyCheck, type CheckSpec } from './verifier';
+import { adaptiveService } from '../adaptive-learning/adaptiveService';
+
+const nullableText = z.string().nullable().optional().catch(null);
 
 const structuredSchema = z.object({
   reply: z.string().default(''),
+  understanding: nullableText,
+  explanation: nullableText,
+  outOfSyllabus: z.boolean().optional().catch(false),
   steps: z
     .array(z.object({ title: z.string().default(''), detail: z.string().default('') }))
     .default([])
@@ -97,13 +103,54 @@ function lessonContext(lesson: { content: unknown } | undefined, title: string) 
   return `Topic: ${title}\n${lines}`.slice(0, 2500);
 }
 
-function renderPlain(s: TutorStructured): string {
-  const parts = [s.reply];
-  if (s.steps.length) parts.push(s.steps.map((st, i) => `${i + 1}. ${st.title}: ${st.detail}`).join('\n'));
-  if (s.hint) parts.push(`Hint: ${s.hint}`);
-  if (s.finalAnswer) parts.push(`Answer: ${s.finalAnswer}`);
-  if (s.followUp) parts.push(s.followUp);
+/** Section headings in the fixed teaching order, used for the stored plain-text copy. */
+export const SECTION_TITLES = {
+  understanding: { HI: 'प्रश्न की समझ', EN: 'Understanding the question', TE: 'ప్రశ్న అర్థం' },
+  hint: { HI: 'पहला संकेत', EN: 'First hint', TE: 'మొదటి సూచన' },
+  explanation: { HI: 'आसान व्याख्या', EN: 'Simple explanation', TE: 'సులభ వివరణ' },
+  steps: { HI: 'चरण-दर-चरण हल', EN: 'Step-by-step solution', TE: 'దశల వారీ పరిష్కారం' },
+  finalAnswer: { HI: 'अंतिम उत्तर', EN: 'Final answer', TE: 'తుది సమాధానం' },
+  followUp: { HI: 'अब आप कोशिश करें', EN: 'Now you try', TE: 'ఇప్పుడు మీరు ప్రయత్నించండి' },
+} as const;
+
+export function renderPlain(s: TutorStructured): string {
+  const t = (k: keyof typeof SECTION_TITLES) => SECTION_TITLES[k][s.language];
+  const parts: Array<string | null | undefined> = [s.reply];
+  if (s.understanding) parts.push(`${t('understanding')}: ${s.understanding}`);
+  if (s.hint) parts.push(`${t('hint')}: ${s.hint}`);
+  if (s.explanation) parts.push(`${t('explanation')}: ${s.explanation}`);
+  if (s.steps.length) parts.push(`${t('steps')}:\n${s.steps.map((st, i) => `${i + 1}. ${st.title}: ${st.detail}`).join('\n')}`);
+  if (s.finalAnswer) parts.push(`${t('finalAnswer')}: ${s.finalAnswer}`);
+  if (s.followUp) parts.push(`${t('followUp')}: ${s.followUp}`);
   return parts.filter(Boolean).join('\n\n');
+}
+
+/**
+ * Turns the model's raw text into the structured reply. Pure, so the rules are unit-tested:
+ *  - unparseable output is kept as plain text with low confidence and a warning;
+ *  - a hint request never carries the final answer or a calculator check (whose computed value
+ *    would give the answer away);
+ *  - a calculator mismatch lowers confidence and tells the student not to rely on the answer.
+ */
+export function buildStructured(text: string, intent: TutorIntent, language: TutorLanguage): TutorStructured {
+  const raw = extractJson(text);
+  const parsed = structuredSchema.safeParse(raw ?? {});
+  const base =
+    parsed.success && (parsed.data.reply || parsed.data.steps.length)
+      ? parsed.data
+      : structuredSchema.parse({ reply: text.slice(0, 2000), confidence: 'low', caveat: MSG.badFormat[language] });
+  if (intent === 'hint') {
+    base.finalAnswer = null;
+    base.check = null;
+    base.steps = base.steps.slice(0, 1);
+  }
+  const v = verifyCheck(base.check as CheckSpec | null);
+  const structured: TutorStructured = { ...base, outOfSyllabus: base.outOfSyllabus ?? false, verification: v.status, computed: v.computed, intent, language };
+  if (v.status === 'mismatch') {
+    structured.confidence = 'low';
+    structured.caveat = [structured.caveat, MSG.mismatch[language](Math.round((v.computed ?? 0) * 10000) / 10000)].filter(Boolean).join(' ');
+  }
+  return structured;
 }
 
 function demoReply(content: string, language: TutorLanguage, intent: TutorIntent, topic?: { titleHi: string; titleEn: string; summaryHi: string; summaryEn: string }): TutorStructured {
@@ -122,6 +169,9 @@ function demoReply(content: string, language: TutorLanguage, intent: TutorIntent
   }
   return {
     reply: MSG.demoReply[language],
+    understanding: null,
+    explanation: null,
+    outOfSyllabus: false,
     steps,
     hint: null,
     finalAnswer: null,
@@ -187,31 +237,25 @@ export const tutorService = {
         role: m.role === 'USER' ? 'user' : 'assistant',
         content: m.content.slice(0, 2000),
       }));
+      const weak = await adaptiveService.weakTopics(studentId).catch(() => []);
       const messages: ChatMessage[] = [
-        { role: 'system', content: systemPrompt({ language, level: student?.teachingLevel ?? 'STANDARD', voice: conversation.mode === 'VOICE', topicContext: topic ? lessonContext(topic.lessons[0], topic.titleEn) : undefined }) },
+        {
+          role: 'system',
+          content: systemPrompt({
+            language,
+            level: student?.teachingLevel ?? 'STANDARD',
+            voice: conversation.mode === 'VOICE',
+            topicContext: topic ? lessonContext(topic.lessons[0], topic.titleEn) : undefined,
+            weakTopics: weak.slice(0, 3).map((w) => `${w.topic.titleEn} (${Math.round(w.accuracy * 100)}% correct)`),
+          }),
+        },
         ...history,
         { role: 'user', content: userTurn(content, input.intent) },
       ];
       try {
         const result = await provider.chat(messages, { json: true, temperature: 0.25 });
         model = result.model;
-        const raw = extractJson(result.text);
-        const parsed = structuredSchema.safeParse(raw ?? {});
-        const base = parsed.success && (parsed.data.reply || parsed.data.steps.length)
-          ? parsed.data
-          : structuredSchema.parse({ reply: result.text.slice(0, 2000), confidence: 'low', caveat: MSG.badFormat[language] });
-        if (input.intent === 'hint') base.finalAnswer = null; // never leak the answer on a hint request
-        const v = verifyCheck(base.check as CheckSpec | null);
-        structured = { ...base, verification: v.status, computed: v.computed, intent: input.intent, language };
-        if (v.status === 'mismatch') {
-          structured.confidence = 'low';
-          structured.caveat = [
-            structured.caveat,
-            MSG.mismatch[language](Math.round((v.computed ?? 0) * 10000) / 10000),
-          ]
-            .filter(Boolean)
-            .join(' ');
-        }
+        structured = buildStructured(result.text, input.intent, language);
       } catch (err) {
         if (err instanceof AIProviderError) {
           await tutorRepository.deleteMessage(userMsg.id).catch(() => undefined);
