@@ -4,7 +4,7 @@
 
 # GURUKUL AI
 
-**A Hindi-first maths tutor for Class 9 students in Jharkhand (JAC board), built for low-cost Android phones and unreliable internet.**
+**A Hindi-first AI tutor for school students in Classes 1 to 12, built for low-cost Android phones and unreliable internet.**
 
 [![Live app](https://img.shields.io/badge/app-gurukul--ai.vercel.app-111111?style=flat-square)](https://gurukul-ai.vercel.app)
 [![API health](https://img.shields.io/badge/API-health-2ea44f?style=flat-square)](https://gurukul-ai-o0nq.onrender.com/api/health)
@@ -43,6 +43,7 @@
 
 - [The problem](#the-problem)
 - [Features](#features)
+- [Classes 1 to 12](#classes-1-to-12)
 - [How a question is answered](#how-a-question-is-answered)
 - [Architecture](#architecture)
 - [Quick start](#quick-start)
@@ -68,30 +69,62 @@
 
 ## The problem
 
-Many Class 9 students in Jharkhand study on a shared, low-cost phone, with patchy mobile data and nobody at home to ask when they get stuck. GURUKUL AI is designed around those conditions:
+Many school students in India, from Class 1 to Class 12, study on a shared, low-cost phone, with patchy mobile data and nobody at home to ask when they get stuck. GURUKUL AI is designed around those conditions:
 
 | Principle | What it means in the app |
 |---|---|
 | **Hindi first** | Hindi by default, English one tap away. The tutor can also reply in Telugu |
+| **Right level for every class** | The tutor teaches a Class 2 child, a Class 8 student and a Class 12 student differently, and stays inside the student's own class, board and subjects |
 | **Hints before answers** | The tutor teaches step by step instead of handing out solutions |
 | **Works on a weak network** | Lessons and practice keep working offline and sync later |
 | **Honest about AI** | Numeric answers are re-checked by a calculator, and uncertain or unverified answers are labelled |
-| **Safe for minors** | Students give only a name and username. Guardians see progress, never tutor conversations |
+| **Safe for minors** | Students give only a name and username, and declare that a parent or guardian agreed. Guardians see progress, never tutor conversations |
 
 ## Features
 
 | Feature | What the student gets | Offline |
 |---|---|:---:|
-| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question. Hindi, English or Telugu | ✗ |
+| **Class and subject choice** | Pick class (1–12), board, session, medium, stream (11–12) and subjects. Only subjects of that class are shown. Changing class keeps earlier progress | ✗ |
+| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question, pitched at the student's class and subject. Hindi, English or Telugu | ✗ |
 | **Answer checking** | A deterministic calculator re-checks the tutor's final number and shows whether it matched | ✗ |
 | **Voice tutor** | Speak the question, check and edit the transcript, then listen to the reply with play, pause, replay and stop. Typing always works as a fallback | ✗ |
 | **Photo questions** | Photograph a question from a book or notebook. The image is compressed on the phone; the student can correct the extracted text before asking | ✗ |
-| **Lessons** | 12 chapters, 24 short lessons with worked examples, in Hindi and English | ✓ after download |
-| **Adaptive practice** | 72 questions at three levels. Difficulty moves up or down with each answer; weak topics come first, with an explanation for every mistake | ✓ after download |
+| **Lessons** | Class 9 maths: 12 chapters, 24 short lessons with worked examples, in Hindi and English. Other classes: official NCERT chapter titles (maths, several classes) or book details | ✓ after download (lessons only) |
+| **Adaptive practice** | 72 Class 9 maths questions at three levels. Difficulty moves up or down with each answer; weak topics come first, with an explanation for every mistake | ✓ after download |
 | **Chapter quizzes** | A timed quiz per chapter, graded on the server | ✗ |
 | **Progress** | Topic mastery, accuracy, daily streak and recommended next steps | Read only |
 | **Parent and teacher view** | A guardian links with a 6-character code the student shares, and sees progress, weak topics and activity, but never the tutor conversations | ✗ |
 | **Installable app** | A PWA that installs to the home screen and caches the app shell | ✓ |
+
+## Classes 1 to 12
+
+Students choose their class, board, academic session, medium, stream (Classes 11–12) and subjects during onboarding, and can change them later under **Settings → Class and subjects**. The choice drives what they see everywhere: subjects and chapters, practice, quizzes, recommendations, the tutor's teaching style, and the class shown to parents and teachers.
+
+| Stage | Classes | How the tutor teaches |
+|---|---|---|
+| Primary | 1–5 | Very short sentences, one idea at a time, things to count or picture, a small activity |
+| Middle | 6–8 | Builds the concept from a relatable example, introduces terms gently, guided practice |
+| Secondary | 9–10 | Board-exam style: concept, reasoned steps, properly written answer, a common mistake |
+| Senior secondary | 11–12 | Deeper concepts with correct terminology, method and reasoning, board-style problem solving |
+
+**What exists today, honestly:**
+
+| Content | Coverage | Source |
+|---|---|---|
+| Subjects and textbooks, Classes 1–12 | All classes (4 to 25 subjects per class), session 2026-27 | Official NCERT textbook list, [ncert.nic.in/textbook.php](https://ncert.nic.in/textbook.php), read 21 Nov 2026 |
+| Maths chapter titles | Classes 2, 6, 7, 9, 10, 11, 12 | Contents page of each NCERT maths book (front-matter PDF). Classes 1, 3, 4, 5 and 8 show the official chapter count only: their contents pages could not be read as text |
+| Lessons, practice questions and quizzes | Class 9 maths only (original sample content, based on the earlier NCERT book, session 2025-26) | Written for this project |
+| Other subjects | Book titles and chapter counts; the AI tutor answers questions | Official NCERT list |
+
+| Board | Status | Why |
+|---|---|---|
+| JAC | Not verified | Subjects come from NCERT's list. An official JCERT 2021-22 document shows JAC followed NCERT for Class 9, but the current JAC syllabus could not be checked |
+| CBSE | Partly verified | Subjects and books are NCERT's official list. CBSE's own scheme of studies was not checked separately |
+| ICSE | Not available | No official source checked; it cannot be selected |
+
+Streams for Classes 11–12 (Science, Commerce, Humanities) are suggestions that pre-select common subjects; students can change any subject. NCERT itself does not define streams.
+
+The catalogue is data, not code: [`backend/content/curriculum-catalog.json`](backend/content/curriculum-catalog.json), loaded by `npm run db:seed`.
 
 ## How a question is answered
 
@@ -163,7 +196,7 @@ cp .env.example .env                 # Windows: copy .env.example .env
 npm install
 npm run db:check                     # read-only: is the database reachable?
 npm run db:migrate                   # create tables (first time)
-npm run db:seed                      # curriculum content (no user accounts)
+npm run db:seed                      # Classes 1-12 catalogue + Class 9 maths lessons (no accounts)
 npm run dev                          # http://localhost:5000/api
 ```
 
@@ -190,7 +223,7 @@ There are no built-in accounts. Open http://localhost:5173/register to create a 
 | `npm run preview` | — | Serve the production build (service worker active) |
 | `npm run db:check` | Read-only connection and table check | — |
 | `npm run db:migrate` | Apply pending migrations (non-destructive) | — |
-| `npm run db:seed` | Upsert curriculum content (creates no accounts) | — |
+| `npm run db:seed` | Upsert the Classes 1–12 catalogue and the Class 9 maths lessons (creates no accounts) | — |
 | `npm run db:generate` | Create a migration from `src/db/schema.ts` | — |
 | `npm run db:studio` | Browse data in Drizzle Studio | — |
 
@@ -267,12 +300,12 @@ Everything here is bundled into the browser, so it must never contain secrets.
 
 ## Database (Turso)
 
-The schema lives in [`backend/src/db/schema.ts`](backend/src/db/schema.ts): 22 tables covering accounts, student, parent and teacher profiles, curriculum (subjects, chapters, topics, lessons, questions, quizzes), learning sessions, answers, progress, recommendations, tutor conversations, sync records and anonymous analytics. Foreign keys, unique constraints and indexes are defined in the schema and in the generated SQL.
+The schema lives in [`backend/src/db/schema.ts`](backend/src/db/schema.ts): 27 tables covering accounts, student, parent and teacher profiles, the curriculum hierarchy (boards → academic sessions → classes → subjects → chapters → topics → lessons, questions, quizzes), each student's class-and-subject selections with history, learning sessions, answers, progress, recommendations, tutor conversations, sync records and anonymous analytics. Foreign keys, unique constraints and indexes are defined in the schema and in the generated SQL.
 
 | Concern | How it is handled |
 |---|---|
 | Connection | One module, [`backend/src/db/client.ts`](backend/src/db/client.ts), checks the connection at startup and reports it on `GET /api/health` without exposing credentials |
-| Migrations | `npm run db:migrate` applies only migrations not yet recorded in `__drizzle_migrations` |
+| Migrations | `npm run db:migrate` applies only migrations not yet recorded in `__drizzle_migrations`. Migration `0001` (Classes 1–12) only adds tables and nullable columns, inserts boards, sessions and classes, and gives every existing student an active Class 9 JAC selection with their current maths subject, so no data is lost |
 | Destructive changes | A migration containing `DROP TABLE`, `DROP COLUMN`, `DELETE FROM` or a table rebuild is refused unless `ALLOW_DESTRUCTIVE_MIGRATION=true` is set after a backup (`turso db shell <db> .dump > backup.sql`). Nothing in the project resets the database |
 | Transactions | Registration, account deletion, tutor messages and recommendation updates each run in a single transaction |
 | Retries | Transient network errors are retried with backoff, only for work that is safe to repeat |
@@ -360,9 +393,10 @@ All routes are under `/api`. Protected routes need `Authorization: Bearer <acces
 | health | `GET /health` |
 | auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
 | users | `GET/PATCH/DELETE /users/me`, `POST /users/me/password` |
-| students | `GET/PATCH /students/me`, `GET /students/me/dashboard`, `POST /students/me/link-code` |
+| students | `GET/PATCH /students/me`, `GET /students/me/dashboard`, `POST /students/me/link-code`, `GET/PUT /students/me/curriculum`, `GET /students/me/curriculum/history` |
+| catalogue (public) | `GET /catalog` (boards, sessions, Classes 1–12, stream suggestions), `GET /catalog/subjects?board=&session=&class=` |
 | parents / teachers | `POST /parents/link`, `GET /parents/students`, `GET /parents/students/:id/report`, `DELETE /parents/students/:id` |
-| curriculum | `GET /curriculum`, `GET /curriculum/sources`, `GET /chapters`, `GET /chapters/:slug`, `GET /chapters/:slug/offline-pack`, `GET /topics/:slug`, `POST /topics/:slug/complete` |
+| curriculum | `GET /curriculum` (the student's own subjects; or `?board=&session=&class=`), `GET /curriculum/sources`, `GET /chapters`, `GET /chapters/:slug`, `GET /chapters/:slug/offline-pack`, `GET /topics/:slug`, `POST /topics/:slug/complete` |
 | tutor | `GET/POST /tutor/conversations`, `GET/DELETE /tutor/conversations/:id`, `POST /tutor/conversations/:id/messages` |
 | voice / vision | `GET /voice/capabilities`, `POST /voice/transcribe?language=hi\|en\|te`, `POST /voice/speak`, `POST /vision/extract` |
 | practice | `GET /practice/next?topic=`, `POST /practice/answer`, `POST /practice/sessions`, `POST /practice/sessions/:id/end` |
@@ -387,7 +421,9 @@ Backend tests never touch the Turso database in `.env`. [`tests/globalSetup.ts`]
 | `backend/tests/db.test.ts` | Health check, CRUD, unique constraints, transaction rollback, JSON columns, progress upsert, nested relations, full account deletion, concurrent duplicate sync, retry policy |
 | `backend/tests/voice.test.ts` | WAV helpers, Sarvam and Gemini request formats (mocked), provider selection, voice API without keys, Telugu demo reply |
 | `backend/tests/logic.test.ts` | Calculator, answer grading, adaptive difficulty, AI answer verification, streaks |
-| `frontend/src/**/*.test.ts` | Audio encoding and cache keys |
+| `backend/tests/classes.test.ts` | Classes 1–12: catalogue and stages, subject rules per class, Class 1/5/8/10/11/12 flows, Science/Commerce/Humanities combinations, class-aware tutor prompts, changing class with history, migration backfill for existing Class 9 students, guardian consent, privacy |
+| `backend/tests/audit.test.ts` | Calculator edge cases, tutor reply structure, hint rules, question choice, atomic offline sync, account isolation |
+| `frontend/src/**/*.test.ts` | Audio encoding, offline grading, offline queue ownership and retry, Hindi error messages |
 
 ## Deployment
 
@@ -403,10 +439,10 @@ Backend tests never touch the Turso database in `.env`. [`tests/globalSetup.ts`]
 |---|---|
 | Root Directory | `backend` |
 | Build Command | `npm ci --include=dev && npm run build` |
-| Start Command | `npm run db:migrate && npm start` |
+| Start Command | `npm run db:migrate && npm run db:seed && npm start` |
 | Health Check Path | `/api/health` |
 
-`--include=dev` is required: with `NODE_ENV=production`, npm would otherwise skip TypeScript and the build would fail. The start command applies any pending migrations before the server starts; it never drops or resets data.
+`--include=dev` is required: with `NODE_ENV=production`, npm would otherwise skip TypeScript and the build would fail. The start command applies any pending migrations and upserts the curriculum catalogue before the server starts; neither step drops or resets data. Without the seed step, new students would find no subjects to choose: `GET /api/health` reports `database.catalogSubjects` so this is easy to check.
 
 **Environment** (Render → Environment). Set everything from `backend/.env.example` with real values, plus the production settings below. Do not set `PORT`; Render provides it.
 
@@ -460,8 +496,10 @@ What has and has not been checked, as observed during development:
 
 | Item | Status |
 |---|---|
-| Backend: lint, 59/59 tests, production build | Passing (2026-11-21) |
-| Frontend: lint, 5/5 tests, production build | Passing (2026-11-21) |
+| Backend: lint, 103/103 tests, production build | Passing locally (2026-11-21) |
+| Frontend: lint, 15/15 tests, production build | Passing locally (2026-11-21) |
+| Migration 0001 (Classes 1–12) | Applied to a fresh database in every test run, and rehearsed on a copy shaped like production. **Not yet applied to production** |
+| Classes 1–12 screens (onboarding, class change, subject tabs, tutor subject) | Type-checked and built; **not yet checked in a browser or on a phone** |
 | Turso database: migration, seed, health check, login and curriculum API | Verified against a live Turso database (2026-11-21) |
 | Render deployment | `/api/health` returns `db: up` with migrations applied and AI live; CORS allows the Vercel origin (2026-11-21) |
 | Vercel frontend talking to the Render API | Depends on `VITE_API_URL` being set on Vercel; not yet confirmed end to end |
@@ -473,7 +511,10 @@ What has and has not been checked, as observed during development:
 
 ## Known limitations
 
-- **Curriculum alignment.** The chapter list was checked against secondary sources, not the official JAC notified syllabus (see `backend/content/class9-maths.json`, `meta`). All lessons are original sample content and not enough for a full course.
+- **Content depth.** Only Class 9 maths has lessons, practice and quizzes. All other classes and subjects have the official subject and book list (and, for maths in several classes, chapter titles) plus the AI tutor. No lessons were generated for them, to avoid inventing syllabus content.
+- **Class 9 book change.** NCERT published a new Class 9 maths book (*Ganita Manjari*, April 2026). The existing Class 9 lessons follow the earlier 12-chapter book, so they are filed under session 2025-26.
+- **Curriculum alignment.** JAC's current syllabus and CBSE's own scheme of studies were not checked against official documents; ICSE is not available. Chapter titles are shown in English (the Hindi titles were not read from the Hindi books).
+- **Guardian consent.** Students declare that a parent or guardian agreed, and a linked parent can confirm it. This is not a verified-consent process.
 - **Telugu.** Lessons and questions are in Hindi and English only. Telugu is supported in tutor replies, not in lesson content.
 - **Password reset.** Students give no email address, so there is no self-service reset.
 - **Answer checking.** The calculator confirms only the final number of arithmetic or one-variable linear answers. It does not check reasoning or geometry proofs.
@@ -486,7 +527,9 @@ What has and has not been checked, as observed during development:
 
 Planned next steps, taken from the gaps above:
 
-- [ ] Align lessons with the official JAC notified syllabus and expand content beyond sample chapters
+- [ ] Verify the current JAC, CBSE and ICSE syllabi against official documents
+- [ ] Lessons and question banks beyond Class 9 maths, written from the verified syllabus
+- [ ] Hindi chapter titles from the Hindi-medium NCERT books
 - [ ] Telugu lessons and practice questions, and native-speaker review of server-written Telugu strings
 - [ ] Field testing on real low-end Android devices and slow networks
 - [ ] End-to-end check of the Vercel frontend against the Render API
