@@ -79,7 +79,8 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
           <ToastProvider>
-            <BrowserRouter>
+            {/* Opt in to React Router v7 behaviour now; silences the future-flag console warnings */}
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <AuthProvider>
                 <ScrollAndAnalytics />
                 <Suspense fallback={<Loading />}>
