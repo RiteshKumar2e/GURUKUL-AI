@@ -97,7 +97,7 @@ export default function Dashboard() {
                 <ActivityBars days={q.data.last7} />
               </div>
             </Section>
-            <Section title={tx('ध्यान देने वाले विषय', 'Topics that need work')} action={<Link to="/app/progress" className="text-sm font-semibold">{tx('पूरी प्रगति', 'Full progress')}</Link>}>
+            <Section title={tx('ध्यान देने वाले विषय', 'Topics that need work')} action={<Link to="/app/progress" className="inline-flex min-h-[44px] items-center text-sm font-semibold">{tx('पूरी प्रगति', 'Full progress')}</Link>}>
               {q.data.weakTopics.length ? (
                 <WeakTopicList items={q.data.weakTopics} />
               ) : (

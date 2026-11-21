@@ -187,7 +187,7 @@ export default function Quiz() {
             <legend className="sr-only">{tx('विकल्प', 'Options')}</legend>
             {question.options.map((o) => (
               <label key={o.id} className={`flex cursor-pointer items-center gap-3 rounded-md border-2 px-3 py-3 ${answers[question.id] === o.id ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`}>
-                <input type="radio" name={`quiz-${question.id}`} className="h-4 w-4 accent-ink-900" checked={answers[question.id] === o.id} onChange={() => setAnswers((a) => ({ ...a, [question.id]: o.id }))} />
+                <input type="radio" name={`quiz-${question.id}`} className="h-5 w-5 accent-ink-950" checked={answers[question.id] === o.id} onChange={() => setAnswers((a) => ({ ...a, [question.id]: o.id }))} />
                 <span className="w-5 font-semibold uppercase text-ink-500">{o.id}</span>
                 <span>{bi(o)}</span>
               </label>

@@ -1,9 +1,8 @@
 /* Latin: Archivo (one variable file, ~35 KB, all weights). */
 @import '@fontsource-variable/archivo/wght.css';
-/* Devanagari: Mukta. Archivo has no Hindi glyphs, so the browser falls through to Mukta and only
+/* Devanagari: Mukta 400 + 700 only (~100 KB each; semibold text uses 700). Archivo has no Hindi glyphs, so the browser falls through to Mukta and only
    downloads these files on pages that show Hindi. */
 @import '@fontsource/mukta/devanagari-400.css';
-@import '@fontsource/mukta/devanagari-600.css';
 @import '@fontsource/mukta/devanagari-700.css';
 /* Telugu for the voice tutor (~36 KB woff2), fetched only when Telugu text is on screen. */
 @import '@fontsource/noto-sans-telugu/telugu-400.css';

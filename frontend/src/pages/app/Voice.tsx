@@ -281,11 +281,11 @@ export default function Voice() {
 
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-3 text-sm text-ink-800">
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="h-4 w-4 accent-ink-900" checked={autoAsk} onChange={(e) => setAutoAsk(e.target.checked)} />
+            <input type="checkbox" className="h-5 w-5 accent-ink-950" checked={autoAsk} onChange={(e) => setAutoAsk(e.target.checked)} />
             {tx('बोलना रुकते ही अपने-आप पूछें', 'Ask automatically when I stop speaking')}
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="h-4 w-4 accent-ink-900" checked={autoRead} onChange={(e) => setAutoRead(e.target.checked)} />
+            <input type="checkbox" className="h-5 w-5 accent-ink-950" checked={autoRead} onChange={(e) => setAutoRead(e.target.checked)} />
             {tx('जवाब अपने-आप सुनाएँ', 'Read answers aloud automatically')}
           </label>
         </div>

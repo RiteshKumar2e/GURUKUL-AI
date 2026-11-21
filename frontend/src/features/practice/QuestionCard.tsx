@@ -88,7 +88,7 @@ export function QuestionCard({ question, onSubmit, onNext, nextLabel, showHint =
                     isRight ? 'border-good-600 bg-good-50' : isWrongChoice ? 'border-bad-600 bg-bad-50' : chosen ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'
                   }`}
                 >
-                  <input type="radio" name={`q-${question.id}`} value={o.id} checked={chosen} onChange={() => setAnswer(o.id)} className="h-4 w-4 accent-ink-900" />
+                  <input type="radio" name={`q-${question.id}`} value={o.id} checked={chosen} onChange={() => setAnswer(o.id)} className="h-5 w-5 accent-ink-950" />
                   <span className="w-5 font-semibold uppercase text-ink-500">{o.id}</span>
                   <span className="flex-1 text-ink-900">{bi(o)}</span>
                   {isRight && <CheckCircle2 className="h-5 w-5 text-good-600" aria-label={tx('सही', 'Correct')} />}
@@ -130,7 +130,7 @@ export function QuestionCard({ question, onSubmit, onNext, nextLabel, showHint =
                 {hint}
               </p>
             ) : (
-              <button type="button" onClick={() => setHintOpen(true)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-800 underline decoration-saffron-400 decoration-2 underline-offset-4">
+              <button type="button" onClick={() => setHintOpen(true)} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-ink-800 underline decoration-saffron-400 decoration-2 underline-offset-4">
                 <Lightbulb className="h-4 w-4" aria-hidden />
                 {tx('संकेत देखें', 'Show a hint')}
               </button>
