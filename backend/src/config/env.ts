@@ -44,12 +44,18 @@ const schema = z.object({
   // Voice: auto = Sarvam if SARVAM_API_KEY is set (best for Telugu/Hindi), else Groq Whisper, else browser only
   STT_PROVIDER: z.enum(['auto', 'sarvam', 'groq', 'none']).default('auto'),
   // auto = Sarvam if SARVAM_API_KEY is set, else the browser's own speechSynthesis
-  TTS_PROVIDER: z.enum(['auto', 'sarvam', 'browser']).default('auto'),
+  // Read-aloud voice: auto = Gemini first, Sarvam if Gemini fails, else the device voice
+  TTS_PROVIDER: z.enum(['auto', 'gemini', 'sarvam', 'browser']).default('auto'),
+  GEMINI_TTS_BASE_URL: z.string().url().optional().default('https://generativelanguage.googleapis.com/v1beta'),
+  GEMINI_TTS_MODEL: z.string().optional().default('gemini-2.5-flash-preview-tts'),
+  // Prebuilt Gemini voice (e.g. Kore, Aoede, Leda = female; Puck, Charon, Orus = male); the accent comes from the style instruction
+  GEMINI_TTS_VOICE: z.string().optional().default('Kore'),
   SARVAM_API_KEY: z.string().optional().default(''),
   SARVAM_BASE_URL: z.string().url().optional().default('https://api.sarvam.ai'),
   SARVAM_STT_MODEL: z.string().optional().default('saarika:v2.5'),
-  SARVAM_TTS_MODEL: z.string().optional().default('bulbul:v2'),
-  SARVAM_TTS_SPEAKER: z.string().optional().default('anushka'),
+  SARVAM_TTS_MODEL: z.string().optional().default('bulbul:v3'),
+  // bulbul:v3 voices include priya, neha, ritu, kavya, shreya (female) and rahul, aditya, amit, rohan (male)
+  SARVAM_TTS_SPEAKER: z.string().optional().default('priya'),
   VOICE_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
   FRONTEND_URL: z.string().min(1).default('http://localhost:5173'),
   UPLOAD_DIR: z.string().default('uploads'),

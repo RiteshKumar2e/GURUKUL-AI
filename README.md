@@ -274,13 +274,16 @@ Generate secrets with `node -e "console.log(require('crypto').randomBytes(48).to
 | `GEMINI_API_KEY` | empty | From https://aistudio.google.com/apikey |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` | |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | |
-| `STT_PROVIDER` | `auto` | Sarvam if `SARVAM_API_KEY` is set, else Groq Whisper, else browser only |
-| `TTS_PROVIDER` | `auto` | Sarvam if `SARVAM_API_KEY` is set, else the device voice |
+| `STT_PROVIDER` | `auto` | Sarvam if `SARVAM_API_KEY` is set (Groq Whisper takes over if Sarvam fails), else Groq Whisper, else browser only |
+| `TTS_PROVIDER` | `auto` | `auto`: Gemini voice first, Sarvam if Gemini fails, then the device voice. Also `gemini`, `sarvam`, `browser` |
+| `GEMINI_TTS_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` | Native Gemini API, used for read-aloud |
+| `GEMINI_TTS_MODEL` | `gemini-2.5-flash-preview-tts` | Gemini speech model. Replies are read with an Indian teacher's accent in Hindi, Indian English and Telugu |
+| `GEMINI_TTS_VOICE` | `Kore` | Prebuilt voice: Kore, Aoede, Leda (female); Puck, Charon, Orus (male) |
 | `SARVAM_API_KEY` | empty | From https://dashboard.sarvam.ai |
 | `SARVAM_BASE_URL` | `https://api.sarvam.ai` | |
 | `SARVAM_STT_MODEL` | `saarika:v2.5` | |
-| `SARVAM_TTS_MODEL` | `bulbul:v2` | |
-| `SARVAM_TTS_SPEAKER` | `anushka` | |
+| `SARVAM_TTS_MODEL` | `bulbul:v3` | `bulbul:v2` was retired by Sarvam |
+| `SARVAM_TTS_SPEAKER` | `priya` | Voices for v3 include priya, neha, ritu, kavya, shreya, rahul, aditya, amit, rohan |
 | `VOICE_TIMEOUT_MS` | `30000` | |
 
 Groq retires models over time. List what your key can use with `GET https://api.groq.com/openai/v1/models`.
@@ -508,7 +511,7 @@ What has and has not been checked, as observed during development:
 
 | Item | Status |
 |---|---|
-| Backend: lint, 117/117 tests, production build | Passing locally (2026-11-22) |
+| Backend: lint, 123/123 tests, production build | Passing locally (2026-11-22) |
 | Frontend: lint, 26/26 tests, production build | Passing locally (2026-11-22) |
 | Migration 0001 (Classes 1–12) | Applied to a fresh database in every test run, and rehearsed on a copy shaped like production. **Not yet applied to production** |
 | Classes 1–12 screens (onboarding, class change, subject tabs, tutor subject) | Type-checked and built; **not yet checked in a browser or on a phone** |

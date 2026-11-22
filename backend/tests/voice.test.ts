@@ -89,12 +89,12 @@ describe('Sarvam speech-to-text', () => {
 describe('Sarvam text-to-speech', () => {
   it('sends JSON per chunk and returns one WAV', async () => {
     const calls = mockFetch(() => ({ audios: [wav([5, 6]).toString('base64')] }));
-    const tts = new SarvamTtsProvider({ apiKey: 'k', baseUrl: 'https://api.sarvam.ai', model: 'bulbul:v2', speaker: 'anushka', timeoutMs: 5000 });
+    const tts = new SarvamTtsProvider({ apiKey: 'k', baseUrl: 'https://api.sarvam.ai', model: 'bulbul:v3', speaker: 'priya', timeoutMs: 5000 });
     const long = 'మొదటి దశ. '.repeat(60); // > 450 chars, so at least two requests
     const r = await tts.synthesize(long, 'te');
     expect(calls.length).toBeGreaterThan(1);
     const body = JSON.parse(calls[0].init.body as string);
-    expect(body).toMatchObject({ target_language_code: 'te-IN', speaker: 'anushka', model: 'bulbul:v2' });
+    expect(body).toMatchObject({ target_language_code: 'te-IN', speaker: 'priya', model: 'bulbul:v3' });
     expect(typeof body.text).toBe('string');
     expect(calls[0].url).toBe('https://api.sarvam.ai/text-to-speech');
     expect(r.mimeType).toBe('audio/wav');
@@ -129,14 +129,23 @@ describe('provider selection', () => {
   });
 
   it('auto picks Sarvam when its key is set', () => {
-    Object.assign(env, { STT_PROVIDER: 'auto', TTS_PROVIDER: 'auto', SARVAM_API_KEY: 'x', sarvamEnabled: true });
+    Object.assign(env, { STT_PROVIDER: 'auto', TTS_PROVIDER: 'auto', SARVAM_API_KEY: 'x', sarvamEnabled: true, GEMINI_API_KEY: '', geminiEnabled: false });
     resetVoiceProvidersForTests();
     expect(getSttProvider().name).toBe('sarvam');
     expect(getTtsProvider()?.name).toBe('sarvam');
   });
 
+  it('auto reads aloud with Gemini first and Sarvam as the backup', () => {
+    Object.assign(env, { TTS_PROVIDER: 'auto', SARVAM_API_KEY: 'x', sarvamEnabled: true, GEMINI_API_KEY: 'g', geminiEnabled: true });
+    resetVoiceProvidersForTests();
+    expect(getTtsProvider()?.name).toBe('gemini+sarvam');
+    Object.assign(env, { SARVAM_API_KEY: '', sarvamEnabled: false });
+    resetVoiceProvidersForTests();
+    expect(getTtsProvider()?.name).toBe('gemini');
+  });
+
   it('falls back to browser voice and no server STT without keys', () => {
-    Object.assign(env, { STT_PROVIDER: 'auto', TTS_PROVIDER: 'auto', SARVAM_API_KEY: '', sarvamEnabled: false, AI_API_KEY: '', aiEnabled: false });
+    Object.assign(env, { STT_PROVIDER: 'auto', TTS_PROVIDER: 'auto', SARVAM_API_KEY: '', sarvamEnabled: false, AI_API_KEY: '', aiEnabled: false, GEMINI_API_KEY: '', geminiEnabled: false });
     resetVoiceProvidersForTests();
     expect(getSttProvider().live).toBe(false);
     expect(getTtsProvider()).toBeNull();

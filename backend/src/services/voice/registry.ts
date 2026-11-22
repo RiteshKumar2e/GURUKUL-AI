@@ -2,6 +2,7 @@ import { env } from '../../config/env';
 import { AIProviderError, getAIProvider, getGroqProvider, resetAIProviders, type AIProvider } from '../ai';
 import { SarvamSttProvider } from '../speech/sarvamStt';
 import { SarvamTtsProvider } from '../speech/sarvamTts';
+import { GeminiTtsProvider, ttsChain } from '../speech/geminiTts';
 import type { SttProvider, TtsProvider, VoiceLanguage } from './types';
 
 /** The tutor's language model. Same object the text tutor uses (see services/ai). */
@@ -53,9 +54,30 @@ export function getSttProvider(): SttProvider {
       sttCache = noStt;
       break;
     default:
-      sttCache = (env.sarvamEnabled ? sarvamStt() : null) ?? groqStt() ?? noStt;
+      sttCache = withSttFallback(env.sarvamEnabled ? sarvamStt() : null, groqStt()) ?? noStt;
   }
   return sttCache;
+}
+
+/**
+ * Sarvam first (better with Indian accents), Groq Whisper when Sarvam fails, for example when the
+ * Sarvam account has run out of credits, so asking by voice keeps working.
+ */
+function withSttFallback(primary: SttProvider | null, backup: SttProvider | null): SttProvider | null {
+  if (!primary || !backup) return primary ?? backup;
+  return {
+    name: primary.name,
+    live: true,
+    async transcribe(input, language) {
+      try {
+        return await primary.transcribe(input, language);
+      } catch (e) {
+        if (!(e instanceof AIProviderError)) throw e;
+        console.warn(`[voice] ${primary.name} transcription failed (${e.message.slice(0, 120)}), using ${backup.name}`);
+        return backup.transcribe(input, language);
+      }
+    },
+  };
 }
 
 export function getLlmProvider(): LlmProvider {
@@ -64,15 +86,20 @@ export function getLlmProvider(): LlmProvider {
 
 /**
  * Server text-to-speech, chosen by TTS_PROVIDER. Returns null when the browser's own voice should be used.
- *   auto → Sarvam if SARVAM_API_KEY, else null
+ *   auto   → Gemini, then Sarvam if Gemini fails (each only when its key is set), else null
+ *   gemini → Gemini only; sarvam → Sarvam only; browser → null
+ * If every server voice fails, the app falls back to the device voice.
  */
 export function getTtsProvider(): TtsProvider | null {
   if (ttsCache !== undefined) return ttsCache;
-  const wantSarvam = env.TTS_PROVIDER === 'sarvam' || (env.TTS_PROVIDER === 'auto' && env.sarvamEnabled);
-  ttsCache =
-    wantSarvam && env.sarvamEnabled
-      ? new SarvamTtsProvider({ apiKey: env.SARVAM_API_KEY, baseUrl: env.SARVAM_BASE_URL, model: env.SARVAM_TTS_MODEL, speaker: env.SARVAM_TTS_SPEAKER, timeoutMs: env.VOICE_TIMEOUT_MS })
-      : null;
+  const gemini = env.geminiEnabled
+    ? new GeminiTtsProvider({ apiKey: env.GEMINI_API_KEY, baseUrl: env.GEMINI_TTS_BASE_URL, model: env.GEMINI_TTS_MODEL, voice: env.GEMINI_TTS_VOICE, timeoutMs: env.VOICE_TIMEOUT_MS })
+    : null;
+  const sarvam = env.sarvamEnabled
+    ? new SarvamTtsProvider({ apiKey: env.SARVAM_API_KEY, baseUrl: env.SARVAM_BASE_URL, model: env.SARVAM_TTS_MODEL, speaker: env.SARVAM_TTS_SPEAKER, timeoutMs: env.VOICE_TIMEOUT_MS })
+    : null;
+  const pick: Array<TtsProvider | null> = { auto: [gemini, sarvam], gemini: [gemini], sarvam: [sarvam], browser: [] }[env.TTS_PROVIDER];
+  ttsCache = ttsChain(pick.filter((p): p is TtsProvider => !!p));
   return ttsCache;
 }
 
