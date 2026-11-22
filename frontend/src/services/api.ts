@@ -28,6 +28,16 @@ function apiBase(): string {
 
 const BASE = apiBase();
 
+/**
+ * Big binary traffic (read-aloud audio, voice recordings, photos) goes straight to the API, not
+ * through the Vercel proxy: the proxy cuts responses and uploads of a few MB, which showed up as
+ * ERR_CONNECTION_RESET on /voice/speak. These calls are authorised with the Bearer token, not the
+ * cookie, so the direct cross-site call is fine. Locally the Vite proxy has no such limit.
+ */
+const DIRECT_BASE = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname) ? BASE : CONFIGURED;
+const DIRECT_PATHS = /^\/(voice|vision)\//;
+const baseFor = (path: string) => (DIRECT_PATHS.test(path) ? DIRECT_BASE : BASE);
+
 export class ApiError extends Error {
   /** The server's original (English) message, for code that inspects it */
   public readonly raw: string;
@@ -136,7 +146,7 @@ export async function apiBlob(path: string, body: unknown, retry = true): Promis
   if (retry) await ensureFreshToken();
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, {
+    res = await fetch(`${baseFor(path)}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
       credentials: 'include',
@@ -155,7 +165,7 @@ export async function apiBlob(path: string, body: unknown, retry = true): Promis
 
 export async function api<T = unknown>(path: string, opts: Options = {}): Promise<T> {
   if (opts.retry !== false && !path.startsWith('/auth/')) await ensureFreshToken();
-  const url = new URL(`${BASE}${path}`);
+  const url = new URL(`${baseFor(path)}${path}`);
   Object.entries(opts.query ?? {}).forEach(([k, v]) => v !== undefined && url.searchParams.set(k, v));
   const headers: Record<string, string> = {};
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
