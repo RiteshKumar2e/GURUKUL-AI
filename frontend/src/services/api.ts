@@ -92,6 +92,26 @@ export function refreshSessionDetailed(): Promise<RefreshResult> {
   return refreshingResult;
 }
 
+/** Seconds until the access token expires (from its `exp` claim), or null when unknown. */
+function secondsLeft(token: string): number | null {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as { exp?: number };
+    return typeof payload.exp === 'number' ? payload.exp - Date.now() / 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The access token lasts 15 minutes. Renew it shortly before it runs out instead of letting a
+ * request fail with 401 first (which the browser logs as an error even though it is handled).
+ */
+async function ensureFreshToken() {
+  if (!accessToken) return;
+  const left = secondsLeft(accessToken);
+  if (left !== null && left < 30) await refreshSession();
+}
+
 let lastRefreshUser: unknown = null;
 export const takeRefreshedUser = () => lastRefreshUser;
 
@@ -110,6 +130,7 @@ interface Options {
 
 /** POST JSON and receive binary (e.g. audio). Same auth/refresh behaviour as api(). */
 export async function apiBlob(path: string, body: unknown, retry = true): Promise<Blob> {
+  if (retry) await ensureFreshToken();
   let res: Response;
   try {
     res = await fetch(`${BASE}${path}`, {
@@ -130,6 +151,7 @@ export async function apiBlob(path: string, body: unknown, retry = true): Promis
 }
 
 export async function api<T = unknown>(path: string, opts: Options = {}): Promise<T> {
+  if (opts.retry !== false && !path.startsWith('/auth/')) await ensureFreshToken();
   const url = new URL(`${BASE}${path}`);
   Object.entries(opts.query ?? {}).forEach(([k, v]) => v !== undefined && url.searchParams.set(k, v));
   const headers: Record<string, string> = {};
