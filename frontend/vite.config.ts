@@ -47,8 +47,18 @@ export default defineConfig(({ mode }) => {
       secure: true,
       // Same-origin call from the browser's point of view: drop Origin so the API's CORS check
       // (which lists only the production site) does not apply to the dev proxy.
-      configure: (proxy: { on: (event: 'proxyReq', cb: (req: { removeHeader: (name: string) => void }) => void) => void }) => {
-        proxy.on('proxyReq', (req) => req.removeHeader('origin'));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      configure: (proxy: any) => {
+        proxy.on('proxyReq', (req: { removeHeader: (name: string) => void }) => req.removeHeader('origin'));
+        // localhost is plain http: a "Secure; SameSite=None" login cookie is dropped by some
+        // browsers (e.g. Safari), which logs the student out on every reload. Over this dev proxy
+        // the cookie is first-party, so serve it as a normal Lax cookie without Secure.
+        proxy.on('proxyRes', (res: { headers: Record<string, string | string[] | undefined> }) => {
+          const cookies = res.headers['set-cookie'];
+          if (Array.isArray(cookies)) {
+            res.headers['set-cookie'] = cookies.map((c) => c.replace(/;\s*Secure/gi, '').replace(/SameSite=None/gi, 'SameSite=Lax'));
+          }
+        });
       },
     },
   };
