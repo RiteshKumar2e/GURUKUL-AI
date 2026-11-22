@@ -180,7 +180,9 @@ export interface PublicQuestion {
 }
 
 export interface NextQuestion {
-  question: PublicQuestion;
+  /** null when there are no practice questions for this topic or for the student's subjects yet */
+  question: PublicQuestion | null;
+  reason?: 'NO_QUESTIONS_IN_TOPIC' | 'NO_QUESTIONS_FOR_CLASS' | null;
   topic: { id: string; slug: string; titleHi: string; titleEn: string; chapterSlug: string } | null;
   level: number;
   mastery: number;

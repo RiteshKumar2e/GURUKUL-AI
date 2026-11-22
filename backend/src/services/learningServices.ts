@@ -196,10 +196,14 @@ export const curriculumService = {
 /* ----------------------------------- practice ----------------------------------- */
 
 export const practiceService = {
+  /**
+   * The next practice question, or `question: null` when the student's subjects (or the chosen
+   * topic) have no practice questions yet. That is a normal state, not an error, so it is a 200.
+   */
   async next(studentId: string, topicSlug?: string) {
     const result = await adaptiveService.nextQuestion(studentId, topicSlug);
-    if (!result) throw notFound('No practice questions are available for this topic yet.');
-    return result;
+    if (!result) return { question: null, topic: null, level: 1, mastery: 0, allRecentlySolved: false, reason: topicSlug ? ('NO_QUESTIONS_IN_TOPIC' as const) : ('NO_QUESTIONS_FOR_CLASS' as const) };
+    return { ...result, reason: null };
   },
 
   async answer(studentId: string, input: { questionId: string; answer: string; timeTakenSec?: number; sessionId?: string }) {

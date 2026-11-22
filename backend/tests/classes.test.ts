@@ -115,6 +115,16 @@ describe('onboarding across classes', () => {
     expect(overview.body.chapters.every((c: { subjectSlug: string }) => subjects.includes(c.subjectSlug))).toBe(true);
   });
 
+  it('Class 6 with no practice questions yet: practice says so with a 200, not an error', async () => {
+    const s = await register('STUDENT', 'c6p');
+    const subjects = await slugsFor('JAC', 6, ['mathematics']);
+    await request(app).put('/api/students/me/curriculum').set(auth(s.token)).send({ board: 'JAC', session: '2026-27', classLevel: 6, medium: 'HI', subjects });
+    const next = await request(app).get('/api/practice/next').set(auth(s.token));
+    expect(next.status).toBe(200);
+    expect(next.body.question).toBeNull();
+    expect(next.body.reason).toBe('NO_QUESTIONS_FOR_CLASS');
+  });
+
   it('Class 5: subject selection, and quizzes never show another class', async () => {
     const s = await register('STUDENT', 'c5');
     const subjects = await slugsFor('CBSE', 5, ['mathematics', 'the-world-around-us', 'english']);

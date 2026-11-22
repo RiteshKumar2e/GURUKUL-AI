@@ -6,7 +6,7 @@ import { useLang } from '@/context/LanguageContext';
 import { useDocumentTitle } from '@/hooks';
 import { api, ApiError } from '@/services/api';
 import type { AnswerFeedback, ChapterDetail, CurriculumOverview, NextQuestion } from '@/types/api';
-import { Alert, Badge, EmptyState, MasteryBar, PageHeader, Select, Skeleton } from '@/components/ui';
+import { Alert, Badge, ButtonLink, EmptyState, MasteryBar, PageHeader, Select, Skeleton } from '@/components/ui';
 import { QueryError } from '@/components/common';
 import { QuestionCard } from '@/features/practice/QuestionCard';
 
@@ -41,7 +41,7 @@ export default function Practice() {
   };
 
   const submit = async (answer: string, timeTakenSec: number) => {
-    const res = await api<AnswerFeedback>('/practice/answer', { body: { questionId: next.data!.question.id, answer, timeTakenSec } });
+    const res = await api<AnswerFeedback>('/practice/answer', { body: { questionId: next.data!.question!.id, answer, timeTakenSec } });
     setTally((t) => ({ right: t.right + (res.isCorrect ? 1 : 0), total: t.total + 1 }));
     setLastProgress(res.progress);
     void qc.invalidateQueries({ queryKey: ['dashboard'] });
@@ -106,7 +106,18 @@ export default function Practice() {
 
       {next.isLoading && <Skeleton className="h-64" />}
       {next.error && (next.error instanceof ApiError && next.error.status === 404 ? <EmptyState title={tx('इस विषय में अभी प्रश्न नहीं हैं', 'No questions in this topic yet')} /> : <QueryError error={next.error} onRetry={() => next.refetch()} />)}
-      {next.data && (
+      {next.data && !next.data.question && (
+        <EmptyState
+          title={next.data.reason === 'NO_QUESTIONS_IN_TOPIC' ? tx('इस विषय में अभी प्रश्न नहीं हैं', 'No questions in this topic yet') : tx('आपकी कक्षा के लिए अभ्यास प्रश्न अभी तैयार नहीं हैं', 'Practice questions for your class are not ready yet')}
+          action={<ButtonLink to="/app/tutor">{tx('ट्यूटर से सवाल पूछें', 'Ask the tutor')}</ButtonLink>}
+        >
+          {tx(
+            'अभी अभ्यास प्रश्न केवल कक्षा 9 गणित (नमूना सामग्री) में हैं। तब तक अपने किसी भी विषय का सवाल AI ट्यूटर से पूछ सकते हैं।',
+            'Practice questions exist only for Class 9 maths (sample content) so far. Meanwhile you can ask the AI tutor about any of your subjects.',
+          )}
+        </EmptyState>
+      )}
+      {next.data?.question && (
         <>
           {next.data.allRecentlySolved && (
             <div className="mb-4">
