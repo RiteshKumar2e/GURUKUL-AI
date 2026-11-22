@@ -40,7 +40,7 @@ export function AppLayout({ kind }: { kind: 'student' | 'guardian' }) {
   const home = kind === 'student' ? '/app' : '/guardian';
 
   const onLogout = async () => {
-    if (await logout()) navigate('/login', { replace: true });
+    if (await logout()) navigate('/', { replace: true });
   };
 
   return (

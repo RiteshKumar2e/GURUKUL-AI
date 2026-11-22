@@ -247,7 +247,7 @@ export default function Settings() {
 
       <Section title={tx('खाता', 'Account')}>
         <div className="panel space-y-3 p-4">
-          <Button variant="secondary" onClick={async () => { if (await logout()) navigate('/login'); }}>
+          <Button variant="secondary" onClick={async () => { if (await logout()) navigate('/', { replace: true }); }}>
             {tx('लॉग आउट', 'Log out')}
           </Button>
           <div className="border-t border-line pt-4">
