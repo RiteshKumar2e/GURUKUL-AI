@@ -89,6 +89,19 @@ describe('catalogue', () => {
   });
 });
 
+describe('CORS for the curriculum API', () => {
+  it('allows the browser to PUT the student curriculum (preflight)', async () => {
+    const origin = (process.env.FRONTEND_URL ?? 'http://localhost:5173').split(',')[0].trim();
+    const res = await request(app)
+      .options('/api/students/me/curriculum')
+      .set('Origin', origin)
+      .set('Access-Control-Request-Method', 'PUT')
+      .set('Access-Control-Request-Headers', 'content-type,authorization');
+    expect(res.status).toBeLessThan(300);
+    expect(res.headers['access-control-allow-methods']).toMatch(/\bPUT\b/);
+  });
+});
+
 describe('onboarding across classes', () => {
   it('Class 1: picks subjects and sees only Class 1 learning', async () => {
     const s = await register('STUDENT', 'c1');
