@@ -125,6 +125,12 @@ export function PublicLayout() {
                   'Prototype built for ACE Builders Global Hackathon 2026. Not affiliated with JAC or NCERT.',
                 )}
               </p>
+              <p className="mt-2 text-xs text-ink-200">
+                {tx(
+                  'Codebenders IDE (हैकथॉन के लिए दिया गया IDE) में, AI कोडिंग सहायकों के साथ बनाया गया।',
+                  'Built in the Codebenders IDE (the IDE provided for the hackathon), together with AI coding assistants.',
+                )}
+              </p>
             </div>
             <div>
               <p className="eyebrow mb-3 text-saffron-400">{tx('उत्पाद', 'Product')}</p>

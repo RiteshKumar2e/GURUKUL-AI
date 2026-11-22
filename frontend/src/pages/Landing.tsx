@@ -212,6 +212,11 @@ export default function Landing() {
               )}
             </div>
             <p className="meta mt-5">{tx('मुफ़्त · विद्यार्थी के लिए ईमेल ज़रूरी नहीं · सस्ते Android फ़ोन पर चलता है', 'Free · No email needed for students · Runs on low-cost Android phones')}</p>
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-ink-950 bg-white px-3 py-1 text-xs font-semibold text-ink-950">
+              {lang !== 'hi' && <span>{tx('', 'Built with')}</span>}
+              <span className="rounded-full bg-lemon-300 px-2 py-0.5 font-bold">Codebenders IDE</span>
+              <span>{tx('और AI कोडिंग सहायकों से बना', 'and AI coding assistants')}</span>
+            </p>
           </div>
           <TutorPreview />
         </div>

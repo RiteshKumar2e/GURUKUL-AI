@@ -6,10 +6,13 @@
 
 **A Hindi-first AI tutor for school students in Classes 1 to 12, built for low-cost Android phones and unreliable internet.**
 
+*Built in the **Codebenders IDE** (the IDE provided for the ACE Builders Global Hackathon 2026), together with AI coding assistants.*
+
 [![Live app](https://img.shields.io/badge/app-gurukul--ai.vercel.app-111111?style=flat-square)](https://gurukul-ai.vercel.app)
 [![API health](https://img.shields.io/badge/API-health-2ea44f?style=flat-square)](https://gurukul-ai-o0nq.onrender.com/api/health)
 ![Status](https://img.shields.io/badge/status-prototype-f5c400?style=flat-square)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5a0fc8?style=flat-square)
+![Built with Codebenders IDE](https://img.shields.io/badge/built_with-Codebenders_IDE-FFD60A?style=flat-square)
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB)
