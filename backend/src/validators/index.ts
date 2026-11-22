@@ -112,6 +112,19 @@ export const syncSchema = z.object({
           createdAt: z.string().datetime(),
           payload: z.object({ topicSlug: z.string().min(1).max(80) }),
         }),
+        z.object({
+          clientId: z.string().min(8).max(64),
+          kind: z.literal('doubt'),
+          createdAt: z.string().datetime(),
+          payload: z.object({
+            content: z.string().trim().min(1, 'Type your question').max(2000),
+            intent: z.enum(['hint', 'solution', 'explain', 'check']).default('hint'),
+            language: z.enum(['HI', 'EN', 'TE']).optional(),
+            conversationId: z.string().min(1).max(40).optional(),
+            subjectSlug: z.string().max(80).optional(),
+            topicSlug: z.string().max(80).optional(),
+          }),
+        }),
       ]),
     )
     .min(1)

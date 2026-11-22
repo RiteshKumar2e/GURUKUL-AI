@@ -5,6 +5,7 @@ import { Camera, History, Mic, Plus, Send, Trash2 } from 'lucide-react';
 import { useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { useCurriculum, useDocumentTitle, useHealth, useOnline } from '@/hooks';
+import { syncManager } from '@/lib/sync';
 import { api, ApiError } from '@/services/api';
 import type { Conversation } from '@/types/api';
 import { Alert, Button, EmptyState, Segmented, Select, Skeleton } from '@/components/ui';
@@ -24,6 +25,7 @@ export default function Tutor() {
   const [text, setText] = useState(() => params.get('q') ?? '');
   const [intent, setIntent] = useState<Intent>(params.get('q') ? 'check' : 'hint');
   const [pending, setPending] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const topicSlug = params.get('topic') ?? undefined;
@@ -57,17 +59,37 @@ export default function Tutor() {
     }
   }, [params, setParams]);
 
+  const queueOfflineDoubt = async (c: string) => {
+    await syncManager.queueDoubt({ content: c, intent, language: lang === 'hi' ? 'HI' : 'EN', conversationId: id, subjectSlug, topicSlug });
+    setNotice(tx('इंटरनेट नहीं है। आपका सवाल फ़ोन में सहेज लिया गया है और नेटवर्क आने पर जवाब मिलेगा।', 'You are offline. Your question is saved on this phone and will be answered when you are back online.'));
+  };
+
   const send = async (content = text) => {
     const c = content.trim();
     if (!c) return;
+    if (!navigator.onLine) {
+      setText('');
+      await queueOfflineDoubt(c);
+      return;
+    }
     setPending(c);
     setText('');
     try {
       const res = await ask.mutateAsync({ conversationId: id, content: c, intent, topicSlug, subjectSlug, language: lang === 'hi' ? 'HI' : 'EN' });
       if (!id) navigate(`/app/tutor/${res.conversationId}`, { replace: true });
     } catch (e) {
-      setText(c);
-      toast(e instanceof ApiError ? (e.isNetwork ? tx('इंटरनेट नहीं है — ट्यूटर के लिए कनेक्शन चाहिए', 'No internet — the tutor needs a connection') : e.message) : tx('भेजा नहीं जा सका', 'Could not send'), 'error');
+      // Network failure (no HTTP status): keep the question on the phone instead of losing it
+      if (e instanceof ApiError && e.isNetwork) {
+        try {
+          await queueOfflineDoubt(c);
+        } catch {
+          setText(c);
+          toast(tx('भेजा नहीं जा सका', 'Could not send'), 'error');
+        }
+      } else {
+        setText(c);
+        toast(e instanceof ApiError ? e.message : tx('भेजा नहीं जा सका', 'Could not send'), 'error');
+      }
     } finally {
       setPending(null);
     }
@@ -132,6 +154,7 @@ export default function Tutor() {
           <DemoModeNotice mode={health.data?.ai.mode} />
           {!online && <Alert tone="warning">{tx('आप ऑफ़लाइन हैं। ट्यूटर को इंटरनेट चाहिए, पर डाउनलोड किए पाठ और अभ्यास चलते रहेंगे।', 'You are offline. The tutor needs internet, but downloaded lessons and practice still work.')}</Alert>}
           {topicSlug && !id && <Alert tone="info">{tx('यह बातचीत आपके चुने हुए पाठ से जुड़ी रहेगी।', 'This conversation will be linked to the lesson you came from.')}</Alert>}
+          {notice && <Alert tone="info">{notice}</Alert>}
         </div>
 
         {id && conv.isLoading && <Skeleton className="h-40" />}

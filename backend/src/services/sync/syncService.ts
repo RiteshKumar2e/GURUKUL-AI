@@ -3,10 +3,12 @@ import { db, isTransient, withRetry } from '../../db/client';
 import { syncRecords } from '../../db/schema';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
 import { adaptiveService } from '../adaptive-learning/adaptiveService';
+import { tutorService } from '../tutor/tutorService';
 
 export type SyncInput =
   | { clientId: string; kind: 'answer'; createdAt: string; payload: { questionId: string; answer: string; timeTakenSec?: number } }
-  | { clientId: string; kind: 'lesson-complete'; createdAt: string; payload: { topicSlug: string } };
+  | { clientId: string; kind: 'lesson-complete'; createdAt: string; payload: { topicSlug: string } }
+  | { clientId: string; kind: 'doubt'; createdAt: string; payload: { content: string; intent: 'hint' | 'solution' | 'explain' | 'check'; language?: 'HI' | 'EN' | 'TE'; conversationId?: string; subjectSlug?: string; topicSlug?: string } };
 
 type SyncResult = { clientId: string; status: 'APPLIED' | 'DUPLICATE' | 'REJECTED' | 'RETRY'; error?: string; isCorrect?: boolean };
 
@@ -74,13 +76,24 @@ export const syncService = {
             await adaptiveService.markLessonComplete(studentId, t.id, when, tx);
             await tx.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId));
           });
+        } else if (rec.kind === 'doubt') {
+          // A doubt is answered by the same tutor service as an online question, so the reply is
+          // generated and stored server-side. It is not wrapped in a transaction: ask() writes its own messages.
+          const p = rec.payload;
+          let conversationId = p.conversationId;
+          if (!conversationId) {
+            const created = await tutorService.create(studentId, { mode: 'TEXT', subjectSlug: p.subjectSlug, topicSlug: p.topicSlug });
+            conversationId = created.id;
+          }
+          await tutorService.ask(studentId, conversationId, { content: p.content, intent: p.intent, language: p.language });
+          await db.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId));
         } else {
           throw new RejectError('Unknown record kind');
         }
         changed = true;
         results.push({ clientId: rec.clientId, status: 'APPLIED', isCorrect });
       } catch (e) {
-        if (!(e instanceof RejectError) && isTransient(e)) {
+        if (!(e instanceof RejectError) && (isTransient(e) || (e as { status?: number }).status === 503)) {
           // Release the claim so the device can send it again later
           await db
             .delete(syncRecords)

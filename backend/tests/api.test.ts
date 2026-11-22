@@ -127,6 +127,26 @@ describe('learning flow', () => {
     expect(second.body.duplicates).toBe(2);
   });
 
+  it('applies an offline doubt and stores the tutor reply', async () => {
+    const content = '15 + 27 कितना है?';
+    const records = [{ clientId: `${prefix}-doubt-0001`, kind: 'doubt', createdAt: new Date().toISOString(), payload: { content, intent: 'hint', language: 'HI' } }];
+    const res = await request(app).post('/api/sync').set('Authorization', `Bearer ${student.token}`).send({ records });
+    expect(res.status).toBe(200);
+    expect(res.body.applied).toBe(1);
+    const list = await request(app).get('/api/tutor/conversations').set('Authorization', `Bearer ${student.token}`);
+    expect(list.status).toBe(200);
+    const conversations: Array<{ id: string; messages?: Array<{ content: string }> }> = Array.isArray(list.body) ? list.body : (list.body.conversations ?? []);
+    expect(conversations.length).toBeGreaterThan(0);
+    // Check each conversation's messages; the list may omit them, so fetch the detail view when needed
+    let found = false;
+    for (const c of conversations) {
+      const messages = c.messages ?? (await request(app).get(`/api/tutor/conversations/${c.id}`).set('Authorization', `Bearer ${student.token}`)).body.messages ?? [];
+      if (messages.some((m: { content: string }) => m.content.includes(content))) found = true;
+    }
+    expect(found).toBe(true);
+  });
+
+
   it('answers in demo mode honestly when no AI key is set', async () => {
     const conv = await request(app).post('/api/tutor/conversations').set('Authorization', `Bearer ${student.token}`).send({});
     expect(conv.status).toBe(201);

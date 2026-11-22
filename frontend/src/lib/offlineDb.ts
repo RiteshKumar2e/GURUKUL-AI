@@ -3,7 +3,7 @@ import type { OfflinePack } from '@/types/api';
 
 export interface QueueRecord {
   clientId: string;
-  kind: 'answer' | 'lesson-complete';
+  kind: 'answer' | 'lesson-complete' | 'doubt';
   createdAt: string;
   payload: Record<string, unknown>;
   attempts: number;
