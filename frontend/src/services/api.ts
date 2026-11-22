@@ -1,5 +1,32 @@
 import { localiseError } from '@/lib/errorText';
-const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || 'http://localhost:5000/api';
+/** The API runs on Render only; there is no local backend. */
+const RENDER_API = 'https://gurukul-ai-o0nq.onrender.com/api';
+const configured = (import.meta.env.VITE_API_URL as string | undefined)?.trim().replace(/\/$/, '');
+// A leftover localhost API URL would point at a backend that no longer exists
+const CONFIGURED = configured && !/\/\/(localhost|127\.0\.0\.1)[:/]/.test(configured) ? configured : RENDER_API;
+
+/**
+ * The browser calls the API through the page's own /api path wherever a proxy exists:
+ *  - localhost (npm run dev / preview): Vite forwards /api to Render (vite.config.ts);
+ *  - the production site: Vercel forwards /api to Render (vercel.json).
+ * Same-site calls keep the login cookie first-party, so browsers that block third-party cookies
+ * (Safari, Brave, Chrome incognito) still keep students signed in after a reload.
+ * Anywhere else (e.g. Vercel preview URLs) the Render API is called directly.
+ */
+function apiBase(): string {
+  if (typeof window === 'undefined') return CONFIGURED;
+  const { origin, hostname } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return `${origin}/api`;
+  try {
+    const site = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim();
+    if (site && new URL(site).origin === origin) return `${origin}/api`;
+  } catch {
+    /* malformed VITE_SITE_URL: call the API directly */
+  }
+  return CONFIGURED;
+}
+
+const BASE = apiBase();
 
 export class ApiError extends Error {
   /** The server's original (English) message, for code that inspects it */

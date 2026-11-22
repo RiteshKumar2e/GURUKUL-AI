@@ -26,13 +26,37 @@ function seoFiles(siteUrl: string): Plugin {
   };
 }
 
+/** The API always runs on Render; there is no local backend. */
+const DEFAULT_API_ORIGIN = 'https://gurukul-ai-o0nq.onrender.com';
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
+  // Local dev and preview forward /api to the Render API, like the Vercel rewrite in production,
+  // so the login cookie is first-party on localhost as well.
+  let apiOrigin = DEFAULT_API_ORIGIN;
+  try {
+    const u = new URL(env.VITE_API_URL || '');
+    if (!/^(localhost|127\.0\.0\.1)$/.test(u.hostname)) apiOrigin = u.origin;
+  } catch {
+    /* not set or relative: keep the default */
+  }
+  const apiProxy = {
+    '/api': {
+      target: apiOrigin,
+      changeOrigin: true,
+      secure: true,
+      // Same-origin call from the browser's point of view: drop Origin so the API's CORS check
+      // (which lists only the production site) does not apply to the dev proxy.
+      configure: (proxy: { on: (event: 'proxyReq', cb: (req: { removeHeader: (name: string) => void }) => void) => void }) => {
+        proxy.on('proxyReq', (req) => req.removeHeader('origin'));
+      },
+    },
+  };
   return {
     plugins: [react(), seoFiles(env.VITE_SITE_URL || 'http://localhost:5173')],
     resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
-    server: { port: 5173, strictPort: true },
-    preview: { port: 4173 },
+    server: { port: 5173, strictPort: true, proxy: apiProxy },
+    preview: { port: 4173, proxy: apiProxy },
     build: {
       target: 'es2019',
       cssCodeSplit: true,
