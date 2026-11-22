@@ -56,14 +56,15 @@ function SectionTitle({ children }: { children: string }) {
   return <h3 className="mb-0.5 font-display text-sm font-bold text-ink-700">{children}</h3>;
 }
 
-const toVoiceLang = (l?: string): VoiceLang | null => (l === 'TE' ? 'te' : l === 'EN' ? 'en' : l === 'HI' ? 'hi' : null);
+// Hinglish is Roman-script text, which an Indian-English voice reads more naturally than a Hindi one
+const toVoiceLang = (l?: string): VoiceLang | null => (l === 'TE' ? 'te' : l === 'EN' || l === 'HG' ? 'en' : l === 'HI' ? 'hi' : null);
 
 export function TutorReply({ message, onFollowUp, player: external }: { message: TutorMessage; onFollowUp?: (text: string) => void; player?: ReturnType<typeof useVoicePlayback> }) {
   const { tx, lang } = useLang();
   const own = useVoicePlayback();
   const player = external ?? own;
   const s = message.structured;
-  const replyLang: VoiceLang = toVoiceLang(s?.language) ?? lang;
+  const replyLang: VoiceLang = toVoiceLang(s?.language) ?? (lang === 'hg' ? 'en' : lang);
   const missingVoice = !player.serverSpeech && deviceHasVoice(replyLang) === false;
 
   const speakButton = <ReplyAudioControls text={speakableText(message)} lang={replyLang} player={player} />;

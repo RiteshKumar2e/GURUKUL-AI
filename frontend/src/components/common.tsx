@@ -27,15 +27,16 @@ export function LanguageToggle({ className = '' }: { className?: string }) {
   const { lang, setLang } = useLang();
   return (
     <div className={`inline-flex overflow-hidden rounded-md border-2 border-ink-950 bg-white text-sm ${className}`} role="group" aria-label="Language / भाषा">
-      {(['hi', 'en'] as const).map((l) => (
+      {(['hi', 'hg', 'en'] as const).map((l) => (
         <button
           key={l}
           type="button"
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
-          className={`min-h-[36px] px-2.5 py-1 font-bold first:border-r-2 first:border-ink-950 ${lang === l ? 'bg-ink-900 text-white' : 'text-ink-950 hover:bg-saffron-100'}`}
+          title={{ hi: 'हिंदी', hg: 'Hinglish', en: 'English' }[l]}
+          className={`min-h-[36px] px-2 py-1 font-bold [&:not(:last-child)]:border-r-2 [&:not(:last-child)]:border-ink-950 ${lang === l ? 'bg-ink-900 text-white' : 'text-ink-950 hover:bg-saffron-100'}`}
         >
-          {l === 'hi' ? 'हिंदी' : 'English'}
+          {{ hi: 'हिं', hg: 'Hing', en: 'En' }[l]}
         </button>
       ))}
     </div>

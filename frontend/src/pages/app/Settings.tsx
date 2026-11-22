@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Copy, RefreshCw } from 'lucide-react';
-import { useLang } from '@/context/LanguageContext';
+import { profileLanguageFor, useLang } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle, writeConsent, readConsent } from '@/hooks';
@@ -38,7 +38,7 @@ export default function Settings() {
 
   const saveProfile = useMutation({
     mutationFn: async () => {
-      const res = await api<{ user: User }>('/users/me', { method: 'PATCH', body: { displayName: name.trim(), preferredLanguage: lang === 'hi' ? 'HI' : 'EN' } });
+      const res = await api<{ user: User }>('/users/me', { method: 'PATCH', body: { displayName: name.trim(), preferredLanguage: profileLanguageFor(lang) } });
       if (isStudent) await api('/students/me', { method: 'PATCH', body: { district: district || null, teachingLevel: level, dailyGoalMinutes: goal } });
       return (await api<{ user: User }>('/users/me')).user ?? res.user;
     },

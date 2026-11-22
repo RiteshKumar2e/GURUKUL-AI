@@ -9,35 +9,64 @@ import { Spinner } from './components/ui';
 import { PublicLayout } from './layouts/PublicLayout';
 import { AppLayout } from './layouts/AppLayout';
 import { usePageAnalytics } from './hooks';
-import { ApiError } from './services/api';
+import { api, ApiError } from './services/api';
 import { syncManager } from './lib/sync';
 import { useEffect } from 'react';
 
-const Landing = lazy(() => import('./pages/Landing'));
-const Login = lazy(() => import('./pages/auth/Login'));
-const Register = lazy(() => import('./pages/auth/Register'));
-const About = lazy(() => import('./pages/About'));
-const Privacy = lazy(() => import('./pages/legal/Privacy'));
-const Terms = lazy(() => import('./pages/legal/Terms'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Onboarding = lazy(() => import('./pages/app/Onboarding'));
-const ClassSettings = lazy(() => import('./pages/app/ClassSettings'));
-const Dashboard = lazy(() => import('./pages/app/Dashboard'));
-const Learn = lazy(() => import('./pages/app/Learn'));
-const Chapters = lazy(() => import('./pages/app/Chapters'));
-const ChapterDetail = lazy(() => import('./pages/app/ChapterDetail'));
-const Topic = lazy(() => import('./pages/app/Topic'));
-const Tutor = lazy(() => import('./pages/app/Tutor'));
-const Voice = lazy(() => import('./pages/app/Voice'));
-const Photo = lazy(() => import('./pages/app/Photo'));
-const Practice = lazy(() => import('./pages/app/Practice'));
-const Quizzes = lazy(() => import('./pages/app/Quizzes'));
-const Quiz = lazy(() => import('./pages/app/Quiz'));
-const Progress = lazy(() => import('./pages/app/Progress'));
-const Offline = lazy(() => import('./pages/app/Offline'));
-const Settings = lazy(() => import('./pages/app/Settings'));
-const Guardian = lazy(() => import('./pages/guardian/GuardianHome'));
-const GuardianStudent = lazy(() => import('./pages/guardian/GuardianStudent'));
+/** Page modules. Each is its own chunk, loaded on first visit and prefetched in the background. */
+const pages = {
+  Landing: () => import('./pages/Landing'),
+  Login: () => import('./pages/auth/Login'),
+  Register: () => import('./pages/auth/Register'),
+  About: () => import('./pages/About'),
+  Privacy: () => import('./pages/legal/Privacy'),
+  Terms: () => import('./pages/legal/Terms'),
+  NotFound: () => import('./pages/NotFound'),
+  Onboarding: () => import('./pages/app/Onboarding'),
+  ClassSettings: () => import('./pages/app/ClassSettings'),
+  Dashboard: () => import('./pages/app/Dashboard'),
+  Learn: () => import('./pages/app/Learn'),
+  Chapters: () => import('./pages/app/Chapters'),
+  ChapterDetail: () => import('./pages/app/ChapterDetail'),
+  Topic: () => import('./pages/app/Topic'),
+  Tutor: () => import('./pages/app/Tutor'),
+  Voice: () => import('./pages/app/Voice'),
+  Photo: () => import('./pages/app/Photo'),
+  Practice: () => import('./pages/app/Practice'),
+  Quizzes: () => import('./pages/app/Quizzes'),
+  Quiz: () => import('./pages/app/Quiz'),
+  Progress: () => import('./pages/app/Progress'),
+  Offline: () => import('./pages/app/Offline'),
+  Settings: () => import('./pages/app/Settings'),
+  Guardian: () => import('./pages/guardian/GuardianHome'),
+  GuardianStudent: () => import('./pages/guardian/GuardianStudent'),
+};
+
+const Landing = lazy(pages.Landing);
+const Login = lazy(pages.Login);
+const Register = lazy(pages.Register);
+const About = lazy(pages.About);
+const Privacy = lazy(pages.Privacy);
+const Terms = lazy(pages.Terms);
+const NotFound = lazy(pages.NotFound);
+const Onboarding = lazy(pages.Onboarding);
+const ClassSettings = lazy(pages.ClassSettings);
+const Dashboard = lazy(pages.Dashboard);
+const Learn = lazy(pages.Learn);
+const Chapters = lazy(pages.Chapters);
+const ChapterDetail = lazy(pages.ChapterDetail);
+const Topic = lazy(pages.Topic);
+const Tutor = lazy(pages.Tutor);
+const Voice = lazy(pages.Voice);
+const Photo = lazy(pages.Photo);
+const Practice = lazy(pages.Practice);
+const Quizzes = lazy(pages.Quizzes);
+const Quiz = lazy(pages.Quiz);
+const Progress = lazy(pages.Progress);
+const Offline = lazy(pages.Offline);
+const Settings = lazy(pages.Settings);
+const Guardian = lazy(pages.Guardian);
+const GuardianStudent = lazy(pages.GuardianStudent);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +78,27 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Render puts the API to sleep when idle. Wake it as soon as the app opens, so the first real
+// request (login, tutor) does not wait for the cold start. This also fills the health cache.
+void queryClient.prefetchQuery({ queryKey: ['health'], queryFn: () => api('/health'), staleTime: 5 * 60_000 });
+
+/**
+ * After the first screen is up, download every other page in the background, so opening a page
+ * later is instant instead of waiting for its chunk. Skipped when the user asked to save data.
+ */
+function prefetchPages() {
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  if (conn?.saveData || conn?.effectiveType === 'slow-2g' || conn?.effectiveType === '2g') return;
+  const run = () => Object.values(pages).forEach((load) => void load().catch(() => undefined));
+  const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+  if (idle) idle(run, { timeout: 3000 });
+  else setTimeout(run, 1500);
+}
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'complete') prefetchPages();
+  else window.addEventListener('load', prefetchPages, { once: true });
+}
 
 // After a sync stores offline work (answers, lessons, tutor replies), refetch so every screen shows it
 let lastSyncSeen = 0;

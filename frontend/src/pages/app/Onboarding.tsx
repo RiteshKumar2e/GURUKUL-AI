@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLang } from '@/context/LanguageContext';
+import { profileLanguageFor, useLang } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
@@ -36,7 +36,7 @@ export default function Onboarding() {
     setSaving(true);
     setError(null);
     try {
-      await api('/users/me', { method: 'PATCH', body: { preferredLanguage: lang === 'hi' ? 'HI' : 'EN' } });
+      await api('/users/me', { method: 'PATCH', body: { preferredLanguage: profileLanguageFor(lang) } });
       await api('/students/me/curriculum', { method: 'PUT', body: curriculum });
       await api('/students/me', { method: 'PATCH', body: { district: district || null, teachingLevel: level, dailyGoalMinutes: goal, onboardingDone: true } });
       await refreshUser();
@@ -59,11 +59,11 @@ export default function Onboarding() {
     {
       title: tx('आप किस भाषा में पढ़ना चाहेंगे?', 'Which language would you like to learn in?'),
       body: (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {(['hi', 'en'] as const).map((l) => (
-            <button key={l} type="button" onClick={() => { setLang(l); setCurriculum((c) => ({ ...c, medium: l === 'hi' ? 'HI' : 'EN' })); }} className={`rounded-md border-2 px-4 py-4 text-left ${lang === l ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`} aria-pressed={lang === l}>
-              <span className="block text-lg font-semibold">{l === 'hi' ? 'हिंदी' : 'English'}</span>
-              <span className="block text-sm text-ink-600">{l === 'hi' ? 'पाठ, संकेत और ट्यूटर हिंदी में' : 'Lessons, hints and tutor in English'}</span>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {(['hi', 'hg', 'en'] as const).map((l) => (
+            <button key={l} type="button" onClick={() => { setLang(l); setCurriculum((c) => ({ ...c, medium: profileLanguageFor(l) })); }} className={`rounded-md border-2 px-4 py-4 text-left ${lang === l ? 'border-ink-950 bg-saffron-100 shadow-brut-sm' : 'border-ink-950 bg-white hover:bg-saffron-50'}`} aria-pressed={lang === l}>
+              <span className="block text-lg font-semibold">{{ hi: 'हिंदी', hg: 'Hinglish', en: 'English' }[l]}</span>
+              <span className="block text-sm text-ink-600">{{ hi: 'पाठ, संकेत और ट्यूटर हिंदी में', hg: 'App aur tutor Hindi mein, English letters mein likha', en: 'Lessons, hints and tutor in English' }[l]}</span>
             </button>
           ))}
         </div>

@@ -9,7 +9,7 @@ import { tutorService } from '../tutor/tutorService';
 export type SyncInput =
   | { clientId: string; kind: 'answer'; createdAt: string; payload: { questionId: string; answer: string; timeTakenSec?: number } }
   | { clientId: string; kind: 'lesson-complete'; createdAt: string; payload: { topicSlug: string } }
-  | { clientId: string; kind: 'doubt'; createdAt: string; payload: { content: string; intent: 'hint' | 'solution' | 'explain' | 'check'; language?: 'HI' | 'EN' | 'TE'; conversationId?: string; subjectSlug?: string; topicSlug?: string } };
+  | { clientId: string; kind: 'doubt'; createdAt: string; payload: { content: string; intent: 'hint' | 'solution' | 'explain' | 'check'; language?: 'HI' | 'EN' | 'TE' | 'HG'; conversationId?: string; subjectSlug?: string; topicSlug?: string } };
 
 type DoubtPayload = Extract<SyncInput, { kind: 'doubt' }>['payload'];
 

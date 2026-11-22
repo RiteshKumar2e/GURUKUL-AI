@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, ImageUp, RotateCcw } from 'lucide-react';
-import { useLang } from '@/context/LanguageContext';
+import { tutorLanguageFor, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle, useHealth, useOnline } from '@/hooks';
 import { api, ApiError } from '@/services/api';
@@ -92,7 +92,7 @@ export default function Photo() {
 
   const submit = async () => {
     try {
-      const res = await ask.mutateAsync({ conversationId, content: text.trim(), intent, mode: 'PHOTO', language: lang === 'hi' ? 'HI' : 'EN' });
+      const res = await ask.mutateAsync({ conversationId, content: text.trim(), intent, mode: 'PHOTO', language: tutorLanguageFor(lang) });
       setConversationId(res.conversationId);
       setReply(res.assistantMessage);
     } catch (e) {

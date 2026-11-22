@@ -58,28 +58,33 @@ const MSG = {
     HI: 'डेमो मोड: अभी AI ट्यूटर सर्वर से जुड़ा नहीं है, इसलिए यह पूरा समझाने वाला उत्तर नहीं है। जो संभव है वह नीचे है।',
     EN: 'Demo mode: the AI tutor is not connected on this server, so this is not a full explanation. Here is what can be done without it.',
     TE: 'డెమో మోడ్: ఈ సర్వర్‌లో AI ట్యూటర్ ఇంకా కనెక్ట్ కాలేదు, కాబట్టి ఇది పూర్తి వివరణ కాదు. AI లేకుండా చేయగలిగింది కింద ఉంది.',
+    HG: 'Demo mode: abhi AI tutor server se juda nahi hai, isliye ye poora samjhane wala jawab nahi hai. Jo ho sakta hai wo neeche hai.',
   },
-  calcTitle: { HI: 'कैलकुलेटर जाँच (AI नहीं)', EN: 'Calculator check (not AI)', TE: 'కాలిక్యులేటర్ తనిఖీ (AI కాదు)' },
-  fromLesson: { HI: 'इस पाठ से', EN: 'From this lesson', TE: 'ఈ పాఠం నుండి' },
+  calcTitle: { HI: 'कैलकुलेटर जाँच (AI नहीं)', EN: 'Calculator check (not AI)', TE: 'కాలిక్యులేటర్ తనిఖీ (AI కాదు)', HG: 'Calculator check (AI nahi)' },
+  fromLesson: { HI: 'इस पाठ से', EN: 'From this lesson', TE: 'ఈ పాఠం నుండి', HG: 'Is lesson se' },
   demoCaveat: {
     HI: 'पूरा AI ट्यूटर चालू करने के लिए सर्वर पर AI key (Groq या Gemini) सेट करें। तब तक पाठ और अभ्यास प्रश्न पूरी तरह काम करते हैं।',
     EN: 'Set an AI key (Groq or Gemini) on the server to enable the full AI tutor. Lessons and practice work fully meanwhile.',
     TE: 'పూర్తి AI ట్యూటర్ కోసం సర్వర్‌లో AI కీ (Groq లేదా Gemini) సెట్ చేయండి. అప్పటి వరకు పాఠాలు, అభ్యాస ప్రశ్నలు పూర్తిగా పనిచేస్తాయి.',
+    HG: 'Poora AI tutor chalane ke liye server par AI key (Groq ya Gemini) set karo. Tab tak lessons aur practice poori tarah chalte hain.',
   },
   badFormat: {
     HI: 'उत्तर अपेक्षित रूप में नहीं आया; ध्यान से जाँचें।',
     EN: 'The answer did not come in the expected format; check it carefully.',
     TE: 'సమాధానం ఆశించిన రూపంలో రాలేదు; జాగ్రత్తగా తనిఖీ చేయండి.',
+    HG: 'Jawab sahi format mein nahi aaya; dhyaan se check karo.',
   },
   mismatch: {
     HI: (n: number) => `कैलकुलेटर जाँच में अंतिम उत्तर मेल नहीं खाया (गणना: ${n})। इस उत्तर पर भरोसा न करें।`,
     EN: (n: number) => `The calculator check did not match the final answer (computed: ${n}). Do not rely on this answer.`,
     TE: (n: number) => `కాలిక్యులేటర్ తనిఖీలో చివరి సమాధానం సరిపోలలేదు (లెక్క: ${n}). ఈ సమాధానాన్ని నమ్మవద్దు.`,
+    HG: (n: number) => `Calculator check mein final jawab match nahi hua (hisaab: ${n}). Is jawab par bharosa mat karo.`,
   },
   unavailable: {
     HI: 'AI ट्यूटर अभी उपलब्ध नहीं है। थोड़ी देर बाद फिर कोशिश करें।',
     EN: 'The AI tutor is unavailable right now. Please try again shortly.',
     TE: 'AI ట్యూటర్ ఇప్పుడు అందుబాటులో లేదు. కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.',
+    HG: 'AI tutor abhi available nahi hai. Thodi der baad phir try karo.',
   },
 } as const;
 
@@ -107,12 +112,12 @@ function lessonContext(lesson: { content: unknown } | undefined, title: string) 
 
 /** Section headings in the fixed teaching order, used for the stored plain-text copy. */
 export const SECTION_TITLES = {
-  understanding: { HI: 'प्रश्न की समझ', EN: 'Understanding the question', TE: 'ప్రశ్న అర్థం' },
-  hint: { HI: 'पहला संकेत', EN: 'First hint', TE: 'మొదటి సూచన' },
-  explanation: { HI: 'आसान व्याख्या', EN: 'Simple explanation', TE: 'సులభ వివరణ' },
-  steps: { HI: 'चरण-दर-चरण हल', EN: 'Step-by-step solution', TE: 'దశల వారీ పరిష్కారం' },
-  finalAnswer: { HI: 'अंतिम उत्तर', EN: 'Final answer', TE: 'తుది సమాధానం' },
-  followUp: { HI: 'अब आप कोशिश करें', EN: 'Now you try', TE: 'ఇప్పుడు మీరు ప్రయత్నించండి' },
+  understanding: { HI: 'प्रश्न की समझ', EN: 'Understanding the question', TE: 'ప్రశ్న అర్థం', HG: 'Sawaal ko samjho' },
+  hint: { HI: 'पहला संकेत', EN: 'First hint', TE: 'మొదటి సూచన', HG: 'Pehla hint' },
+  explanation: { HI: 'आसान व्याख्या', EN: 'Simple explanation', TE: 'సులభ వివరణ', HG: 'Aasaan explanation' },
+  steps: { HI: 'चरण-दर-चरण हल', EN: 'Step-by-step solution', TE: 'దశల వారీ పరిష్కారం', HG: 'Step-by-step solution' },
+  finalAnswer: { HI: 'अंतिम उत्तर', EN: 'Final answer', TE: 'తుది సమాధానం', HG: 'Final jawab' },
+  followUp: { HI: 'अब आप कोशिश करें', EN: 'Now you try', TE: 'ఇప్పుడు మీరు ప్రయత్నించండి', HG: 'Ab aap try karo' },
 } as const;
 
 export function renderPlain(s: TutorStructured): string {
@@ -227,8 +232,14 @@ export const tutorService = {
     const content = input.content.trim();
     if (!content) throw badRequest('Please type a question.');
 
-    const student = await db.query.studentProfiles.findFirst({ where: eq(studentProfiles.id, studentId), with: { user: { columns: { preferredLanguage: true } } } });
-    const curriculum = await studentCurriculumService.active(studentId);
+    // Independent look-ups run together; each is a round trip to the remote database
+    const provider = getLlmProvider();
+    const [student, curriculum, topic, weak] = await Promise.all([
+      db.query.studentProfiles.findFirst({ where: eq(studentProfiles.id, studentId), with: { user: { columns: { preferredLanguage: true } } } }),
+      studentCurriculumService.active(studentId),
+      conversation.topicId ? curriculumRepository.topicById(conversation.topicId) : Promise.resolve(null),
+      provider.live ? adaptiveService.weakTopics(studentId).catch(() => []) : Promise.resolve([]),
+    ]);
     const language: TutorLanguage = input.language ?? curriculum?.medium ?? student?.user.preferredLanguage ?? 'HI';
     const classLevel = curriculum?.classLevel ?? student?.classLevel ?? 9;
     const conversationSubject = conversation.subjectId ? curriculum?.subjects.find((s) => s.id === conversation.subjectId) : undefined;
@@ -239,14 +250,13 @@ export const tutorService = {
       subjects: curriculum?.subjects.map((s) => s.nameEn),
       subject: conversationSubject?.nameEn ?? null,
     };
-    const topic = conversation.topicId ? await curriculumRepository.topicById(conversation.topicId) : null;
 
+    // Writes stay one after another: two writes at once on the same row can hit a database lock
     const userMsg = await tutorRepository.addMessage({ conversationId, role: 'USER', content });
     if (conversation.messages.length === 0 && conversation.title === 'नया सवाल') {
       await tutorRepository.setTitle(conversationId, content.slice(0, 70));
     }
 
-    const provider = getLlmProvider();
     let structured: TutorStructured;
     let model: string | null = null;
 
@@ -257,7 +267,6 @@ export const tutorService = {
         role: m.role === 'USER' ? 'user' : 'assistant',
         content: m.content.slice(0, 2000),
       }));
-      const weak = await adaptiveService.weakTopics(studentId).catch(() => []);
       const messages: ChatMessage[] = [
         {
           role: 'system',

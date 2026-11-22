@@ -1,3 +1,4 @@
+import { env } from '../../config/env';
 import { AIProvider, AIProviderError, ChatMessage, ChatOptions, ChatResult, TranscriptionResult } from './types';
 
 interface Config {
@@ -60,6 +61,9 @@ export class OpenAICompatibleProvider implements AIProvider {
       max_tokens: options.maxTokens ?? 1200,
     };
     if (options.json) body.response_format = { type: 'json_object' };
+    // Reasoning models think before answering; on the default effort that is most of the wait.
+    // Low effort is enough for school questions, and numeric answers are re-checked by the calculator.
+    if (env.AI_REASONING_EFFORT !== 'off' && /gpt-oss|gemini-(2\.5|3)/i.test(model)) body.reasoning_effort = env.AI_REASONING_EFFORT;
     const data = (await this.request('/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

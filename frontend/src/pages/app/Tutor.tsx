@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Camera, History, Mic, Plus, Send, Trash2 } from 'lucide-react';
-import { useLang } from '@/context/LanguageContext';
+import { tutorLanguageFor, useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
 import { useCurriculum, useDocumentTitle, useHealth, useOnline, useSyncState } from '@/hooks';
 import { syncManager } from '@/lib/sync';
@@ -66,7 +66,7 @@ export default function Tutor() {
   }, [params, setParams]);
 
   const queueOfflineDoubt = async (c: string) => {
-    await syncManager.queueDoubt({ content: c, intent, language: lang === 'hi' ? 'HI' : 'EN', conversationId: id, subjectSlug, topicSlug });
+    await syncManager.queueDoubt({ content: c, intent, language: tutorLanguageFor(lang), conversationId: id, subjectSlug, topicSlug });
     setNotice(tx('इंटरनेट नहीं है। आपका सवाल फ़ोन में सहेज लिया गया है और नेटवर्क आने पर जवाब मिलेगा।', 'You are offline. Your question is saved on this phone and will be answered when you are back online.'));
   };
 
@@ -81,7 +81,7 @@ export default function Tutor() {
     setPending(c);
     setText('');
     try {
-      const res = await ask.mutateAsync({ conversationId: id, content: c, intent, topicSlug, subjectSlug, language: lang === 'hi' ? 'HI' : 'EN' });
+      const res = await ask.mutateAsync({ conversationId: id, content: c, intent, topicSlug, subjectSlug, language: tutorLanguageFor(lang) });
       setNotice(null);
       if (!id) navigate(`/app/tutor/${res.conversationId}`, { replace: true });
     } catch (e) {

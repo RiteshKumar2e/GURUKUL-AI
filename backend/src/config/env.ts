@@ -28,6 +28,10 @@ const schema = z.object({
   AI_VISION_MODEL: z.string().optional().default('qwen/qwen3.8-27b'),
   AI_STT_MODEL: z.string().optional().default('whisper-large-v3'),
   AI_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
+  // Thinking time for reasoning models (gpt-oss, Gemini 2.5+). low = much faster replies; off = send nothing
+  // Second Groq model, used when the main one is rate-limited (each Groq model has its own limit). Empty = none
+  AI_FALLBACK_MODEL: z.string().optional().default('openai/gpt-oss-20b'),
+  AI_REASONING_EFFORT: z.enum(['off', 'low', 'medium', 'high']).default('low'),
 
   // Tutor LLM: auto = Groq if AI_API_KEY is set, else Gemini if GEMINI_API_KEY is set, else demo mode
   LLM_PROVIDER: z.enum(['auto', 'groq', 'gemini']).default('auto'),

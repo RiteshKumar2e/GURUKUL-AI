@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncManager.setOwner(u.id);
       setUser(u);
       setStatus('authenticated');
-      if (adoptLanguage) setLang(u.preferredLanguage === 'EN' ? 'en' : 'hi');
+      if (adoptLanguage) setLang((cur) => (u.preferredLanguage === 'EN' ? 'en' : cur === 'hg' ? 'hg' : 'hi'));
       void syncManager.flush();
     },
     [setLang, setUser],

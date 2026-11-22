@@ -184,6 +184,10 @@ export default function Landing() {
                 <>
                   पढ़ाई का हर सवाल, <span className="mark">अपनी भाषा</span> में समझिए।
                 </>
+              ) : lang === 'hg' ? (
+                <>
+                  Padhai ka har sawaal, <span className="mark">apni bhasha</span> mein samjho.
+                </>
               ) : (
                 <>
                   Understand every study question in <span className="mark">your own language.</span>

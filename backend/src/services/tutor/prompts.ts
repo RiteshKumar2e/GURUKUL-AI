@@ -15,7 +15,7 @@ const INTENT_TEXT: Record<TutorIntent, string> = {
   check: 'The student shared their own answer or working. Check it, point out exactly where it goes wrong (if it does), and guide them to fix it.',
 };
 
-export type TutorLanguage = 'HI' | 'EN' | 'TE';
+export type TutorLanguage = 'HI' | 'EN' | 'TE' | 'HG';
 
 /** Teaching style by school stage, so a Class 2 child and a Class 12 student are not taught alike. */
 const STAGE_TEXT: Record<SchoolStage, string> = {
@@ -44,6 +44,7 @@ export function systemPrompt(opts: { language: TutorLanguage; level: TeachingLev
     HI: 'Reply in simple, natural Hindi written in Devanagari script, the way a kind teacher in an Indian government school would speak. Keep common subject terms in English in brackets when helpful, e.g. "बहुपद (polynomial)". Write numbers and maths symbols normally.',
     EN: 'Reply in simple, clear English.',
     TE: 'Reply in simple, natural Telugu written in Telugu script, the way a kind school teacher in Andhra Pradesh or Telangana would speak. Keep common subject terms in English in brackets when helpful, e.g. "బహుపది (polynomial)". Write numbers and maths symbols normally. Every text field of the JSON must be in Telugu.',
+    HG: 'Reply in Hinglish: simple, friendly Hindi written ONLY in Roman (English) letters, mixing in common English words the way Indian students chat, e.g. "Pehle dono taraf se 5 ghatao, phir x ki value nikalo." Never use Devanagari script. Keep subject terms in English (polynomial, equation, triangle). Write numbers and maths symbols normally. Every text field of the JSON must be in Hinglish.',
   }[opts.language];
   const { learner } = opts;
   const board = learner.board ? ` (${learner.board} board)` : '';

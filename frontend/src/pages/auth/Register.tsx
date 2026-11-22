@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowLeft, ArrowRight, AtSign, Check, KeyRound, Mail, School, User } from 'lucide-react';
-import { useLang } from '@/context/LanguageContext';
+import { profileLanguageFor, useLang } from '@/context/LanguageContext';
 import { homePathFor, useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useDocumentTitle } from '@/hooks';
@@ -95,7 +95,7 @@ export default function Register() {
         email: data.role === 'STUDENT' ? undefined : data.email,
         schoolName: data.role === 'TEACHER' ? data.schoolName : undefined,
         guardianConsent: data.role === 'STUDENT' ? data.guardianConsent : undefined,
-        preferredLanguage: lang === 'hi' ? 'HI' : 'EN',
+        preferredLanguage: profileLanguageFor(lang),
       });
       toast(tx('खाता बन गया!', 'Your account is ready!'));
       navigate(homePathFor(u), { replace: true });

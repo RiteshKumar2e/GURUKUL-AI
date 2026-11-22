@@ -79,7 +79,7 @@ export default function Topic() {
               {supported && lesson && (
                 <button
                   className="inline-flex items-center gap-1 font-semibold text-ink-800 hover:text-ink-900"
-                  onClick={() => (speaking ? stop() : speak(lesson.content.map((b) => bi(b)).join('. '), lang))}
+                  onClick={() => (speaking ? stop() : speak(lesson.content.map((b) => bi(b)).join('. '), lang === 'hi' ? 'hi' : 'en'))}
                 >
                   {speaking ? <Square className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}
                   {speaking ? tx('रोकें', 'Stop') : tx('पाठ सुनें', 'Listen')}

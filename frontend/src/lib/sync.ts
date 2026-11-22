@@ -61,7 +61,7 @@ export const syncManager = {
     await emit();
   },
 
-  async queueDoubt(doubt: { content: string; intent: 'hint' | 'solution' | 'explain' | 'check'; language?: 'HI' | 'EN' | 'TE'; conversationId?: string; subjectSlug?: string; topicSlug?: string }) {
+  async queueDoubt(doubt: { content: string; intent: 'hint' | 'solution' | 'explain' | 'check'; language?: 'HI' | 'EN' | 'TE' | 'HG'; conversationId?: string; subjectSlug?: string; topicSlug?: string }) {
     if (!owner) throw new Error('No signed-in student');
     await offlineDb.enqueue({ kind: 'doubt', payload: { ...doubt }, ownerId: owner });
     await this.requestBackgroundSync();

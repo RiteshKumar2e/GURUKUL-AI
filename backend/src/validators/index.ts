@@ -89,7 +89,7 @@ export const askSchema = z.object({
   content: z.string().trim().min(1, 'Type your question').max(2000, 'Keep the question under 2000 characters'),
   intent: z.enum(['hint', 'solution', 'explain', 'check']).default('hint'),
   // Reply language for this question. TE (Telugu) is per-request only; the account language stays HI/EN.
-  language: z.enum(['HI', 'EN', 'TE']).optional(),
+  language: z.enum(['HI', 'EN', 'TE', 'HG']).optional(),
 });
 
 export const voiceLanguage = z.enum(['hi', 'en', 'te']);
@@ -119,7 +119,7 @@ export const syncSchema = z.object({
           payload: z.object({
             content: z.string().trim().min(1, 'Type your question').max(2000),
             intent: z.enum(['hint', 'solution', 'explain', 'check']).default('hint'),
-            language: z.enum(['HI', 'EN', 'TE']).optional(),
+            language: z.enum(['HI', 'EN', 'TE', 'HG']).optional(),
             conversationId: z.string().min(1).max(40).optional(),
             subjectSlug: z.string().max(80).optional(),
             topicSlug: z.string().max(80).optional(),

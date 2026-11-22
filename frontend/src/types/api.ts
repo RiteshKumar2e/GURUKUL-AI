@@ -307,7 +307,7 @@ export interface TutorStructured {
   language?: TutorLanguage;
 }
 
-export type TutorLanguage = 'HI' | 'EN' | 'TE';
+export type TutorLanguage = 'HI' | 'EN' | 'TE' | 'HG';
 export type VoiceLang = 'hi' | 'en' | 'te';
 
 export interface VoiceCapabilities {

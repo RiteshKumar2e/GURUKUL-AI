@@ -186,6 +186,17 @@ describe('learning flow', () => {
   });
 
 
+  it('accepts Hinglish as the tutor language', async () => {
+    const auth = { Authorization: `Bearer ${student.token}` };
+    const conv = await request(app).post('/api/tutor/conversations').set(auth).send({});
+    const res = await request(app).post(`/api/tutor/conversations/${conv.body.id}/messages`).set(auth).send({ content: '12 + 30 kitna hai?', intent: 'hint', language: 'HG' });
+    expect([200, 503]).toContain(res.status);
+    if (res.status === 200) {
+      expect(res.body.assistantMessage.structured.language).toBe('HG');
+      expect(res.body.assistantMessage.content).not.toMatch(/[ऀ-ॿ]/);
+    }
+  });
+
   it('answers in demo mode honestly when no AI key is set', async () => {
     const conv = await request(app).post('/api/tutor/conversations').set('Authorization', `Bearer ${student.token}`).send({});
     expect(conv.status).toBe(201);

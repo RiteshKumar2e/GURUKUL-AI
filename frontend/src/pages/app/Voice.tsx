@@ -33,7 +33,7 @@ export default function Voice() {
   const caps = useVoiceCapabilities();
   useDocumentTitle(tx('बोलकर पूछें', 'Ask by voice'));
 
-  const [voiceLang, setVoiceLang] = useState<VoiceLang>(uiLang);
+  const [voiceLang, setVoiceLang] = useState<VoiceLang>(uiLang === 'hg' ? 'hi' : uiLang);
   const support = speechSupport();
   const maxSeconds = caps.data?.maxRecordingSeconds ?? 60;
   const recog = useSpeechRecognition(voiceLang);
