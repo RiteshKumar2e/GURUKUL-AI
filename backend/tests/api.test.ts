@@ -55,6 +55,21 @@ describe('auth', () => {
     const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_stu`, displayName: 'Dup', password: pw, acceptTerms: true, guardianConsent: true });
     expect(res.status).toBe(409);
   });
+  it('answers login and sign-up mistakes with 200 + error only when the app asks (X-Soft-Errors)', async () => {
+    const wrong = { username: `${prefix}_stu`, password: 'definitely-wrong-1' };
+    const plain = await request(app).post('/api/auth/login').send(wrong);
+    expect(plain.status).toBe(401);
+    const soft = await request(app).post('/api/auth/login').set('X-Soft-Errors', '1').send(wrong);
+    expect(soft.status).toBe(200);
+    expect(soft.body.error.status).toBe(401);
+    expect(soft.body.accessToken).toBeUndefined();
+    const taken = await request(app).post('/api/auth/register').set('X-Soft-Errors', '1').send({ role: 'STUDENT', username: `${prefix}_stu`, displayName: 'Dup', password: pw, acceptTerms: true, guardianConsent: true });
+    expect(taken.status).toBe(200);
+    expect(taken.body.error.status).toBe(409);
+    // Other endpoints keep real status codes even with the header
+    const other = await request(app).get('/api/progress/me').set('X-Soft-Errors', '1');
+    expect(other.status).toBe(401);
+  });
   it('rejects the honeypot field', async () => {
     const res = await request(app).post('/api/auth/register').send({ role: 'STUDENT', username: `${prefix}_bot`, displayName: 'Bot', password: pw, acceptTerms: true, guardianConsent: true, website: 'http://spam' });
     expect(res.status).toBe(400);

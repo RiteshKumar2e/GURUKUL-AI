@@ -70,6 +70,9 @@ async function parse(res: Response) {
   }
 }
 
+/** Form endpoints whose expected mistakes come back as 200 + error (see backend errorHandler). */
+const SOFT_ERROR_PATHS = /^\/auth\/(login|register)$/;
+
 export type RefreshResult = 'ok' | 'invalid' | 'offline';
 let refreshingResult: Promise<RefreshResult> | null = null;
 
@@ -157,6 +160,9 @@ export async function api<T = unknown>(path: string, opts: Options = {}): Promis
   const headers: Record<string, string> = {};
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
   if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+  // Wrong password or a taken username is shown in the form; ask the server to answer such
+  // mistakes with 200 so the browser does not also log a red network error in the console
+  if (SOFT_ERROR_PATHS.test(path)) headers['X-Soft-Errors'] = '1';
 
   let res: Response;
   try {
@@ -179,9 +185,11 @@ export async function api<T = unknown>(path: string, opts: Options = {}): Promis
   }
 
   const data = await parse(res);
-  if (!res.ok) {
-    const e = (data as { error?: { code?: string; message?: string; details?: unknown } })?.error;
-    throw new ApiError(res.status, e?.code ?? 'ERROR', e?.message ?? 'Something went wrong.', Array.isArray(e?.details) ? (e!.details as ApiError['details']) : undefined);
+  const e = (data as { error?: { code?: string; message?: string; details?: unknown; status?: number } } | null)?.error;
+  // A "soft" error arrives as 200 with the real status inside; treat it exactly like that status
+  const status = !res.ok ? res.status : typeof e?.status === 'number' ? e.status : 0;
+  if (status) {
+    throw new ApiError(status, e?.code ?? 'ERROR', e?.message ?? 'Something went wrong.', Array.isArray(e?.details) ? (e!.details as ApiError['details']) : undefined);
   }
   return data as T;
 }
