@@ -13,6 +13,27 @@ export function useVoiceCapabilities() {
   return useQuery({ queryKey: ['voice-caps'], queryFn: () => api<VoiceCapabilities>('/voice/capabilities'), staleTime: 10 * 60_000, retry: 1 });
 }
 
+/** Names of Indian voices shipped by Windows, macOS/iOS, Android and Chrome. */
+const INDIAN_NAMES = /india|indian|hindi|heera|kalpana|hemant|swara|madhur|neerja|prabhat|ravi|rishi|veena|lekha|sangeeta|aarav|aditi|kajal|ananya/i;
+/** Neural/online voices sound far more natural than the old offline ones. */
+const quality = (v: SpeechSynthesisVoice) => (/natural|neural|online|google|premium|enhanced/i.test(v.name) ? 2 : 0) + (v.localService ? 0 : 1);
+
+/**
+ * The most natural Indian voice on this device for the language, never a US or UK one when an
+ * Indian voice exists. Order: exact Indian locale (hi-IN, en-IN, te-IN), then any voice with an
+ * Indian name, then (for English) a Hindi voice, which reads English with an Indian accent.
+ */
+export function pickIndianVoice(lang: VoiceLang, voices: SpeechSynthesisVoice[] = 'speechSynthesis' in window ? window.speechSynthesis.getVoices() : []): SpeechSynthesisVoice | null {
+  const best = (list: SpeechSynthesisVoice[]) => list.sort((a, b) => quality(b) - quality(a))[0] ?? null;
+  const locale = (l: string) => (v: SpeechSynthesisVoice) => v.lang.toLowerCase().replace('_', '-') === l.toLowerCase();
+  return (
+    best(voices.filter(locale(LOCALE[lang]))) ??
+    best(voices.filter((v) => v.lang.toLowerCase().startsWith(lang) && INDIAN_NAMES.test(v.name))) ??
+    (lang === 'en' ? best(voices.filter(locale('hi-IN'))) : null) ??
+    best(voices.filter((v) => v.lang.toLowerCase().startsWith(lang)))
+  );
+}
+
 export function deviceHasVoice(lang: VoiceLang): boolean | null {
   if (!('speechSynthesis' in window)) return false;
   const voices = window.speechSynthesis.getVoices();
@@ -58,10 +79,9 @@ export function useVoicePlayback() {
     }
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find((v) => v.lang.toLowerCase() === LOCALE[lang].toLowerCase()) ?? voices.find((v) => v.lang.toLowerCase().startsWith(lang));
+    const voice = pickIndianVoice(lang);
     if (voice) u.voice = voice;
-    u.lang = LOCALE[lang];
+    u.lang = voice?.lang ?? LOCALE[lang];
     u.rate = 0.95;
     u.onend = () => setState('idle');
     u.onerror = () => setState('idle');

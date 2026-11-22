@@ -1,3 +1,4 @@
+import { pickIndianVoice } from '@/features/voice/useVoicePlayback';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /* Minimal typings for the Web Speech API (not in lib.dom for all browsers) */
@@ -165,10 +166,9 @@ export function useSpeak() {
     if (!('speechSynthesis' in window)) return false;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text.replace(/[*#_`]/g, ''));
-    const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find((v) => v.lang.toLowerCase().startsWith(lang === 'hi' ? 'hi' : 'en-in')) ?? voices.find((v) => v.lang.toLowerCase().startsWith(lang));
+    const voice = pickIndianVoice(lang);
     if (voice) u.voice = voice;
-    u.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+    u.lang = voice?.lang ?? (lang === 'hi' ? 'hi-IN' : 'en-IN');
     u.rate = 0.95;
     u.onend = () => setSpeaking(false);
     u.onerror = () => setSpeaking(false);

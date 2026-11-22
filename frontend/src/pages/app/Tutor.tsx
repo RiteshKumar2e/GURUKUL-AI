@@ -205,7 +205,9 @@ export default function Tutor() {
             void send();
           }}
         >
-          <div className="mb-2 overflow-x-auto">
+          {/* Gap between subject and the intent buttons; the scroll area is only around the buttons
+              and has padding, so focus outlines are not cut off */}
+          <div className="mb-3 space-y-3">
             {!id && mySubjects.length > 1 && (
               <Select id="tutor-subject" label={tx('विषय', 'Subject')} value={subjectSlug} onChange={(e) => setSubjectSlug(e.target.value)}>
                 <option value="">{tx('कोई भी विषय', 'Any subject')}</option>
@@ -216,7 +218,9 @@ export default function Tutor() {
                 ))}
               </Select>
             )}
-            <Segmented label={tx('मुझे चाहिए', 'I want')} value={intent} onChange={setIntent} options={intents} />
+            <div className="-m-1 overflow-x-auto p-1">
+              <Segmented label={tx('मुझे चाहिए', 'I want')} value={intent} onChange={setIntent} options={intents} />
+            </div>
           </div>
           <label htmlFor="tutor-input" className="sr-only">
             {tx('अपना सवाल लिखें', 'Type your question')}

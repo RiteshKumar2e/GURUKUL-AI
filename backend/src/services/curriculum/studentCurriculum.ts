@@ -8,6 +8,7 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { cachedContent, forgetContent, STUDENT_TTL_MS } from '../../utils/contentCache';
 import { and, asc, count, eq, inArray } from 'drizzle-orm';
 import { db } from '../../db/client';
 import {
@@ -89,7 +90,7 @@ export interface CurriculumInput {
 
 export const catalogService = {
   /** Everything the onboarding form needs before a class is chosen. */
-  async options() {
+  options: cachedContent('catalog.options', async () => {
     const [b, s, c] = await Promise.all([
       db.select().from(boards).orderBy(asc(boards.order)),
       db.select().from(academicSessions).orderBy(asc(academicSessions.code)),
@@ -101,22 +102,25 @@ export const catalogService = {
       classes: c.map((x) => ({ level: x.level, stage: x.stage, nameHi: x.nameHi, nameEn: x.nameEn })),
       streams: streamSuggestions(),
     };
-  },
+  }),
 
   /** Subjects that exist for this board, session and class. Empty when none are listed. */
-  async subjects(boardCode: string, sessionCode: string, classLevel: number) {
+  subjects: cachedContent('catalog.subjects', async (boardCode: string, sessionCode: string, classLevel: number) => {
     const board = await db.query.boards.findFirst({ where: eq(boards.code, boardCode) });
     const session = await db.query.academicSessions.findFirst({ where: eq(academicSessions.code, sessionCode) });
     if (!board || !session) throw notFound('Board or session not found.');
     if (board.status === 'NOT_AVAILABLE') return { board: board.code, session: session.code, classLevel, available: false, subjects: [] };
     const list = await subjectsWithContent(and(eq(subjects.boardId, board.id), eq(subjects.sessionId, session.id), eq(subjects.classLevel, classLevel)));
     return { board: board.code, session: session.code, classLevel, stage: stageOf(classLevel), available: true, subjects: list };
-  },
+  }),
 };
 
 export const studentCurriculumService = {
-  /** The active selection with its subjects, or null if the student has not chosen yet. */
-  async active(studentId: string) {
+  /**
+   * The active selection with its subjects, or null if the student has not chosen yet.
+   * Read on almost every request, so it is cached for a minute and dropped when set() changes it.
+   */
+  active: cachedContent('student.active', async (studentId: string) => {
     const row = await db.query.studentCurricula.findFirst({
       where: and(eq(studentCurricula.studentId, studentId), eq(studentCurricula.isActive, true)),
       with: { board: true, session: true, subjects: { with: { subject: { columns: subjectColumns } } } },
@@ -133,17 +137,17 @@ export const studentCurriculumService = {
       startedAt: row.startedAt,
       subjects: row.subjects.map((s) => s.subject).sort((a, b) => a.order - b.order),
     };
-  },
+  }, STUDENT_TTL_MS),
 
   /** Subject ids the student is currently studying (empty if no selection). */
-  async subjectIds(studentId: string): Promise<string[]> {
+  subjectIds: cachedContent('student.subjectIds', async (studentId: string): Promise<string[]> => {
     const rows = await db
       .select({ id: studentSubjects.subjectId })
       .from(studentSubjects)
       .innerJoin(studentCurricula, eq(studentCurricula.id, studentSubjects.curriculumId))
       .where(and(eq(studentCurricula.studentId, studentId), eq(studentCurricula.isActive, true)));
     return rows.map((r) => r.id);
-  },
+  }, STUDENT_TTL_MS),
 
   async history(studentId: string) {
     const rows = await db.query.studentCurricula.findMany({
@@ -199,6 +203,8 @@ export const studentCurriculumService = {
       // Keep the profile's summary fields in step (used by guardian views and older clients)
       await tx.update(studentProfiles).set({ classLevel: input.classLevel, board: board.code }).where(eq(studentProfiles.id, studentId));
     });
-    return this.active(studentId);
+    forgetContent('student.active', studentId);
+    forgetContent('student.subjectIds', studentId);
+    return studentCurriculumService.active(studentId);
   },
 };

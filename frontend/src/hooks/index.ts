@@ -76,8 +76,13 @@ export function usePageAnalytics(lang: string) {
   const { pathname } = useLocation();
   useEffect(() => {
     if (readConsent() !== 'analytics' || !navigator.onLine) return;
-    // Strip ids from paths: /app/tutor/abc123 -> /app/tutor/:id
-    const path = pathname.replace(/\/c[a-z0-9]{20,}/g, '/:id').slice(0, 120) || '/';
+    // Strip ids from paths (UUIDs and other long ids): /app/tutor/1b9d6bcd-... -> /app/tutor/id
+    const path =
+      pathname
+        .replace(/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '/id')
+        .replace(/\/c[a-z0-9]{20,}/g, '/id')
+        .replace(/[^\w\-/]/g, '')
+        .slice(0, 120) || '/';
     void api('/analytics/pageview', { body: { path, lang } }).catch(() => undefined);
   }, [pathname, lang]);
 }

@@ -131,4 +131,4 @@ export const syncSchema = z.object({
     .max(200),
 });
 
-export const pageviewSchema = z.object({ path: z.string().max(120).regex(/^\/[\w\-/]*$/), lang: z.enum(['hi', 'en']).optional() });
+export const pageviewSchema = z.object({ path: z.string().max(120).regex(/^\/[\w\-/]*$/), lang: z.enum(['hi', 'en', 'hg']).optional() });

@@ -1,6 +1,7 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '../db/client';
 import { assessments, chapters, lessons, questions, subjects, topics } from '../db/schema';
+import { cachedContent } from '../utils/contentCache';
 
 const questionPublic = {
   id: true,
@@ -23,7 +24,7 @@ function withCount<T extends { questions: unknown[] }>(row: T): Omit<T, 'questio
   return { ...rest, _count: { questions: q.length } };
 }
 
-export const curriculumRepository = {
+const repository = {
   subjects: async () => {
     const rows = await db.query.subjects.findMany({
       with: { chapters: { orderBy: (c, { asc }) => [asc(c.number)], with: { topics: { columns: { id: true } } } } },
@@ -128,3 +129,10 @@ export const curriculumRepository = {
   subjectBySlug: async (slug: string) => (await db.query.subjects.findFirst({ where: eq(subjects.slug, slug) })) ?? null,
 };
 
+/**
+ * Curriculum content only changes when the seed runs on deploy, so every read is served from the
+ * in-memory content cache (see utils/contentCache). Student data is never read through here.
+ */
+export const curriculumRepository = Object.fromEntries(
+  Object.entries(repository).map(([name, fn]) => [name, cachedContent(`curriculum.${name}`, fn as (...a: unknown[]) => Promise<unknown>)]),
+) as unknown as typeof repository;

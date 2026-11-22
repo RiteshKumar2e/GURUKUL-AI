@@ -31,6 +31,8 @@ const schema = z.object({
   // Thinking time for reasoning models (gpt-oss, Gemini 2.5+). low = much faster replies; off = send nothing
   // Second Groq model, used when the main one is rate-limited (each Groq model has its own limit). Empty = none
   AI_FALLBACK_MODEL: z.string().optional().default('openai/gpt-oss-20b'),
+  // Curriculum content kept in server memory; 0 turns it off. Default: 10 minutes (off in tests)
+  CONTENT_CACHE_TTL_MS: z.coerce.number().int().min(0).optional(),
   AI_REASONING_EFFORT: z.enum(['off', 'low', 'medium', 'high']).default('low'),
 
   // Tutor LLM: auto = Groq if AI_API_KEY is set, else Gemini if GEMINI_API_KEY is set, else demo mode
