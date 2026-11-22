@@ -13,6 +13,8 @@ interface AuthCtx {
   status: Status;
   /** true when we are showing a cached profile because the network is down */
   offlineSession: boolean;
+  /** True after the user logged out themselves (protected pages then go to the home page). */
+  signedOut: boolean;
   login: (username: string, password: string) => Promise<User>;
   register: (data: Record<string, unknown>) => Promise<User>;
   /**
@@ -49,6 +51,7 @@ const hint = {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<User | null>(null);
   const [status, setStatus] = useState<Status>('loading');
+  const [signedOut, setSignedOut] = useState(false);
   const qc = useQueryClient();
   const { setLang, tx } = useLang();
 
@@ -67,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncManager.setOwner(u.id);
       setUser(u);
       setStatus('authenticated');
+      setSignedOut(false);
       if (adoptLanguage) setLang((cur) => (u.preferredLanguage === 'EN' ? 'en' : cur === 'hg' ? 'hg' : 'hi'));
       void syncManager.flush();
     },
@@ -168,6 +172,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await offlineDb.clearPersonal(user?.id ?? null);
     syncManager.setOwner(null);
     qc.clear();
+    // Signed out on purpose: protected pages send them to the home page, not the login page
+    setSignedOut(true);
     setUserState(null);
     setStatus('anonymous');
     return true;
@@ -179,8 +185,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [setUser]);
 
   const value = useMemo(
-    () => ({ user, status, offlineSession: status === 'offline', login, register, logout, setUser, refreshUser }),
-    [user, status, login, register, logout, setUser, refreshUser],
+    () => ({ user, status, signedOut, offlineSession: status === 'offline', login, register, logout, setUser, refreshUser }),
+    [user, status, signedOut, login, register, logout, setUser, refreshUser],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

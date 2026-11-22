@@ -47,8 +47,8 @@ export default function About() {
             </p>
             <p className="mt-2 text-ink-800">
               {tx(
-                'कक्षा 1 से 12 के विषय और पुस्तकें NCERT की आधिकारिक पुस्तक सूची (ncert.nic.in, सत्र 2026-27, 21 नवंबर 2026 को पढ़ी गई) से हैं। गणित के अध्यायों के नाम वहीं से लिए गए हैं जहाँ वे पुस्तक की विषय-सूची में पढ़े जा सके। हर बोर्ड के साथ उसकी जाँच की स्थिति दिखाई जाती है; ICSE का पाठ्यक्रम अभी उपलब्ध नहीं है।',
-                'Subjects and books for Classes 1 to 12 come from NCERT’s official textbook list (ncert.nic.in, session 2026-27, read on 21 November 2026). Maths chapter titles are included only where they could be read from the book’s contents page. Each board shows how far it has been verified; the ICSE curriculum is not available yet.',
+                'कक्षा 1 से 12 के विषय और पुस्तकें NCERT की आधिकारिक पुस्तक सूची (ncert.nic.in, सत्र 2026-27, 21 नवंबर 2026 को पढ़ी गई) से हैं। सत्र 2025-26 और 2024-25 की सूची उसी पेज की archive.org पर सहेजी गई प्रतियों (13 अगस्त 2025 और 15 अगस्त 2024) से ली गई है। गणित के अध्यायों के नाम वहीं से लिए गए हैं जहाँ वे पुस्तक की विषय-सूची में पढ़े जा सके। हर बोर्ड के साथ उसकी जाँच की स्थिति दिखाई जाती है; ICSE का पाठ्यक्रम अभी उपलब्ध नहीं है।',
+                'Subjects and books for Classes 1 to 12 come from NCERT’s official textbook list (ncert.nic.in, session 2026-27, read on 21 November 2026). Sessions 2025-26 and 2024-25 come from archived copies of the same page on archive.org (13 August 2025 and 15 August 2024). Maths chapter titles are included only where they could be read from the book’s contents page. Each board shows how far it has been verified; the ICSE curriculum is not available yet.',
               )}
             </p>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">

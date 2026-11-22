@@ -15,6 +15,13 @@
       "when": 1795282092151,
       "tag": "0001_curriculum_classes_1_12",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795347100608,
+      "tag": "0002_sessions_2024_25",
+      "breakpoints": true
     }
   ]
 }

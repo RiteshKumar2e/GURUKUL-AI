@@ -155,7 +155,7 @@ export function CookieBanner() {
 
 /** Route guard. Allows the cached offline session for student pages. */
 export function RequireAuth({ roles, children, allowIncompleteOnboarding = false }: { roles?: Role[]; children: ReactNode; allowIncompleteOnboarding?: boolean }) {
-  const { user, status } = useAuth();
+  const { user, status, signedOut } = useAuth();
   const location = useLocation();
   const { tx } = useLang();
   if (status === 'loading') {
@@ -165,7 +165,8 @@ export function RequireAuth({ roles, children, allowIncompleteOnboarding = false
       </div>
     );
   }
-  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  // After the user logs out (sidebar, settings or mobile), land on the home page; otherwise ask to log in
+  if (!user) return signedOut ? <Navigate to="/" replace /> : <Navigate to="/login" replace state={{ from: location.pathname }} />;
   if (roles && !roles.includes(user.role)) return <Navigate to={homePathFor(user)} replace />;
   if (!allowIncompleteOnboarding && user.role === 'STUDENT' && user.student && !user.student.onboardingDone) return <Navigate to="/onboarding" replace />;
   return <>{children}</>;

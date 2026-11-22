@@ -14,7 +14,7 @@
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db, closeDatabase, checkDatabase } from '../src/db/client';
 import {
   academicSessions,
@@ -169,9 +169,19 @@ interface Catalog {
   >;
 }
 
+/**
+ * One catalogue file per academic session: the current list (curriculum-catalog.json) and earlier
+ * sessions taken from archived copies of the same official NCERT page.
+ */
+const CATALOG_FILES = ['curriculum-catalog.json', 'curriculum-catalog-2025-26.json', 'curriculum-catalog-2024-25.json'];
+
+async function seedCatalogs() {
+  for (const file of CATALOG_FILES) await seedCatalog(file);
+}
+
 /** Subjects (and maths chapter titles) for Classes 1-12 from the official NCERT textbook list. */
-async function seedCatalog() {
-  const catalog = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../content/curriculum-catalog.json'), 'utf8')) as Catalog;
+async function seedCatalog(file: string) {
+  const catalog = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../content', file), 'utf8')) as Catalog;
   const session = await db.query.academicSessions.findFirst({ where: eq(academicSessions.code, catalog.meta.session) });
   if (!session) throw new Error(`Session ${catalog.meta.session} is missing. Run \`npm run db:migrate\` first.`);
   const available = (await db.select().from(boards)).filter((b) => b.status !== 'NOT_AVAILABLE');
@@ -179,8 +189,21 @@ async function seedCatalog() {
   let subjectCount = 0;
   let chapterCount = 0;
   for (const board of available) {
-    for (const [cls, list] of Object.entries(catalog.classes)) {
+    for (const [cls, all] of Object.entries(catalog.classes)) {
+      let list = all;
       const classLevel = Number(cls);
+      // A subject that already exists for this board, session and class under another slug (the
+      // Class 9 maths sample lessons, JAC 2025-26) keeps its row; it only gets the official book list.
+      const existing = await db.query.subjects.findMany({
+        where: and(eq(subjects.boardId, board.id), eq(subjects.sessionId, session.id), eq(subjects.classLevel, classLevel)),
+        columns: { id: true, slug: true, subjectKey: true },
+      });
+      const prefix = `${board.code.toLowerCase()}-${session.code}-c${classLevel}-`;
+      const taken = new Map(existing.filter((e) => !e.slug.startsWith(prefix) && e.subjectKey).map((e) => [e.subjectKey!, e.id]));
+      for (const sub of list.filter((x) => taken.has(x.key))) {
+        await db.update(subjects).set({ books: sub.books }).where(eq(subjects.id, taken.get(sub.key)!));
+      }
+      list = list.filter((x) => !taken.has(x.key));
       const rows = list.map((sub) => ({
         slug: `${board.code.toLowerCase()}-${session.code}-c${classLevel}-${sub.key}`,
         nameHi: sub.nameHi,
@@ -239,8 +262,9 @@ async function main() {
   const health = await checkDatabase();
   if (!health.ok) throw new Error(`Database not reachable (${health.location}): ${health.error}`);
   if (!health.migrated) throw new Error('Tables are missing. Run `npm run db:migrate` first.');
-  await seedCatalog();
+  // Sample lessons first, so the catalogue sees the existing Class 9 maths subject and does not duplicate it
   await seedContent();
+  await seedCatalogs();
 }
 
 main()

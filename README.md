@@ -112,6 +112,7 @@ Students choose their class, board, academic session, medium, stream (Classes 11
 | Content | Coverage | Source |
 |---|---|---|
 | Subjects and textbooks, Classes 1–12 | All classes (4 to 25 subjects per class), session 2026-27 | Official NCERT textbook list, [ncert.nic.in/textbook.php](https://ncert.nic.in/textbook.php), read 21 Nov 2026 |
+| Subjects and textbooks, earlier sessions | All classes, sessions 2025-26 and 2024-25, with that year's books (e.g. Class 4 maths: *Math-Magic* in 2024-25, *Math-Mela* in 2025-26). Maths chapter titles only where the book is unchanged in 2026-27 (Classes 2, 6, 10, 11, 12) | Archived copies of the same NCERT page on archive.org: [13 Aug 2025](https://web.archive.org/web/20250813112136/https://ncert.nic.in/textbook.php), [15 Aug 2024](https://web.archive.org/web/20240815162514/https://ncert.nic.in/textbook.php) |
 | Maths chapter titles | Classes 2, 6, 7, 9, 10, 11, 12 | Contents page of each NCERT maths book (front-matter PDF). Classes 1, 3, 4, 5 and 8 show the official chapter count only: their contents pages could not be read as text |
 | Lessons, practice questions and quizzes | Class 9 maths only (original sample content, based on the earlier NCERT book, session 2025-26) | Written for this project |
 | Other subjects | Book titles and chapter counts; the AI tutor answers questions | Official NCERT list |
@@ -507,8 +508,8 @@ What has and has not been checked, as observed during development:
 
 | Item | Status |
 |---|---|
-| Backend: lint, 113/113 tests, production build | Passing locally (2026-11-22) |
-| Frontend: lint, 21/21 tests, production build | Passing locally (2026-11-22) |
+| Backend: lint, 117/117 tests, production build | Passing locally (2026-11-22) |
+| Frontend: lint, 26/26 tests, production build | Passing locally (2026-11-22) |
 | Migration 0001 (Classes 1–12) | Applied to a fresh database in every test run, and rehearsed on a copy shaped like production. **Not yet applied to production** |
 | Classes 1–12 screens (onboarding, class change, subject tabs, tutor subject) | Type-checked and built; **not yet checked in a browser or on a phone** |
 | Turso database: migration, seed, health check, login and curriculum API | Verified against a live Turso database (2026-11-21) |

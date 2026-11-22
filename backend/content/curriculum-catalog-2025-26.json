@@ -1,0 +1,3063 @@
+{
+ "meta": {
+  "session": "2025-26",
+  "retrievedOn": "2026-11-22",
+  "sources": {
+   "subjectsAndBooks": "https://web.archive.org/web/20250813112136/https://ncert.nic.in/textbook.php (archived copy of the official NCERT textbook list, captured 13 Aug 2025; commented-out and \"Coming Soon\" entries excluded)",
+   "mathsChapterTitles": "Only for books unchanged in 2026-27 (same code, title and chapter count): the contents page read for the 2026-27 list"
+  },
+  "notes": [
+   "Subject names in Hindi are interface translations, not official titles.",
+   "Books that changed after this session have no chapter titles here; only the official book titles and chapter counts."
+  ]
+ },
+ "classes": {
+  "1": [
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 0,
+    "books": [
+     {
+      "title": "Mridang",
+      "code": "aemr1",
+      "medium": "EN",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 1,
+    "books": [
+     {
+      "title": "Joyful-Mathematics (English)",
+      "code": "aejm1",
+      "medium": "EN",
+      "chapters": 13
+     },
+     {
+      "title": "Joyful-Mathematics (Hindi)",
+      "code": "ahjm1",
+      "medium": "HI",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 2,
+    "books": [
+     {
+      "title": "Sarangi",
+      "code": "ahsr1",
+      "medium": "HI",
+      "chapters": 19
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 3,
+    "books": [
+     {
+      "title": "Shahnai",
+      "code": "aush1",
+      "medium": "UR",
+      "chapters": 18
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "2": [
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 0,
+    "books": [
+     {
+      "title": "Joyful-Mathematics (English)",
+      "code": "bejm1",
+      "medium": "EN",
+      "chapters": 11
+     },
+     {
+      "title": "Joyful-Mathematics (Hindi)",
+      "code": "bhjm1",
+      "medium": "HI",
+      "chapters": 11
+     }
+    ],
+    "chapters": [
+     {
+      "number": 1,
+      "titleEn": "A Day at the Beach"
+     },
+     {
+      "number": 2,
+      "titleEn": "Shapes Around Us"
+     },
+     {
+      "number": 3,
+      "titleEn": "Fun with Numbers"
+     },
+     {
+      "number": 4,
+      "titleEn": "Shadow Story"
+     },
+     {
+      "number": 5,
+      "titleEn": "Playing with Lines"
+     },
+     {
+      "number": 6,
+      "titleEn": "Decoration for Festival"
+     },
+     {
+      "number": 7,
+      "titleEn": "Rani’s Gift"
+     },
+     {
+      "number": 8,
+      "titleEn": "Grouping and Sharing"
+     },
+     {
+      "number": 9,
+      "titleEn": "Which Season is it?"
+     },
+     {
+      "number": 10,
+      "titleEn": "Fun at the Fair"
+     },
+     {
+      "number": 11,
+      "titleEn": "Data Handling"
+     }
+    ],
+    "chapterSource": [
+     "https://ncert.nic.in/textbook/pdf/bejm1ps.pdf"
+    ]
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Sarangi",
+      "code": "bhsr1",
+      "medium": "HI",
+      "chapters": 26
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 2,
+    "books": [
+     {
+      "title": "Mridang",
+      "code": "bemr1",
+      "medium": "EN",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 3,
+    "books": [
+     {
+      "title": "Shahnai",
+      "code": "bush1",
+      "medium": "UR",
+      "chapters": 19
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "3": [
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 0,
+    "books": [
+     {
+      "title": "Maths Mela",
+      "code": "cemm1",
+      "medium": "EN",
+      "chapters": 14
+     },
+     {
+      "title": "Ganit Mela",
+      "code": "chmm1",
+      "medium": "HI",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Santoor",
+      "code": "cesa1",
+      "medium": "EN",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 2,
+    "books": [
+     {
+      "title": "Veena",
+      "code": "chve1",
+      "medium": "HI",
+      "chapters": 18
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "the-world-around-us",
+    "nameEn": "The World Around Us",
+    "nameHi": "हमारे आस-पास की दुनिया",
+    "order": 3,
+    "books": [
+     {
+      "title": "Our Wondrous World",
+      "code": "ceev1",
+      "medium": "EN",
+      "chapters": 12
+     },
+     {
+      "title": "Hamara Adhbhut Sansar",
+      "code": "chev1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "arts",
+    "nameEn": "Arts",
+    "nameHi": "कला",
+    "order": 4,
+    "books": [
+     {
+      "title": "Bansuri - I",
+      "code": "cebu1",
+      "medium": "EN",
+      "chapters": 20
+     },
+     {
+      "title": "Bansuri - I (Hindi)",
+      "code": "chbu1",
+      "medium": "HI",
+      "chapters": 20
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physical-education-and-well-being",
+    "nameEn": "Physical Education and Well Being",
+    "nameHi": "शारीरिक शिक्षा और कल्याण",
+    "order": 5,
+    "books": [
+     {
+      "title": "Khel Yoga",
+      "code": "ceky1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Khel Yoga (Hindi)",
+      "code": "chky1",
+      "medium": "HI",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 6,
+    "books": [
+     {
+      "title": "Sitar",
+      "code": "cust1",
+      "medium": "UR",
+      "chapters": 19
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "4": [
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 0,
+    "books": [
+     {
+      "title": "Math-Mela",
+      "code": "demm1",
+      "medium": "EN",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Veena",
+      "code": "dhve1",
+      "medium": "HI",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 2,
+    "books": [
+     {
+      "title": "Santoor",
+      "code": "desa1",
+      "medium": "EN",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "the-world-around-us",
+    "nameEn": "The World Around Us",
+    "nameHi": "हमारे आस-पास की दुनिया",
+    "order": 3,
+    "books": [
+     {
+      "title": "Our Wonderous World",
+      "code": "deev1",
+      "medium": "EN",
+      "chapters": 10
+     },
+     {
+      "title": "Hamara Adhbhut Sansar",
+      "code": "dhev1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "arts",
+    "nameEn": "Arts",
+    "nameHi": "कला",
+    "order": 4,
+    "books": [
+     {
+      "title": "Bansuri",
+      "code": "debu1",
+      "medium": "EN",
+      "chapters": 18
+     },
+     {
+      "title": "Bansuri - I (Hindi)",
+      "code": "dhbu1",
+      "medium": "HI",
+      "chapters": 18
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physical-education-and-well-being",
+    "nameEn": "Physical Education and Well Being",
+    "nameHi": "शारीरिक शिक्षा और कल्याण",
+    "order": 5,
+    "books": [
+     {
+      "title": "Khel Yoga",
+      "code": "deky1",
+      "medium": "EN",
+      "chapters": 3
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 6,
+    "books": [
+     {
+      "title": "Sitaar",
+      "code": "dust1",
+      "medium": "UR",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "5": [
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 0,
+    "books": [
+     {
+      "title": "Math-Mela",
+      "code": "eemm1",
+      "medium": "EN",
+      "chapters": 15
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Veena",
+      "code": "ehve1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 2,
+    "books": [
+     {
+      "title": "Santoor",
+      "code": "eesa1",
+      "medium": "EN",
+      "chapters": 10
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "the-world-around-us",
+    "nameEn": "The World Around Us",
+    "nameHi": "हमारे आस-पास की दुनिया",
+    "order": 3,
+    "books": [
+     {
+      "title": "Our Wonderous World",
+      "code": "eeev1",
+      "medium": "EN",
+      "chapters": 10
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "arts",
+    "nameEn": "Arts",
+    "nameHi": "कला",
+    "order": 4,
+    "books": [
+     {
+      "title": "Bansuri",
+      "code": "eebu1",
+      "medium": "EN",
+      "chapters": 19
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physical-education-and-well-being",
+    "nameEn": "Physical Education and Well Being",
+    "nameHi": "शारीरिक शिक्षा और कल्याण",
+    "order": 5,
+    "books": [
+     {
+      "title": "Khel Yoga",
+      "code": "eeky1",
+      "medium": "EN",
+      "chapters": 3
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 6,
+    "books": [
+     {
+      "title": "Sitaar",
+      "code": "eust1",
+      "medium": "UR",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "6": [
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 0,
+    "books": [
+     {
+      "title": "Malhar",
+      "code": "fhml1",
+      "medium": "HI",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Poorvi",
+      "code": "fepr1",
+      "medium": "EN",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 2,
+    "books": [
+     {
+      "title": "Ganita Prakash",
+      "code": "fegp1",
+      "medium": "EN",
+      "chapters": 10
+     },
+     {
+      "title": "Ganita Prakash (Hindi)",
+      "code": "fhgp1",
+      "medium": "HI",
+      "chapters": 10
+     }
+    ],
+    "chapters": [
+     {
+      "number": 1,
+      "titleEn": "Patterns in Mathematics"
+     },
+     {
+      "number": 2,
+      "titleEn": "Lines and Angles"
+     },
+     {
+      "number": 3,
+      "titleEn": "Number Play"
+     },
+     {
+      "number": 4,
+      "titleEn": "Data Handling and Presentation"
+     },
+     {
+      "number": 5,
+      "titleEn": "Prime Time"
+     },
+     {
+      "number": 6,
+      "titleEn": "Perimeter and Area"
+     },
+     {
+      "number": 7,
+      "titleEn": "Fractions"
+     },
+     {
+      "number": 8,
+      "titleEn": "Playing with Constructions"
+     },
+     {
+      "number": 9,
+      "titleEn": "Symmetry"
+     },
+     {
+      "number": 10,
+      "titleEn": "The Other Side of Zero"
+     }
+    ],
+    "chapterSource": [
+     "https://ncert.nic.in/textbook/pdf/fegp1ps.pdf"
+    ]
+   },
+   {
+    "key": "social-science",
+    "nameEn": "Social Science",
+    "nameHi": "सामाजिक विज्ञान",
+    "order": 3,
+    "books": [
+     {
+      "title": "Exploring Society India and Beyond",
+      "code": "fees1",
+      "medium": "EN",
+      "chapters": 14
+     },
+     {
+      "title": "Samaj Ka Aadhyan: Bharat or uske aage",
+      "code": "fhes1",
+      "medium": "HI",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 4,
+    "books": [
+     {
+      "title": "Deepakam",
+      "code": "fsde1",
+      "medium": "SA",
+      "chapters": 16
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "science",
+    "nameEn": "Science",
+    "nameHi": "विज्ञान",
+    "order": 5,
+    "books": [
+     {
+      "title": "Curiosity",
+      "code": "fecu1",
+      "medium": "EN",
+      "chapters": 12
+     },
+     {
+      "title": "Jigyasa",
+      "code": "fhcu1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "arts",
+    "nameEn": "Arts",
+    "nameHi": "कला",
+    "order": 6,
+    "books": [
+     {
+      "title": "Kriti-I",
+      "code": "fekr1",
+      "medium": "EN",
+      "chapters": 22
+     },
+     {
+      "title": "Kriti-I (Hindi)",
+      "code": "fhkr1",
+      "medium": "HI",
+      "chapters": 22
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physical-education-and-well-being",
+    "nameEn": "Physical Education and Well Being",
+    "nameHi": "शारीरिक शिक्षा और कल्याण",
+    "order": 7,
+    "books": [
+     {
+      "title": "Khel Yatra",
+      "code": "feky1",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Khel Yatra (Hindi)",
+      "code": "fhky1",
+      "medium": "HI",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "vocational-education",
+    "nameEn": "Vocational Education",
+    "nameHi": "व्यावसायिक शिक्षा",
+    "order": 8,
+    "books": [
+     {
+      "title": "Kaushal Bodh",
+      "code": "fekb1",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Kaushal Bodh (Hindi)",
+      "code": "fhkb1",
+      "medium": "HI",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 9,
+    "books": [
+     {
+      "title": "Khayal",
+      "code": "fuky1",
+      "medium": "UR",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "7": [
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 0,
+    "books": [
+     {
+      "title": "Malhar",
+      "code": "ghml1",
+      "medium": "HI",
+      "chapters": 10
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Poorvi",
+      "code": "gepr1",
+      "medium": "EN",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 2,
+    "books": [
+     {
+      "title": "Ganita Prakash",
+      "code": "gegp1",
+      "medium": "EN",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "social-science",
+    "nameEn": "Social Science",
+    "nameHi": "सामाजिक विज्ञान",
+    "order": 3,
+    "books": [
+     {
+      "title": "Exploring Society India and Beyond",
+      "code": "gees1",
+      "medium": "EN",
+      "chapters": 12
+     },
+     {
+      "title": "Samaj Ka Aadhyan: Bharat or uske aage",
+      "code": "ghes1",
+      "medium": "HI",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 4,
+    "books": [
+     {
+      "title": "Deepakam",
+      "code": "gsde1",
+      "medium": "SA",
+      "chapters": 15
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "science",
+    "nameEn": "Science",
+    "nameHi": "विज्ञान",
+    "order": 5,
+    "books": [
+     {
+      "title": "Curiosity",
+      "code": "gecu1",
+      "medium": "EN",
+      "chapters": 12
+     },
+     {
+      "title": "Jigyasa",
+      "code": "ghcu1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "arts",
+    "nameEn": "Arts",
+    "nameHi": "कला",
+    "order": 6,
+    "books": [
+     {
+      "title": "Kriti",
+      "code": "gekr1",
+      "medium": "EN",
+      "chapters": 20
+     },
+     {
+      "title": "Kriti-I (Hindi)",
+      "code": "ghkr1",
+      "medium": "HI",
+      "chapters": 22
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physical-education-and-well-being",
+    "nameEn": "Physical Education and Well Being",
+    "nameHi": "शारीरिक शिक्षा और कल्याण",
+    "order": 7,
+    "books": [
+     {
+      "title": "Khel Yatra",
+      "code": "geky1",
+      "medium": "EN",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "vocational-education",
+    "nameEn": "Vocational Education",
+    "nameHi": "व्यावसायिक शिक्षा",
+    "order": 8,
+    "books": [
+     {
+      "title": "Kaushal Bodh",
+      "code": "gekb1",
+      "medium": "EN",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 9,
+    "books": [
+     {
+      "title": "Khayal",
+      "code": "guky1",
+      "medium": "UR",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "8": [
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 0,
+    "books": [
+     {
+      "title": "Malhar",
+      "code": "hhml1",
+      "medium": "HI",
+      "chapters": 10
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Poorvi",
+      "code": "hepr1",
+      "medium": "EN",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 2,
+    "books": [
+     {
+      "title": "Ganita Prakash",
+      "code": "hegp1",
+      "medium": "EN",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "social-science",
+    "nameEn": "Social Science",
+    "nameHi": "सामाजिक विज्ञान",
+    "order": 3,
+    "books": [
+     {
+      "title": "Exploring Society India and Beyond",
+      "code": "hees1",
+      "medium": "EN",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 4,
+    "books": [
+     {
+      "title": "Deepakam",
+      "code": "hsde1",
+      "medium": "SA",
+      "chapters": 17
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "science",
+    "nameEn": "Science",
+    "nameHi": "विज्ञान",
+    "order": 5,
+    "books": [
+     {
+      "title": "Curiosity",
+      "code": "hecu1",
+      "medium": "EN",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "arts",
+    "nameEn": "Arts",
+    "nameHi": "कला",
+    "order": 6,
+    "books": [
+     {
+      "title": "Kriti",
+      "code": "hekr1",
+      "medium": "EN",
+      "chapters": 19
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physical-education-and-well-being",
+    "nameEn": "Physical Education and Well Being",
+    "nameHi": "शारीरिक शिक्षा और कल्याण",
+    "order": 7,
+    "books": [
+     {
+      "title": "Khel Yatra",
+      "code": "heky1",
+      "medium": "EN",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "vocational-education",
+    "nameEn": "Vocational Education",
+    "nameHi": "व्यावसायिक शिक्षा",
+    "order": 8,
+    "books": [
+     {
+      "title": "Kaushal Bodh",
+      "code": "hekb1",
+      "medium": "EN",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 9,
+    "books": [
+     {
+      "title": "Khayal",
+      "code": "huky1",
+      "medium": "UR",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "9": [
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 0,
+    "books": [
+     {
+      "title": "Beehive",
+      "code": "iebe1",
+      "medium": "EN",
+      "chapters": 9
+     },
+     {
+      "title": "Moments Supplementary Reader",
+      "code": "iemo1",
+      "medium": "EN",
+      "chapters": 9
+     },
+     {
+      "title": "Words and Expressions  1",
+      "code": "iewe1",
+      "medium": "EN",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Kshitij",
+      "code": "ihks1",
+      "medium": "HI",
+      "chapters": 13
+     },
+     {
+      "title": "Sprash",
+      "code": "ihsp1",
+      "medium": "HI",
+      "chapters": 10
+     },
+     {
+      "title": "Kritika",
+      "code": "ihkr1",
+      "medium": "HI",
+      "chapters": 3
+     },
+     {
+      "title": "Sanchayan",
+      "code": "ihsa1",
+      "medium": "HI",
+      "chapters": 4
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 2,
+    "books": [
+     {
+      "title": "Shemushi Prathmo Bhag",
+      "code": "ihsh1",
+      "medium": "HI",
+      "chapters": 10
+     },
+     {
+      "title": "Vyakaranavithi",
+      "code": "jhva1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 3,
+    "books": [
+     {
+      "title": "Mathematics",
+      "code": "iemh1",
+      "medium": "EN",
+      "chapters": 12
+     },
+     {
+      "title": "Ganit",
+      "code": "ihmh1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "science",
+    "nameEn": "Science",
+    "nameHi": "विज्ञान",
+    "order": 4,
+    "books": [
+     {
+      "title": "Science",
+      "code": "iesc1",
+      "medium": "EN",
+      "chapters": 12
+     },
+     {
+      "title": "Vigyan",
+      "code": "ihsc1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "social-science",
+    "nameEn": "Social Science",
+    "nameHi": "सामाजिक विज्ञान",
+    "order": 5,
+    "books": [
+     {
+      "title": "Democratic Politics",
+      "code": "iess4",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Loktantrik Rajniti",
+      "code": "ihss4",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Contemporary India",
+      "code": "iess1",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Samkalin Bharat",
+      "code": "ihss1",
+      "medium": "HI",
+      "chapters": 6
+     },
+     {
+      "title": "Arthashastra",
+      "code": "ihss2",
+      "medium": "HI",
+      "chapters": 4
+     },
+     {
+      "title": "Economics",
+      "code": "iess2",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "India and the Contemporary World-I",
+      "code": "iess3",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Bharat Aur Samkalin Vishwa-I",
+      "code": "ihss3",
+      "medium": "HI",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 6,
+    "books": [
+     {
+      "title": "Gulzare-e-urdu",
+      "code": "iugu1",
+      "medium": "UR",
+      "chapters": 19
+     },
+     {
+      "title": "Nawa-e-urdu",
+      "code": "iuna1",
+      "medium": "UR",
+      "chapters": 23
+     },
+     {
+      "title": "Jaan Pahechan",
+      "code": "iujp1",
+      "medium": "UR",
+      "chapters": 22
+     },
+     {
+      "title": "Door Pass",
+      "code": "iudp1",
+      "medium": "UR",
+      "chapters": 20
+     },
+     {
+      "title": "Sab Rang",
+      "code": "iusr1",
+      "medium": "UR",
+      "chapters": 10
+     },
+     {
+      "title": "Urdu ki Adabi Asnaf",
+      "code": "iuau1",
+      "medium": "UR",
+      "chapters": 40
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "health-and-physical-education",
+    "nameEn": "Health and Physical Education",
+    "nameHi": "स्वास्थ्य एवं शारीरिक शिक्षा",
+    "order": 7,
+    "books": [
+     {
+      "title": "Health and Physical Education",
+      "code": "iehp1",
+      "medium": "EN",
+      "chapters": 14
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "ict",
+    "nameEn": "ICT",
+    "nameHi": "ICT",
+    "order": 8,
+    "books": [
+     {
+      "title": "Information and Communication Technology",
+      "code": "iict1",
+      "medium": "OTHER",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "10": [
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 0,
+    "books": [
+     {
+      "title": "Mathematics",
+      "code": "jemh1",
+      "medium": "EN",
+      "chapters": 14
+     },
+     {
+      "title": "Ganit",
+      "code": "jhmh1",
+      "medium": "HI",
+      "chapters": 14
+     }
+    ],
+    "chapters": [
+     {
+      "number": 1,
+      "titleEn": "Real Numbers"
+     },
+     {
+      "number": 2,
+      "titleEn": "Polynomials"
+     },
+     {
+      "number": 3,
+      "titleEn": "Pair of Linear Equations in Two Variables"
+     },
+     {
+      "number": 4,
+      "titleEn": "Quadratic Equations"
+     },
+     {
+      "number": 5,
+      "titleEn": "Arithmetic Progressions"
+     },
+     {
+      "number": 6,
+      "titleEn": "Triangles"
+     },
+     {
+      "number": 7,
+      "titleEn": "Coordinate Geometry"
+     },
+     {
+      "number": 8,
+      "titleEn": "Introduction to Trigonometry"
+     },
+     {
+      "number": 9,
+      "titleEn": "Some Applications of Trigonometry"
+     },
+     {
+      "number": 10,
+      "titleEn": "Circles"
+     },
+     {
+      "number": 11,
+      "titleEn": "Areas Related to Circles"
+     },
+     {
+      "number": 12,
+      "titleEn": "Surface Areas and Volumes"
+     },
+     {
+      "number": 13,
+      "titleEn": "Statistics"
+     },
+     {
+      "number": 14,
+      "titleEn": "Probability"
+     }
+    ],
+    "chapterSource": [
+     "https://ncert.nic.in/textbook/pdf/jemh1ps.pdf"
+    ]
+   },
+   {
+    "key": "science",
+    "nameEn": "Science",
+    "nameHi": "विज्ञान",
+    "order": 1,
+    "books": [
+     {
+      "title": "Science",
+      "code": "jesc1",
+      "medium": "EN",
+      "chapters": 13
+     },
+     {
+      "title": "Vigyan",
+      "code": "jhsc1",
+      "medium": "HI",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 2,
+    "books": [
+     {
+      "title": "Kshitij-2",
+      "code": "jhks1",
+      "medium": "HI",
+      "chapters": 12
+     },
+     {
+      "title": "Sparsh",
+      "code": "jhsp1",
+      "medium": "HI",
+      "chapters": 14
+     },
+     {
+      "title": "Sanchayan Bhag-2",
+      "code": "jhsy1",
+      "medium": "HI",
+      "chapters": 3
+     },
+     {
+      "title": "Kritika",
+      "code": "jhkr1",
+      "medium": "HI",
+      "chapters": 3
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "social-science",
+    "nameEn": "Social Science",
+    "nameHi": "सामाजिक विज्ञान",
+    "order": 3,
+    "books": [
+     {
+      "title": "Contemporary India",
+      "code": "jess1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Samkalin Bharat",
+      "code": "jhss1",
+      "medium": "HI",
+      "chapters": 7
+     },
+     {
+      "title": "Understanding Economic Development",
+      "code": "jess2",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Arthik Vikas ki Samajh",
+      "code": "jhss2",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "India and the Contemporary World-II",
+      "code": "jess3",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Bharat Aur Samakalin Vishav-2",
+      "code": "jhss3",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Democratic Politics",
+      "code": "jess4",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Loktantrik Rajniti",
+      "code": "jhss4",
+      "medium": "HI",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 4,
+    "books": [
+     {
+      "title": "First Flight",
+      "code": "jeff1",
+      "medium": "EN",
+      "chapters": 9
+     },
+     {
+      "title": "Foot Prints Without feet Supp. Reader",
+      "code": "jefp1",
+      "medium": "EN",
+      "chapters": 9
+     },
+     {
+      "title": "Words and Expressions  2",
+      "code": "jewe2",
+      "medium": "EN",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 5,
+    "books": [
+     {
+      "title": "Shemushi",
+      "code": "jhsk1",
+      "medium": "HI",
+      "chapters": 10
+     },
+     {
+      "title": "Vyakaranavithi",
+      "code": "jhva1",
+      "medium": "HI",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 6,
+    "books": [
+     {
+      "title": "Gulzar-e-Urdu",
+      "code": "juge1",
+      "medium": "UR",
+      "chapters": 12
+     },
+     {
+      "title": "Nawa-e-Urdu",
+      "code": "june1",
+      "medium": "UR",
+      "chapters": 23
+     },
+     {
+      "title": "Jaan Pahechan",
+      "code": "jujp1",
+      "medium": "UR",
+      "chapters": 22
+     },
+     {
+      "title": "Door-Paas",
+      "code": "judp1",
+      "medium": "UR",
+      "chapters": 19
+     },
+     {
+      "title": "Sab Rang",
+      "code": "jusr1",
+      "medium": "UR",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "health-and-physical-education",
+    "nameEn": "Health and Physical Education",
+    "nameHi": "स्वास्थ्य एवं शारीरिक शिक्षा",
+    "order": 7,
+    "books": [
+     {
+      "title": "Health and Physical Education",
+      "code": "jehp1",
+      "medium": "EN",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "11": [
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 0,
+    "books": [
+     {
+      "title": "Bhaswati",
+      "code": "khsk1",
+      "medium": "HI",
+      "chapters": 11
+     },
+     {
+      "title": "Shashwati",
+      "code": "khsk2",
+      "medium": "HI",
+      "chapters": 11
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "accountancy",
+    "nameEn": "Accountancy",
+    "nameHi": "लेखाशास्त्र",
+    "order": 1,
+    "books": [
+     {
+      "title": "Financial Accounting-I",
+      "code": "keac1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Lekhashastra-I",
+      "code": "khac1",
+      "medium": "HI",
+      "chapters": 7
+     },
+     {
+      "title": "Accountancy-II",
+      "code": "keac2",
+      "medium": "EN",
+      "chapters": 2
+     },
+     {
+      "title": "Lekhashastra-II",
+      "code": "khac2",
+      "medium": "HI",
+      "chapters": 2
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "chemistry",
+    "nameEn": "Chemistry",
+    "nameHi": "रसायन विज्ञान",
+    "order": 2,
+    "books": [
+     {
+      "title": "Chemistry Part-I",
+      "code": "kech1",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Rasayan Vigyan bhag-I",
+      "code": "khch1",
+      "medium": "HI",
+      "chapters": 6
+     },
+     {
+      "title": "Chemistry Part II",
+      "code": "kech2",
+      "medium": "EN",
+      "chapters": 3
+     },
+     {
+      "title": "Rasayan Vigyan bhag-II",
+      "code": "khch2",
+      "medium": "HI",
+      "chapters": 3
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 3,
+    "books": [
+     {
+      "title": "Mathematics",
+      "code": "kemh1",
+      "medium": "EN",
+      "chapters": 14
+     },
+     {
+      "title": "Ganit",
+      "code": "khmh1",
+      "medium": "HI",
+      "chapters": 14
+     }
+    ],
+    "chapters": [
+     {
+      "number": 1,
+      "titleEn": "Sets"
+     },
+     {
+      "number": 2,
+      "titleEn": "Relations and Functions"
+     },
+     {
+      "number": 3,
+      "titleEn": "Trigonometric Functions"
+     },
+     {
+      "number": 4,
+      "titleEn": "Complex Numbers and Quadratic Equations"
+     },
+     {
+      "number": 5,
+      "titleEn": "Linear Inequalities"
+     },
+     {
+      "number": 6,
+      "titleEn": "Permutations and Combinations"
+     },
+     {
+      "number": 7,
+      "titleEn": "Binomial Theorem"
+     },
+     {
+      "number": 8,
+      "titleEn": "Sequences and Series"
+     },
+     {
+      "number": 9,
+      "titleEn": "Straight Lines"
+     },
+     {
+      "number": 10,
+      "titleEn": "Conic Sections"
+     },
+     {
+      "number": 11,
+      "titleEn": "Introduction to Three Dimensional Geometry"
+     },
+     {
+      "number": 12,
+      "titleEn": "Limits and Derivatives"
+     },
+     {
+      "number": 13,
+      "titleEn": "Statistics"
+     },
+     {
+      "number": 14,
+      "titleEn": "Probability"
+     }
+    ],
+    "chapterSource": [
+     "https://ncert.nic.in/textbook/pdf/kemh1ps.pdf"
+    ]
+   },
+   {
+    "key": "biology",
+    "nameEn": "Biology",
+    "nameHi": "जीव विज्ञान",
+    "order": 4,
+    "books": [
+     {
+      "title": "Biology",
+      "code": "kebo1",
+      "medium": "EN",
+      "chapters": 19
+     },
+     {
+      "title": "Jeev Vigyan",
+      "code": "khbo1",
+      "medium": "HI",
+      "chapters": 19
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "psychology",
+    "nameEn": "Psychology",
+    "nameHi": "मनोविज्ञान",
+    "order": 5,
+    "books": [
+     {
+      "title": "Introduction to Psychology",
+      "code": "kepy1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Manovigyan",
+      "code": "khpy1",
+      "medium": "HI",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "geography",
+    "nameEn": "Geography",
+    "nameHi": "भूगोल",
+    "order": 6,
+    "books": [
+     {
+      "title": "Fundamental of Physical Geography",
+      "code": "kegy2",
+      "medium": "EN",
+      "chapters": 14
+     },
+     {
+      "title": "Bhautique Bhugol ke Mool Sidhant",
+      "code": "khgy2",
+      "medium": "HI",
+      "chapters": 14
+     },
+     {
+      "title": "Pratical Work in Geography",
+      "code": "kegy3",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Bhugol Main Prayogatmak Karya",
+      "code": "khgy3",
+      "medium": "HI",
+      "chapters": 6
+     },
+     {
+      "title": "India Physical Environment",
+      "code": "kegy1",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Bhart Bhautik Paryabaran",
+      "code": "khgy1",
+      "medium": "HI",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "physics",
+    "nameEn": "Physics",
+    "nameHi": "भौतिकी",
+    "order": 7,
+    "books": [
+     {
+      "title": "Physics Part-I",
+      "code": "keph1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Bhautiki-I",
+      "code": "khph1",
+      "medium": "HI",
+      "chapters": 7
+     },
+     {
+      "title": "Physics Part-II",
+      "code": "keph2",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Bhautiki-II",
+      "code": "khph2",
+      "medium": "HI",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 8,
+    "books": [
+     {
+      "title": "Antra",
+      "code": "khat1",
+      "medium": "HI",
+      "chapters": 16
+     },
+     {
+      "title": "Aroh",
+      "code": "khar1",
+      "medium": "HI",
+      "chapters": 16
+     },
+     {
+      "title": "Vitan",
+      "code": "khvt1",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Antral",
+      "code": "khan1",
+      "medium": "HI",
+      "chapters": 2
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sociology",
+    "nameEn": "Sociology",
+    "nameHi": "समाजशास्त्र",
+    "order": 9,
+    "books": [
+     {
+      "title": "Introducing Sociology",
+      "code": "kesy1",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Samaj Shastra Parichay-I",
+      "code": "khsy1",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Understanding Society",
+      "code": "kesy2",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Samaj ka Bodh",
+      "code": "khsy2",
+      "medium": "HI",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 10,
+    "books": [
+     {
+      "title": "Woven Words",
+      "code": "keww1",
+      "medium": "EN",
+      "chapters": 27
+     },
+     {
+      "title": "Hornbill",
+      "code": "kehb1",
+      "medium": "EN",
+      "chapters": 14
+     },
+     {
+      "title": "Snapshots Suppl.Reader English",
+      "code": "kesp1",
+      "medium": "EN",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "political-science",
+    "nameEn": "Political Science",
+    "nameHi": "राजनीति विज्ञान",
+    "order": 11,
+    "books": [
+     {
+      "title": "Political Theory",
+      "code": "keps1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Raajneeti Sidhant",
+      "code": "khps1",
+      "medium": "HI",
+      "chapters": 8
+     },
+     {
+      "title": "India Constitution at Work",
+      "code": "keps2",
+      "medium": "EN",
+      "chapters": 10
+     },
+     {
+      "title": "Bharat ka Samvidhan Sidhant aur Vyavhar",
+      "code": "khps2",
+      "medium": "HI",
+      "chapters": 10
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "history",
+    "nameEn": "History",
+    "nameHi": "इतिहास",
+    "order": 12,
+    "books": [
+     {
+      "title": "Themes in World History",
+      "code": "kehs1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Vishwa Itihas Ke Kuch Vishay",
+      "code": "khhs1",
+      "medium": "HI",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "economics",
+    "nameEn": "Economics",
+    "nameHi": "अर्थशास्त्र",
+    "order": 13,
+    "books": [
+     {
+      "title": "Indian Economic Development",
+      "code": "keec1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Statistics for Economics",
+      "code": "kest1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Sankhyiki",
+      "code": "khst1",
+      "medium": "HI",
+      "chapters": 8
+     },
+     {
+      "title": "Bhartiya Airthryavstha Ka Vikas",
+      "code": "khec1",
+      "medium": "HI",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "business-studies",
+    "nameEn": "Business Studies",
+    "nameHi": "व्यवसाय अध्ययन",
+    "order": 14,
+    "books": [
+     {
+      "title": "Business Studies",
+      "code": "kebs1",
+      "medium": "EN",
+      "chapters": 11
+     },
+     {
+      "title": "Vyavsay Adhyanan",
+      "code": "khbs1",
+      "medium": "HI",
+      "chapters": 11
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 15,
+    "books": [
+     {
+      "title": "Nai Awaz",
+      "code": "kuna1",
+      "medium": "UR",
+      "chapters": 20
+     },
+     {
+      "title": "Dhanak",
+      "code": "kudh1",
+      "medium": "UR",
+      "chapters": 27
+     },
+     {
+      "title": "Gulistan e Adab",
+      "code": "kuga1",
+      "medium": "UR",
+      "chapters": 22
+     },
+     {
+      "title": "Khyabane Urdu",
+      "code": "kuku1",
+      "medium": "UR",
+      "chapters": 15
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "home-science",
+    "nameEn": "Home Science",
+    "nameHi": "गृह विज्ञान",
+    "order": 16,
+    "books": [
+     {
+      "title": "Human Ecology and Family Sciences Part I",
+      "code": "kehe1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Human Ecology and Family Sciences Part II",
+      "code": "kehe2",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "Manav Paristhitiki evm pariwar vigyan Bhag-I",
+      "code": "khhe1",
+      "medium": "HI",
+      "chapters": 7
+     },
+     {
+      "title": "Manav Paristhitiki evm pariwar vigyan Bhag-II",
+      "code": "khhe2",
+      "medium": "HI",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "creative-writing-and-translation",
+    "nameEn": "Creative Writing and Translation",
+    "nameHi": "सृजनात्मक लेखन और अनुवाद",
+    "order": 17,
+    "books": [
+     {
+      "title": "Srijan",
+      "code": "khsr1",
+      "medium": "HI",
+      "chapters": 4
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "fine-art",
+    "nameEn": "Fine Art",
+    "nameHi": "ललित कला",
+    "order": 18,
+    "books": [
+     {
+      "title": "An Introduction to Indian Art Part-I",
+      "code": "kefa1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Bhartiya Kala ka parichay",
+      "code": "khfa1",
+      "medium": "HI",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "informatics-practices",
+    "nameEn": "Informatics Practices",
+    "nameHi": "सूचना विज्ञान अभ्यास",
+    "order": 19,
+    "books": [
+     {
+      "title": "Informatics Practices",
+      "code": "keip1",
+      "medium": "EN",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "computer-science",
+    "nameEn": "Computer Science",
+    "nameHi": "कंप्यूटर विज्ञान",
+    "order": 20,
+    "books": [
+     {
+      "title": "Computer Science",
+      "code": "kecs1",
+      "medium": "EN",
+      "chapters": 11
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "health-and-physical-education",
+    "nameEn": "Health and Physical Education",
+    "nameHi": "स्वास्थ्य एवं शारीरिक शिक्षा",
+    "order": 21,
+    "books": [
+     {
+      "title": "Health and Physical Education",
+      "code": "kehp1",
+      "medium": "EN",
+      "chapters": 11
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "biotechnology",
+    "nameEn": "Biotechnology",
+    "nameHi": "जैव प्रौद्योगिकी",
+    "order": 22,
+    "books": [
+     {
+      "title": "Biotechnology",
+      "code": "kebt1",
+      "medium": "EN",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sangeet",
+    "nameEn": "Sangeet",
+    "nameHi": "संगीत",
+    "order": 23,
+    "books": [
+     {
+      "title": "Tabla evam Pakhawaj",
+      "code": "khtp1",
+      "medium": "HI",
+      "chapters": 8
+     },
+     {
+      "title": "Hindustani Sangeet Gayan Evam Vadan",
+      "code": "khgv1",
+      "medium": "HI",
+      "chapters": 10
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "knowledge-traditions-practices-of-india",
+    "nameEn": "Knowledge Traditions Practices of India",
+    "nameHi": "भारत की ज्ञान परंपराएँ और प्रथाएँ",
+    "order": 24,
+    "books": [
+     {
+      "title": "Knowledge Traditions Practices of India",
+      "code": "keks1",
+      "medium": "EN",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   }
+  ],
+  "12": [
+   {
+    "key": "mathematics",
+    "nameEn": "Mathematics",
+    "nameHi": "गणित",
+    "order": 0,
+    "books": [
+     {
+      "title": "Mathematics Part-I",
+      "code": "lemh1",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Mathematics Part-II",
+      "code": "lemh2",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Ganit-I",
+      "code": "lhmh1",
+      "medium": "HI",
+      "chapters": 6
+     },
+     {
+      "title": "Ganit-II",
+      "code": "lhmh2",
+      "medium": "HI",
+      "chapters": 7
+     }
+    ],
+    "chapters": [
+     {
+      "number": 1,
+      "titleEn": "Relations and Functions"
+     },
+     {
+      "number": 2,
+      "titleEn": "Inverse Trigonometric Functions"
+     },
+     {
+      "number": 3,
+      "titleEn": "Matrices"
+     },
+     {
+      "number": 4,
+      "titleEn": "Determinants"
+     },
+     {
+      "number": 5,
+      "titleEn": "Continuity and Differentiability"
+     },
+     {
+      "number": 6,
+      "titleEn": "Application of Derivatives"
+     },
+     {
+      "number": 7,
+      "titleEn": "Integrals"
+     },
+     {
+      "number": 8,
+      "titleEn": "Application of Integrals"
+     },
+     {
+      "number": 9,
+      "titleEn": "Differential Equations"
+     },
+     {
+      "number": 10,
+      "titleEn": "Vector Algebra"
+     },
+     {
+      "number": 11,
+      "titleEn": "Three Dimensional Geometry"
+     },
+     {
+      "number": 12,
+      "titleEn": "Linear Programming"
+     },
+     {
+      "number": 13,
+      "titleEn": "Probability"
+     }
+    ],
+    "chapterSource": [
+     "https://ncert.nic.in/textbook/pdf/lemh1ps.pdf",
+     "https://ncert.nic.in/textbook/pdf/lemh2ps.pdf"
+    ]
+   },
+   {
+    "key": "physics",
+    "nameEn": "Physics",
+    "nameHi": "भौतिकी",
+    "order": 1,
+    "books": [
+     {
+      "title": "Physics Part-I",
+      "code": "leph1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Physics Part-II",
+      "code": "leph2",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Bhautiki-I",
+      "code": "lhph1",
+      "medium": "HI",
+      "chapters": 8
+     },
+     {
+      "title": "Bhautiki-II",
+      "code": "lhph2",
+      "medium": "HI",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "accountancy",
+    "nameEn": "Accountancy",
+    "nameHi": "लेखाशास्त्र",
+    "order": 2,
+    "books": [
+     {
+      "title": "Accountancy-I",
+      "code": "leac1",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "Accountancy Part-II",
+      "code": "leac2",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Lekhashastra Part-I",
+      "code": "lhac1",
+      "medium": "HI",
+      "chapters": 4
+     },
+     {
+      "title": "Lekhashastra Part-II",
+      "code": "lhac2",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Computerised Accounting System",
+      "code": "leca1",
+      "medium": "EN",
+      "chapters": 4
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sanskrit",
+    "nameEn": "Sanskrit",
+    "nameHi": "संस्कृत",
+    "order": 3,
+    "books": [
+     {
+      "title": "Bhaswati",
+      "code": "lhsk1",
+      "medium": "HI",
+      "chapters": 10
+     },
+     {
+      "title": "Shaswati",
+      "code": "lhsk2",
+      "medium": "HI",
+      "chapters": 11
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "hindi",
+    "nameEn": "Hindi",
+    "nameHi": "हिंदी",
+    "order": 4,
+    "books": [
+     {
+      "title": "Antra",
+      "code": "lhat1",
+      "medium": "HI",
+      "chapters": 21
+     },
+     {
+      "title": "Aroh",
+      "code": "lhar1",
+      "medium": "HI",
+      "chapters": 15
+     },
+     {
+      "title": "Vitan",
+      "code": "lhvt1",
+      "medium": "HI",
+      "chapters": 3
+     },
+     {
+      "title": "Antral Bhag 2",
+      "code": "lhan1",
+      "medium": "HI",
+      "chapters": 3
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "english",
+    "nameEn": "English",
+    "nameHi": "अंग्रेज़ी",
+    "order": 5,
+    "books": [
+     {
+      "title": "Kaliedoscope",
+      "code": "lekl1",
+      "medium": "EN",
+      "chapters": 21
+     },
+     {
+      "title": "Flamingo",
+      "code": "lefl1",
+      "medium": "EN",
+      "chapters": 13
+     },
+     {
+      "title": "Vistas",
+      "code": "levt1",
+      "medium": "EN",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "biology",
+    "nameEn": "Biology",
+    "nameHi": "जीव विज्ञान",
+    "order": 6,
+    "books": [
+     {
+      "title": "Biology",
+      "code": "lebo1",
+      "medium": "EN",
+      "chapters": 13
+     },
+     {
+      "title": "Jeev Vigyan",
+      "code": "lhbo1",
+      "medium": "HI",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "history",
+    "nameEn": "History",
+    "nameHi": "इतिहास",
+    "order": 7,
+    "books": [
+     {
+      "title": "Themes in Indian History-I",
+      "code": "lehs1",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "Bharatiya Itihas ke kuchh Vishay-I",
+      "code": "lhhs1",
+      "medium": "HI",
+      "chapters": 4
+     },
+     {
+      "title": "Themes in Indian History-II",
+      "code": "lehs2",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "Bharatiya Itihas ke kuchh Vishay-II",
+      "code": "lhhs2",
+      "medium": "HI",
+      "chapters": 4
+     },
+     {
+      "title": "Themes in Indian History-III",
+      "code": "lehs3",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "Bharatiya Itihas ke kuchh Vishay-III",
+      "code": "lhhs3",
+      "medium": "HI",
+      "chapters": 4
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "geography",
+    "nameEn": "Geography",
+    "nameHi": "भूगोल",
+    "order": 8,
+    "books": [
+     {
+      "title": "Fundamentals of Human Geography",
+      "code": "legy1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Practical Work in Geography Part II",
+      "code": "legy3",
+      "medium": "EN",
+      "chapters": 4
+     },
+     {
+      "title": "Manav Bhugol Ke Mool Sidhant",
+      "code": "lhgy1",
+      "medium": "HI",
+      "chapters": 8
+     },
+     {
+      "title": "Bhugol main peryojnatmak pryogatmak karye",
+      "code": "lhgy3",
+      "medium": "HI",
+      "chapters": 4
+     },
+     {
+      "title": "India -People And Economy",
+      "code": "legy2",
+      "medium": "EN",
+      "chapters": 9
+     },
+     {
+      "title": "Bharat log aur arthvyasastha(Bhugol)",
+      "code": "lhgy2",
+      "medium": "HI",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "psychology",
+    "nameEn": "Psychology",
+    "nameHi": "मनोविज्ञान",
+    "order": 9,
+    "books": [
+     {
+      "title": "Psychology",
+      "code": "lepy1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Manovigyan",
+      "code": "lhpy1",
+      "medium": "HI",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sociology",
+    "nameEn": "Sociology",
+    "nameHi": "समाजशास्त्र",
+    "order": 10,
+    "books": [
+     {
+      "title": "Indian Society",
+      "code": "lesy1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Bhartiya Samaj",
+      "code": "lhsy1",
+      "medium": "HI",
+      "chapters": 7
+     },
+     {
+      "title": "Social Change and Development in India",
+      "code": "lesy2",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Bharat main Samajik Parivartan aur Vikas",
+      "code": "lhsy2",
+      "medium": "HI",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "chemistry",
+    "nameEn": "Chemistry",
+    "nameHi": "रसायन विज्ञान",
+    "order": 11,
+    "books": [
+     {
+      "title": "Chemistry-I",
+      "code": "lech1",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Chemistry-II",
+      "code": "lech2",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Rasayan vigyan bhag I",
+      "code": "lhch1",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Rasayan vigyan bhag II",
+      "code": "lhch2",
+      "medium": "HI",
+      "chapters": 5
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "political-science",
+    "nameEn": "Political Science",
+    "nameHi": "राजनीति विज्ञान",
+    "order": 12,
+    "books": [
+     {
+      "title": "Contemporary World Politics",
+      "code": "leps1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Samkalin Vishwa Rajniti",
+      "code": "lhps1",
+      "medium": "HI",
+      "chapters": 7
+     },
+     {
+      "title": "Politics in India Since Independence",
+      "code": "leps2",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Swatantra Bharat Mein Rajniti-II",
+      "code": "lhps2",
+      "medium": "HI",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "economics",
+    "nameEn": "Economics",
+    "nameHi": "अर्थशास्त्र",
+    "order": 13,
+    "books": [
+     {
+      "title": "Introductory Microeconomics",
+      "code": "leec2",
+      "medium": "EN",
+      "chapters": 5
+     },
+     {
+      "title": "Introductory Macroeconomics",
+      "code": "leec1",
+      "medium": "EN",
+      "chapters": 6
+     },
+     {
+      "title": "Vyashthi Arthshasrta",
+      "code": "lhec2",
+      "medium": "HI",
+      "chapters": 5
+     },
+     {
+      "title": "Samashty Arthshastra Ek Parichay",
+      "code": "lhec1",
+      "medium": "HI",
+      "chapters": 6
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "business-studies",
+    "nameEn": "Business Studies",
+    "nameHi": "व्यवसाय अध्ययन",
+    "order": 14,
+    "books": [
+     {
+      "title": "Business Studies-I",
+      "code": "lebs1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Vyavasai Adhyan-I",
+      "code": "lhbs1",
+      "medium": "HI",
+      "chapters": 8
+     },
+     {
+      "title": "Business Studies-II",
+      "code": "lebs2",
+      "medium": "EN",
+      "chapters": 3
+     },
+     {
+      "title": "Vyavasai Adhyan-II",
+      "code": "lhbs2",
+      "medium": "HI",
+      "chapters": 3
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "home-science",
+    "nameEn": "Home Science",
+    "nameHi": "गृह विज्ञान",
+    "order": 15,
+    "books": [
+     {
+      "title": "Human Ecology and Family Sciences Part I",
+      "code": "lehe1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Human Ecology and Family Sciences Part II",
+      "code": "lehe2",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Manav Paristhitik avam Parivar Vigyan Bhag 1",
+      "code": "lehh1",
+      "medium": "EN",
+      "chapters": 7
+     },
+     {
+      "title": "Manav Paristhitiki avam Parivar Vigyan Bhag 2",
+      "code": "lehh2",
+      "medium": "EN",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "urdu",
+    "nameEn": "Urdu",
+    "nameHi": "उर्दू",
+    "order": 16,
+    "books": [
+     {
+      "title": "Gulistan-e- Adab",
+      "code": "luga1",
+      "medium": "UR",
+      "chapters": 12
+     },
+     {
+      "title": "Khayaban-e-Urdu",
+      "code": "luku1",
+      "medium": "UR",
+      "chapters": 6
+     },
+     {
+      "title": "Nai Awaz",
+      "code": "luna1",
+      "medium": "UR",
+      "chapters": 16
+     },
+     {
+      "title": "Dhanak",
+      "code": "ludh1",
+      "medium": "UR",
+      "chapters": 12
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "creative-writing-and-translation",
+    "nameEn": "Creative Writing and Translation",
+    "nameHi": "सृजनात्मक लेखन और अनुवाद",
+    "order": 17,
+    "books": [
+     {
+      "title": "Srijan-II",
+      "code": "khsr2",
+      "medium": "HI",
+      "chapters": 4
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "fine-art",
+    "nameEn": "Fine Art",
+    "nameHi": "ललित कला",
+    "order": 18,
+    "books": [
+     {
+      "title": "An Introduction to Indian Art Part-II",
+      "code": "lefa1",
+      "medium": "EN",
+      "chapters": 8
+     },
+     {
+      "title": "Bhartiya Kala ka Itihaas Bhag 2",
+      "code": "lhfa1",
+      "medium": "HI",
+      "chapters": 8
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "computer-science",
+    "nameEn": "Computer Science",
+    "nameHi": "कंप्यूटर विज्ञान",
+    "order": 19,
+    "books": [
+     {
+      "title": "Computer Science",
+      "code": "lecs1",
+      "medium": "EN",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "informatics-practices",
+    "nameEn": "Informatics Practices",
+    "nameHi": "सूचना विज्ञान अभ्यास",
+    "order": 20,
+    "books": [
+     {
+      "title": "Informatics Practices",
+      "code": "leip1",
+      "medium": "EN",
+      "chapters": 7
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "biotechnology",
+    "nameEn": "Biotechnology",
+    "nameHi": "जैव प्रौद्योगिकी",
+    "order": 21,
+    "books": [
+     {
+      "title": "Biotechnology",
+      "code": "lebt1",
+      "medium": "EN",
+      "chapters": 13
+     }
+    ],
+    "chapters": null
+   },
+   {
+    "key": "sangeet",
+    "nameEn": "Sangeet",
+    "nameHi": "संगीत",
+    "order": 22,
+    "books": [
+     {
+      "title": "Tabla evam Pakhawaj",
+      "code": "lstp1",
+      "medium": "SA",
+      "chapters": 7
+     },
+     {
+      "title": "Hindustani Sangeet Gayan Evam Vaadan",
+      "code": "lsgv1",
+      "medium": "SA",
+      "chapters": 9
+     }
+    ],
+    "chapters": null
+   }
+  ]
+ }
+}

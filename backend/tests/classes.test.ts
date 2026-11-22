@@ -62,6 +62,22 @@ describe('catalogue', () => {
     expect(res.body.sessions.find((s: { code: string }) => s.code === '2026-27').isCurrent).toBe(true);
   });
 
+  it('has every class in the earlier sessions 2025-26 and 2024-25, with that year’s books', async () => {
+    const res = await request(app).get('/api/catalog');
+    expect(res.body.sessions.map((s: { code: string }) => s.code)).toEqual(['2026-27', '2025-26', '2024-25']);
+    for (const session of ['2025-26', '2024-25']) {
+      for (let cls = 1; cls <= 12; cls++) expect((await subjectsOf('CBSE', session, cls)).length).toBeGreaterThan(0);
+    }
+    // NCERT replaced the Class 4 maths book in 2025-26 (Math-Magic -> Math-Mela)
+    const book = async (session: string) => ((await subjectsOf('CBSE', session, 4)) as Array<{ subjectKey: string; books?: Array<{ title: string; medium: string }> }>).find((s) => s.subjectKey === 'mathematics')?.books?.find((b) => b.medium === 'EN')?.title;
+    expect(await book('2024-25')).toBe('Math-Magic');
+    expect(await book('2025-26')).toBe('Math-Mela');
+    // JAC Class 9 maths 2025-26 stays the one subject with sample lessons, not a duplicate
+    const jac9 = (await subjectsOf('JAC', '2025-26', 9)).filter((s) => s.subjectKey === 'mathematics');
+    expect(jac9).toHaveLength(1);
+    expect(jac9[0].hasLessons).toBe(true);
+  });
+
   it('shows only the subjects that belong to a class', async () => {
     const c1 = (await subjectsOf('CBSE', '2026-27', 1)).map((s) => s.subjectKey).sort();
     expect(c1).toEqual(['english', 'hindi', 'mathematics', 'urdu']);
