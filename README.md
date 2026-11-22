@@ -73,7 +73,7 @@ Many school students in India, from Class 1 to Class 12, study on a shared, low-
 
 | Principle | What it means in the app |
 |---|---|
-| **Hindi first** | Hindi by default, English one tap away. The tutor can also reply in Telugu |
+| **Hindi first** | Hindi by default, with Hinglish (Hindi in Roman letters) and English one tap away. The tutor can also reply in Telugu |
 | **Right level for every class** | The tutor teaches a Class 2 child, a Class 8 student and a Class 12 student differently, and stays inside the student's own class, board and subjects |
 | **Hints before answers** | The tutor teaches step by step instead of handing out solutions |
 | **Works on a weak network** | Lessons and practice keep working offline and sync later |
@@ -85,7 +85,7 @@ Many school students in India, from Class 1 to Class 12, study on a shared, low-
 | Feature | What the student gets | Offline |
 |---|---|:---:|
 | **Class and subject choice** | Pick class (1–12), board, session, medium, stream (11–12) and subjects. Only subjects of that class are shown. Changing class keeps earlier progress | ✗ |
-| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question, pitched at the student's class and subject. Hindi, English or Telugu | ✗ |
+| **AI tutor** | A hint first, then a step-by-step solution, then a follow-up question, pitched at the student's class and subject. Hindi, Hinglish, English or Telugu | Questions typed offline are saved and answered on reconnect |
 | **Answer checking** | A deterministic calculator re-checks the tutor's final number and shows whether it matched | ✗ |
 | **Voice tutor** | Speak the question, check and edit the transcript, then listen to the reply with play, pause, replay and stop. Typing always works as a fallback | ✗ |
 | **Photo questions** | Photograph a question from a book or notebook. The image is compressed on the phone; the student can correct the extracted text before asking | ✗ |
@@ -267,6 +267,8 @@ Generate secrets with `node -e "console.log(require('crypto').randomBytes(48).to
 | `AI_STT_MODEL` | `whisper-large-v3` | Groq Whisper model |
 | `AI_BASE_URL` | `https://api.groq.com/openai/v1` | Any OpenAI-compatible endpoint |
 | `AI_TIMEOUT_MS` | `30000` | |
+| `AI_REASONING_EFFORT` | `low` | Thinking time for `gpt-oss` and Gemini 2.5 models: `off`, `low`, `medium`, `high`. `low` gives much faster replies |
+| `AI_FALLBACK_MODEL` | `openai/gpt-oss-20b` | Second Groq model, used when the main one is rate-limited or down (each Groq model has its own limit). Then Gemini, if `GEMINI_API_KEY` is set. Empty means no fallback model |
 | `LLM_PROVIDER` | `auto` | `auto`: Groq if `AI_API_KEY` is set, else Gemini if `GEMINI_API_KEY` is set, else demo mode |
 | `GEMINI_API_KEY` | empty | From https://aistudio.google.com/apikey |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` | |
@@ -342,8 +344,9 @@ The schema lives in [`backend/src/db/schema.ts`](backend/src/db/schema.ts): 27 t
 4. The server re-grades every answer. The phone's own grading is never trusted, and future timestamps are clamped.
 5. Each record is applied **exactly once**. It is first claimed through a unique `(student, clientId)` key, so a record sent twice, even at the same moment, is reported as `DUPLICATE`.
 6. If the database is briefly unreachable, the record comes back as `RETRY` and stays queued on the phone instead of being lost.
+7. **Tutor doubts.** A question typed in the tutor while offline is queued as well. On reconnect the server asks the tutor and stores the reply, and the chat refreshes on its own. At most 3 doubts are answered per request; the rest come back as `DEFERRED` and the phone sends them straight away in the next request. A question the server had already answered (the connection dropped after the reply) is not asked twice, and a failed attempt leaves no empty conversation behind.
 
-AI features (tutor, voice, photo) always need internet, and the app says so.
+Voice and photo need internet, and the app says so.
 
 ## Security and privacy
 
@@ -363,7 +366,7 @@ The interface uses a print-style neo-brutalist look: white paper, 2 px black out
 
 | Area | What is in place |
 |---|---|
-| Language | Hindi by default, English one tap away. Archivo for Latin text, Mukta for Devanagari, Noto Sans Telugu for Telugu |
+| Language | हिंदी by default, plus Hinglish and English (toggle: हिं · Hing · En). Archivo for Latin text, Mukta for Devanagari, Noto Sans Telugu for Telugu |
 | Contrast | Text colours meet WCAG AA (4.5:1 or higher). The one lighter grey is used only for icons and separators |
 | Touch targets | Buttons, links and form controls are at least 44 px tall |
 | Small screens | Checked at 360 px width on every route with no horizontal scrolling |
@@ -383,6 +386,13 @@ Measured on the production build of the Hindi landing page, with the network thr
 | Repeat visit | served from the service worker cache |
 
 Fonts are subset and loaded only for the scripts on screen, routes are split into separate chunks, photos are compressed on the phone before upload, and chapter packs are downloaded once for offline use.
+
+Speed measures added on 2026-11-22 (the measurements above were taken before them):
+
+- **Pages open without waiting.** Once the first screen is up, every other page chunk is downloaded in the background while the phone is idle. This is skipped with Data Saver or on 2G.
+- **No cold-start wait.** The Render API sleeps when idle; the app pings `/api/health` as soon as it opens, so login and the first tutor question do not wait for it to wake.
+- **Faster tutor replies.** Reasoning models run on low effort (`AI_REASONING_EFFORT`); in one local check a short request took 535 ms instead of 828 ms. The tutor's database look-ups run in parallel before the AI call.
+- **Rate limits.** Groq's free tier allows 8,000 tokens per minute per model, and one tutor question uses about 1,200. When the limit is hit, the tutor answers with `AI_FALLBACK_MODEL`, then Gemini, instead of failing.
 
 ## API reference
 
@@ -423,7 +433,8 @@ Backend tests never touch the Turso database in `.env`. [`tests/globalSetup.ts`]
 | `backend/tests/logic.test.ts` | Calculator, answer grading, adaptive difficulty, AI answer verification, streaks |
 | `backend/tests/classes.test.ts` | Classes 1–12: catalogue and stages, subject rules per class, Class 1/5/8/10/11/12 flows, Science/Commerce/Humanities combinations, class-aware tutor prompts, changing class with history, migration backfill for existing Class 9 students, guardian consent, privacy |
 | `backend/tests/audit.test.ts` | Calculator edge cases, tutor reply structure, hint rules, question choice, atomic offline sync, account isolation |
-| `frontend/src/**/*.test.ts` | Audio encoding, offline grading, offline queue ownership and retry, Hindi error messages |
+| `backend/tests/aiFallback.test.ts` | Fallback to the second model and to Gemini on rate limits; no retry on bad requests |
+| `frontend/src/**/*.test.ts` | Audio encoding, offline grading, offline queue ownership, retry and deferred doubts, Hindi error messages, Hinglish text |
 
 ## Deployment
 
@@ -496,8 +507,8 @@ What has and has not been checked, as observed during development:
 
 | Item | Status |
 |---|---|
-| Backend: lint, 103/103 tests, production build | Passing locally (2026-11-21) |
-| Frontend: lint, 15/15 tests, production build | Passing locally (2026-11-21) |
+| Backend: lint, 113/113 tests, production build | Passing locally (2026-11-22) |
+| Frontend: lint, 21/21 tests, production build | Passing locally (2026-11-22) |
 | Migration 0001 (Classes 1–12) | Applied to a fresh database in every test run, and rehearsed on a copy shaped like production. **Not yet applied to production** |
 | Classes 1–12 screens (onboarding, class change, subject tabs, tutor subject) | Type-checked and built; **not yet checked in a browser or on a phone** |
 | Turso database: migration, seed, health check, login and curriculum API | Verified against a live Turso database (2026-11-21) |
@@ -516,6 +527,8 @@ What has and has not been checked, as observed during development:
 - **Curriculum alignment.** JAC's current syllabus and CBSE's own scheme of studies were not checked against official documents; ICSE is not available. Chapter titles are shown in English (the Hindi titles were not read from the Hindi books).
 - **Guardian consent.** Students declare that a parent or guardian agreed, and a linked parent can confirm it. This is not a verified-consent process.
 - **Telugu.** Lessons and questions are in Hindi and English only. Telugu is supported in tutor replies, not in lesson content.
+- **Hinglish.** The app text comes from a fixed dictionary ([`frontend/src/lib/hinglish.ts`](frontend/src/lib/hinglish.ts)); any text missing from it shows in English. Lessons, questions and the privacy and terms pages show in English, because the content exists only in Hindi and English. Tutor replies are written by the AI in Hinglish.
+- **AI rate limits.** On Groq's free tier, many students asking at once can still exhaust both models. Set `GEMINI_API_KEY` or use a paid Groq tier for a pilot. Replies arrive in one piece (no streaming yet).
 - **Password reset.** Students give no email address, so there is no self-service reset.
 - **Answer checking.** The calculator confirms only the final number of arithmetic or one-variable linear answers. It does not check reasoning or geometry proofs.
 - **Device voices.** Without a Sarvam key, read-aloud depends on the device's installed voices. Browser speech recognition needs internet and works best in Chrome on Android.
@@ -536,6 +549,8 @@ Planned next steps, taken from the gaps above:
 - [ ] Live testing of Sarvam speech and the Gemini fallback
 - [ ] A guardian- or teacher-assisted password reset that does not require a student email
 - [ ] Commit the browser journey tests to the repository
+- [ ] Stream tutor replies so the first words appear sooner
+- [ ] Native-speaker review of the Hinglish text
 - [ ] Legal review of the privacy policy and terms (DPDP Act 2023) and a project licence
 
 ## Project structure
@@ -569,7 +584,7 @@ Issues and pull requests are welcome.
 2. Follow the [Quick start](#quick-start) to run both apps locally against your own Turso database.
 3. For schema changes, edit `backend/src/db/schema.ts` and generate a migration with `npm run db:generate`. Never edit an applied migration.
 4. Before opening a pull request, run lint, tests and build in both apps (see [Testing](#testing)).
-5. Keep student data minimal, keep secrets out of the frontend, and write any new user-facing text in both Hindi and English.
+5. Keep student data minimal, keep secrets out of the frontend, and write any new user-facing text in both Hindi and English, and add its Hinglish to `frontend/src/lib/hinglish.ts`.
 
 ## Credits and licences
 
