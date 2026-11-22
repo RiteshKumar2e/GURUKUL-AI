@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Camera, History, Mic, Plus, Send, Trash2 } from 'lucide-react';
 import { useLang } from '@/context/LanguageContext';
 import { useToast } from '@/context/ToastContext';
-import { useCurriculum, useDocumentTitle, useHealth, useOnline } from '@/hooks';
+import { useCurriculum, useDocumentTitle, useHealth, useOnline, useSyncState } from '@/hooks';
 import { syncManager } from '@/lib/sync';
 import { api, ApiError } from '@/services/api';
 import type { Conversation } from '@/types/api';
@@ -51,6 +51,12 @@ export default function Tutor() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [conv.data?.messages?.length, pending]);
 
+  // The saved-offline notice goes once a sync has delivered the queued questions
+  const syncState = useSyncState();
+  useEffect(() => {
+    if (syncState.lastResult && syncState.lastResult.applied > 0 && syncState.pending === 0) setNotice(null);
+  }, [syncState.lastResult, syncState.pending]);
+
   // Clear the one-time ?q= prefill from the URL once it is in the box
   useEffect(() => {
     if (params.get('q')) {
@@ -76,6 +82,7 @@ export default function Tutor() {
     setText('');
     try {
       const res = await ask.mutateAsync({ conversationId: id, content: c, intent, topicSlug, subjectSlug, language: lang === 'hi' ? 'HI' : 'EN' });
+      setNotice(null);
       if (!id) navigate(`/app/tutor/${res.conversationId}`, { replace: true });
     } catch (e) {
       // Network failure (no HTTP status): keep the question on the phone instead of losing it

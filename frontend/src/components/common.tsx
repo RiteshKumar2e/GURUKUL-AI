@@ -90,12 +90,12 @@ export function OfflineBanner() {
   }[state];
   const detail = {
     offline:
-      tx('डाउनलोड किए अध्याय और अभ्यास चलते रहेंगे। AI ट्यूटर, आवाज़ और फ़ोटो के लिए इंटरनेट चाहिए।', 'Downloaded chapters and practice still work. The AI tutor, voice and photo need internet.') +
-      (pending > 0 ? tx(` ${pending} उत्तर फ़ोन पर सुरक्षित हैं।`, ` ${pending} answer(s) saved on this phone.`) : ''),
-    syncing: tx(`${pending} उत्तर सर्वर पर भेजे जा रहे हैं।`, `Sending ${pending} answer(s) to the server.`),
-    pending: tx(`${pending} उत्तर सर्वर पर भेजने बाकी हैं।`, `${pending} answer(s) waiting to be sent.`),
-    retry: tx(`${pending} उत्तर फ़ोन पर सुरक्षित हैं, पर अभी भेजे नहीं जा सके।`, `${pending} answer(s) are safe on this phone but could not be sent yet.`),
-    done: tx(`${lastResult?.applied ?? 0} उत्तर सर्वर पर पहुँच गए। प्रगति अपडेट हो गई।`, `${lastResult?.applied ?? 0} answer(s) reached the server. Progress updated.`),
+      tx('डाउनलोड किए अध्याय और अभ्यास चलते रहेंगे। ट्यूटर से पूछे सवाल नेटवर्क आने पर भेजे जाएँगे। आवाज़ और फ़ोटो के लिए इंटरनेट चाहिए।', 'Downloaded chapters and practice still work. Questions for the tutor are sent when you are back online. Voice and photo need internet.') +
+      (pending > 0 ? tx(` ${pending} उत्तर/सवाल फ़ोन पर सुरक्षित हैं।`, ` ${pending} answer(s)/question(s) saved on this phone.`) : ''),
+    syncing: tx(`${pending} उत्तर/सवाल सर्वर पर भेजे जा रहे हैं।`, `Sending ${pending} answer(s)/question(s) to the server.`),
+    pending: tx(`${pending} उत्तर/सवाल सर्वर पर भेजने बाकी हैं।`, `${pending} answer(s)/question(s) waiting to be sent.`),
+    retry: tx(`${pending} उत्तर/सवाल फ़ोन पर सुरक्षित हैं, पर अभी भेजे नहीं जा सके।`, `${pending} answer(s)/question(s) are safe on this phone but could not be sent yet.`),
+    done: tx(`${lastResult?.applied ?? 0} उत्तर/सवाल सर्वर पर पहुँच गए। प्रगति और ट्यूटर के जवाब अपडेट हो गए।`, `${lastResult?.applied ?? 0} answer(s)/question(s) reached the server. Progress and tutor replies updated.`),
   }[state];
 
   return (

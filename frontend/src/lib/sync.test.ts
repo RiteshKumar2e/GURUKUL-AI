@@ -56,6 +56,33 @@ describe('offline sync queue', () => {
     expect(await syncManager.pendingCount()).toBe(0);
   });
 
+  it('sends deferred tutor doubts again in the same flush until all are answered', async () => {
+    syncManager.setOwner('s');
+    for (let i = 0; i < 5; i++) await syncManager.queueDoubt({ content: `q${i}`, intent: 'hint' });
+    // Server answers two doubts per request and defers the rest
+    apiMock.mockImplementation(async (_p: string, o: { body: { records: Array<{ clientId: string }> } }) => {
+      const results = o.body.records.map((r, i) => (i < 2 ? { clientId: r.clientId, status: 'APPLIED' } : { clientId: r.clientId, status: 'RETRY', error: 'DEFERRED' }));
+      return { results, applied: Math.min(2, o.body.records.length), rejected: 0 };
+    });
+    const res = await syncManager.flush();
+    expect(apiMock).toHaveBeenCalledTimes(3);
+    expect(res?.applied).toBe(5);
+    expect(store.size).toBe(0);
+  });
+
+  it('stops when a round answers nothing and keeps the doubts queued', async () => {
+    syncManager.setOwner('s');
+    await syncManager.queueDoubt({ content: 'q', intent: 'hint' });
+    apiMock.mockImplementation(async (_p: string, o: { body: { records: Array<{ clientId: string }> } }) => ({
+      results: o.body.records.map((r) => ({ clientId: r.clientId, status: 'RETRY', error: 'DEFERRED' })),
+      applied: 0,
+      rejected: 0,
+    }));
+    await syncManager.flush();
+    expect(apiMock).toHaveBeenCalledTimes(1);
+    expect(store.size).toBe(1);
+  });
+
   it('keeps RETRY records queued and settles the rest', async () => {
     syncManager.setOwner('s');
     await syncManager.queueAnswer('q1', '1');

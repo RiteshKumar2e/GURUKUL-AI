@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { db, isTransient, withRetry } from '../../db/client';
 import { syncRecords } from '../../db/schema';
 import { curriculumRepository } from '../../repositories/curriculumRepository';
+import { tutorRepository } from '../../repositories/tutorRepository';
 import { adaptiveService } from '../adaptive-learning/adaptiveService';
 import { tutorService } from '../tutor/tutorService';
 
@@ -10,7 +11,62 @@ export type SyncInput =
   | { clientId: string; kind: 'lesson-complete'; createdAt: string; payload: { topicSlug: string } }
   | { clientId: string; kind: 'doubt'; createdAt: string; payload: { content: string; intent: 'hint' | 'solution' | 'explain' | 'check'; language?: 'HI' | 'EN' | 'TE'; conversationId?: string; subjectSlug?: string; topicSlug?: string } };
 
-type SyncResult = { clientId: string; status: 'APPLIED' | 'DUPLICATE' | 'REJECTED' | 'RETRY'; error?: string; isCorrect?: boolean };
+type DoubtPayload = Extract<SyncInput, { kind: 'doubt' }>['payload'];
+
+/** AI answers per /sync request. Later doubts are returned as RETRY/DEFERRED and sent again. */
+export const MAX_DOUBTS_PER_SYNC = 3;
+
+/**
+ * Answers one offline doubt without ever storing it twice.
+ * - The question may already have reached the server (the connection dropped after the server
+ *   answered). If the conversation already holds this question with a reply, nothing is asked again.
+ * - A question stored without a reply (a failed earlier attempt) is removed before asking again.
+ * - A conversation created here is deleted again if answering fails, so a retry never leaves an
+ *   empty extra conversation behind.
+ */
+async function applyDoubt(studentId: string, p: DoubtPayload) {
+  const content = p.content.trim();
+  /** 'answered' when this exact question is the conversation's last one and has a reply. */
+  const lastQuestion = async (conversationId: string) => {
+    const conv = await tutorRepository.findOwned(studentId, conversationId);
+    if (!conv) return null;
+    const msgs = conv.messages;
+    const lastUser = [...msgs].reverse().find((m) => m.role === 'USER');
+    if (!lastUser || lastUser.content !== content) return { conv, state: 'other' as const };
+    if (msgs.indexOf(lastUser) < msgs.length - 1) return { conv, state: 'answered' as const };
+    // Stored without a reply by a failed earlier attempt: remove it so it isn't stored twice
+    await tutorRepository.deleteMessage(lastUser.id);
+    return { conv, state: 'other' as const };
+  };
+
+  if (p.conversationId) {
+    const found = await lastQuestion(p.conversationId);
+    if (!found) throw new RejectError('Conversation not found');
+    if (found.state === 'answered') return;
+    await tutorService.ask(studentId, p.conversationId, { content, intent: p.intent, language: p.language });
+    return;
+  }
+  // New conversation: the online request may have created and answered it before the
+  // connection dropped. The newest one-question conversation with this question means done.
+  const [newest] = await tutorRepository.list(studentId);
+  if (newest && newest._count.messages === 2 && (await lastQuestion(newest.id))?.state === 'answered') return;
+  let created: { id: string };
+  try {
+    created = await tutorService.create(studentId, { mode: 'TEXT', subjectSlug: p.subjectSlug, topicSlug: p.topicSlug });
+  } catch (e) {
+    // Subject or topic no longer belongs to the student: permanent, don't retry
+    if ((e as { status?: number }).status === 400 || (e as { status?: number }).status === 404) throw new RejectError((e as Error).message);
+    throw e;
+  }
+  try {
+    await tutorService.ask(studentId, created.id, { content, intent: p.intent, language: p.language });
+  } catch (e) {
+    await tutorRepository.remove(studentId, created.id).catch(() => undefined);
+    throw e;
+  }
+}
+
+type SyncResult ={ clientId: string; status: 'APPLIED' | 'DUPLICATE' | 'REJECTED' | 'RETRY'; error?: string; isCorrect?: boolean };
 
 /**
  * Applies records queued on the device while offline.
@@ -28,6 +84,7 @@ export const syncService = {
   async apply(studentId: string, records: SyncInput[]) {
     const results: SyncResult[] = [];
     let changed = false;
+    let doubtsAnswered = 0;
 
     const sorted = [...records].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
     for (const rec of sorted) {
@@ -77,16 +134,16 @@ export const syncService = {
             await tx.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId));
           });
         } else if (rec.kind === 'doubt') {
-          // A doubt is answered by the same tutor service as an online question, so the reply is
-          // generated and stored server-side. It is not wrapped in a transaction: ask() writes its own messages.
-          const p = rec.payload;
-          let conversationId = p.conversationId;
-          if (!conversationId) {
-            const created = await tutorService.create(studentId, { mode: 'TEXT', subjectSlug: p.subjectSlug, topicSlug: p.topicSlug });
-            conversationId = created.id;
+          // Each doubt is one AI call. Answer only a few per request; the rest stay queued on the
+          // device (RETRY + DEFERRED) and go in the next request, so one sync can't run up cost or time out.
+          if (doubtsAnswered >= MAX_DOUBTS_PER_SYNC) {
+            await db.delete(syncRecords).where(and(eq(syncRecords.id, claimId), eq(syncRecords.status, 'PENDING')));
+            results.push({ clientId: rec.clientId, status: 'RETRY', error: 'DEFERRED' });
+            continue;
           }
-          await tutorService.ask(studentId, conversationId, { content: p.content, intent: p.intent, language: p.language });
-          await db.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId));
+          doubtsAnswered++;
+          await applyDoubt(studentId, rec.payload);
+          await withRetry(() => db.update(syncRecords).set({ status: 'APPLIED', processedAt: new Date() }).where(eq(syncRecords.id, claimId)));
         } else {
           throw new RejectError('Unknown record kind');
         }

@@ -10,6 +10,7 @@ import { PublicLayout } from './layouts/PublicLayout';
 import { AppLayout } from './layouts/AppLayout';
 import { usePageAnalytics } from './hooks';
 import { ApiError } from './services/api';
+import { syncManager } from './lib/sync';
 import { useEffect } from 'react';
 
 const Landing = lazy(() => import('./pages/Landing'));
@@ -47,6 +48,14 @@ const queryClient = new QueryClient({
       retry: (count, err) => count < 1 && !(err instanceof ApiError && err.status >= 400 && err.status < 500),
     },
   },
+});
+
+// After a sync stores offline work (answers, lessons, tutor replies), refetch so every screen shows it
+let lastSyncSeen = 0;
+syncManager.subscribe(({ lastResult }) => {
+  if (!lastResult || lastResult.at === lastSyncSeen) return;
+  lastSyncSeen = lastResult.at;
+  if (lastResult.applied > 0) void queryClient.invalidateQueries();
 });
 
 function Loading() {

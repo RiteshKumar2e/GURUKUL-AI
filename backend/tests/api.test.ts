@@ -146,6 +146,45 @@ describe('learning flow', () => {
     expect(found).toBe(true);
   });
 
+  it('answers at most a few doubts per sync and defers the rest', async () => {
+    const auth = { Authorization: `Bearer ${student.token}` };
+    const records = Array.from({ length: 5 }, (_, i) => ({ clientId: `${prefix}-cap-${i}`, kind: 'doubt', createdAt: new Date(Date.now() - (5 - i) * 1000).toISOString(), payload: { content: `${i + 2} + ${i + 3} कितना है?`, intent: 'hint' } }));
+    const first = await request(app).post('/api/sync').set(auth).send({ records });
+    expect(first.status).toBe(200);
+    expect(first.body.applied).toBe(3);
+    const deferred = first.body.results.filter((r: { status: string; error?: string }) => r.status === 'RETRY' && r.error === 'DEFERRED');
+    expect(deferred).toHaveLength(2);
+    // The deferred ones are sent again (the device keeps them queued) and get answered
+    const second = await request(app).post('/api/sync').set(auth).send({ records });
+    expect(second.body.applied).toBe(2);
+    expect(second.body.duplicates).toBe(3);
+  });
+
+  it('does not ask a doubt twice when the online request already got an answer', async () => {
+    const auth = { Authorization: `Bearer ${student.token}` };
+    const content = '9 × 8 कितना है?';
+    const conv = await request(app).post('/api/tutor/conversations').set(auth).send({});
+    const online = await request(app).post(`/api/tutor/conversations/${conv.body.id}/messages`).set(auth).send({ content, intent: 'hint' });
+    expect(online.status).toBe(200);
+    // The connection dropped after the server answered, so the phone queued the same question
+    const res = await request(app)
+      .post('/api/sync')
+      .set(auth)
+      .send({ records: [{ clientId: `${prefix}-dedupe-1`, kind: 'doubt', createdAt: new Date().toISOString(), payload: { content, intent: 'hint', conversationId: conv.body.id } }] });
+    expect(res.body.applied).toBe(1);
+    const detail = await request(app).get(`/api/tutor/conversations/${conv.body.id}`).set(auth);
+    expect(detail.body.messages.filter((m: { content: string; role: string }) => m.role === 'USER' && m.content === content)).toHaveLength(1);
+    expect(detail.body.messages).toHaveLength(2);
+  });
+
+  it('rejects a doubt for a conversation that is not the student’s', async () => {
+    const res = await request(app)
+      .post('/api/sync')
+      .set('Authorization', `Bearer ${student.token}`)
+      .send({ records: [{ clientId: `${prefix}-badconv-1`, kind: 'doubt', createdAt: new Date().toISOString(), payload: { content: 'x', intent: 'hint', conversationId: 'not-a-real-conversation' } }] });
+    expect(res.body.rejected).toBe(1);
+  });
+
 
   it('answers in demo mode honestly when no AI key is set', async () => {
     const conv = await request(app).post('/api/tutor/conversations').set('Authorization', `Bearer ${student.token}`).send({});

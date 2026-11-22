@@ -11,6 +11,8 @@ export interface SyncState {
 }
 
 type Listener = (state: SyncState) => void;
+/** Upper bound on back-to-back /sync requests in one flush (each answers a few tutor doubts). */
+const MAX_ROUNDS = 20;
 const listeners = new Set<Listener>();
 let syncing = false;
 let failed = false;
@@ -85,7 +87,7 @@ export const syncManager = {
   async flush(): Promise<{ applied: number; rejected: number } | null> {
     if (syncing || !navigator.onLine || !tokenStore.get() || !owner) return null;
     const sendingFor = owner;
-    const records = await offlineDb.queue(sendingFor);
+    let records = await offlineDb.queue(sendingFor);
     if (records.length === 0) return null;
     syncing = true;
     await emit();
@@ -93,17 +95,32 @@ export const syncManager = {
       let applied = 0;
       let rejected = 0;
       let retry = 0;
-      for (let i = 0; i < records.length; i += 100) {
-        const batch = records.slice(i, i + 100);
-        const res = await api<{ results: Array<{ clientId: string; status: string }>; applied: number; rejected: number }>('/sync', {
-          body: { records: batch.map(({ clientId, kind, createdAt, payload }) => ({ clientId, kind, createdAt, payload })) },
-        });
-        // Applied, duplicate and rejected records are settled. RETRY (server database briefly
-        // unavailable) and network failures stay queued for the next attempt.
-        await offlineDb.removeFromQueue(res.results.filter((r) => r.status !== 'RETRY').map((r) => r.clientId));
-        applied += res.applied;
-        rejected += res.rejected;
-        retry += res.results.filter((r) => r.status === 'RETRY').length;
+      // The server answers only a few tutor doubts per request and returns the rest as DEFERRED.
+      // Those are sent again straight away; a round that settles nothing ends the loop.
+      for (let round = 0; round < MAX_ROUNDS && records.length > 0; round++) {
+        let deferred = 0;
+        let settled = 0;
+        retry = 0;
+        for (let i = 0; i < records.length; i += 100) {
+          const batch = records.slice(i, i + 100);
+          const res = await api<{ results: Array<{ clientId: string; status: string; error?: string }>; applied: number; rejected: number }>('/sync', {
+            body: { records: batch.map(({ clientId, kind, createdAt, payload }) => ({ clientId, kind, createdAt, payload })) },
+          });
+          // Applied, duplicate and rejected records are settled. RETRY (server database briefly
+          // unavailable, or a deferred doubt) and network failures stay queued.
+          const done = res.results.filter((r) => r.status !== 'RETRY').map((r) => r.clientId);
+          await offlineDb.removeFromQueue(done);
+          settled += done.length;
+          applied += res.applied;
+          rejected += res.rejected;
+          deferred += res.results.filter((r) => r.status === 'RETRY' && r.error === 'DEFERRED').length;
+          retry += res.results.filter((r) => r.status === 'RETRY' && r.error !== 'DEFERRED').length;
+        }
+        if (deferred === 0 || settled === 0 || owner !== sendingFor) {
+          retry += deferred;
+          break;
+        }
+        records = await offlineDb.queue(sendingFor);
       }
       failed = retry > 0;
       lastResult = { applied, rejected, at: Date.now() };
